@@ -4473,6 +4473,77 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       opacity: 0.85;
     }
     .estado-card-value.bump { animation: countBump 0.5s cubic-bezier(.34,1.56,.64,1); }
+
+    /* ===== Pestaña Inconsistencias (rediseño) ===== */
+    .incon-header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px 20px; margin: 4px 14px 18px;
+      background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.03));
+      border: 1px solid rgba(245,166,35,0.25);
+      border-radius: 14px;
+    }
+    .incon-header-icon {
+      width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #F5A623, #E2001A); color: #fff;
+      box-shadow: 0 4px 14px rgba(226,0,26,0.25);
+    }
+    .incon-header-icon .material-symbols-outlined { font-size: 26px; }
+    .incon-header h2 { margin: 0 0 2px; font-size: 19px; font-weight: 700; color: var(--text); }
+    .incon-header p { margin: 0; font-size: 12.5px; color: var(--text-light); }
+    .incon-badge {
+      margin-left: auto; text-align: center; min-width: 64px;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 8px 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .incon-badge span { display: block; font-size: 24px; font-weight: 800; color: #E2001A; line-height: 1; font-variant-numeric: tabular-nums; }
+    .incon-badge small { font-size: 9.5px; color: var(--text-light); text-transform: uppercase; letter-spacing: .06em; }
+    .incon-badge.zero span { color: #1F7A4E; }
+
+    .incon-card {
+      margin: 0 14px 18px; background: var(--card-bg);
+      border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      animation: sectionFromRight .3s ease;
+    }
+    .incon-card-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(226,0,26,0.05), transparent);
+    }
+    .incon-card-head .material-symbols-outlined { font-size: 22px; color: #E2001A; }
+    .incon-card-head h3 { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--text); }
+    .incon-card-head p { margin: 2px 0 0; font-size: 11.5px; color: var(--text-light); }
+    .incon-card thead th {
+      text-align: left; padding: 10px 14px; font-size: 12px; font-weight: 700;
+      color: var(--text); background: var(--table-head-bg);
+      border-bottom: 2px solid var(--border);
+    }
+    .incon-card tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+    .incon-card tbody tr { transition: background .15s ease; }
+    .incon-card tbody tr:hover { background: var(--hover-bg); }
+
+    /* Estado vacío con check animado */
+    .incon-empty { padding: 56px 20px; text-align: center; }
+    .incon-empty h2 { margin: 18px 0 8px; font-size: 22px; font-weight: 700; color: var(--text); }
+    .incon-empty p { font-size: 14px; color: var(--text-light); margin: 0 auto; max-width: 460px; line-height: 1.5; }
+    .incon-empty-check svg { width: 84px; height: 84px; }
+    .incon-empty-check .ic-circle { stroke: #1F7A4E; stroke-width: 3; stroke-dasharray: 151; stroke-dashoffset: 151; animation: icCircle .6s cubic-bezier(.65,0,.45,1) forwards; }
+    .incon-empty-check .ic-check { stroke: #1F7A4E; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 48; stroke-dashoffset: 48; animation: icCheck .35s cubic-bezier(.65,0,.45,1) .5s forwards; }
+    @keyframes icCircle { to { stroke-dashoffset: 0; } }
+    @keyframes icCheck { to { stroke-dashoffset: 0; } }
+    @media (prefers-reduced-motion: reduce) {
+      .incon-empty-check .ic-circle, .incon-empty-check .ic-check { animation: none; stroke-dashoffset: 0; }
+      .incon-card { animation: none; }
+    }
+
+    /* Cards de estado del tab Stock/Garantía: compactas y responsivas */
+    .garantia-estado-grid .estado-card { padding: 14px !important; min-height: 0 !important; }
+    .garantia-estado-grid .estado-card svg[viewBox="0 0 64 64"] { width: 34px !important; height: 34px !important; }
+    .garantia-estado-grid .estado-card .estado-num,
+    .garantia-estado-grid .estado-card > div:last-child { font-size: 30px !important; }
+    @media (max-width: 900px) { .garantia-estado-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+    @media (max-width: 520px) { .garantia-estado-grid { grid-template-columns: 1fr !important; } }
     @keyframes countBump {
       0%   { transform: scale(1); }
       40%  { transform: scale(1.18); }
@@ -9585,25 +9656,42 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       <!-- INCONSISTENCIAS TAB -->
       <div id="inconsistencias" class="section">
+        <!-- ENCABEZADO -->
+        <div class="incon-header">
+          <span class="incon-header-icon"><span class="material-symbols-outlined">rule</span></span>
+          <div>
+            <h2>Auditoría de Datos</h2>
+            <p>Registros que requieren tu atención para mantener la calidad de la información.</p>
+          </div>
+          <div class="incon-badge" id="incon-count-badge"><span id="incon-count">0</span><small>pendientes</small></div>
+        </div>
+
         <!-- ESTADO SIN PROBLEMAS -->
-        <div id="inconsistencias-empty-state" style="padding: 40px 16px; text-align: center; display: none;">
-          <div style="font-size: 64px; margin-bottom: 16px;">✅</div>
-          <h2 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 600;">¡Todo bien!</h2>
-          <p style="font-size: 14px; color: var(--text-light); margin: 0;">No hay inconsistencias detectadas en los datos cargados. Todos los equipos están correctamente mapeados a sus plazas.</p>
+        <div id="inconsistencias-empty-state" class="incon-empty" style="display: none;">
+          <div class="incon-empty-check">
+            <svg viewBox="0 0 52 52"><circle class="ic-circle" cx="26" cy="26" r="24" fill="none"/><path class="ic-check" fill="none" d="M14 27l8 8 16-16"/></svg>
+          </div>
+          <h2>¡Todo en orden!</h2>
+          <p>No hay inconsistencias detectadas. Todos los equipos están correctamente mapeados a sus plazas.</p>
         </div>
 
         <!-- TABLA DE PROBLEMAS -->
-        <div id="plaza-issues-section" style="padding: 16px;">
-          <h2 style="margin-top: 0;">⚠️ Equipos sin plaza identificada</h2>
-          <p style="color: var(--text-light);">Estos registros no pudieron mapearse automáticamente a ninguna plaza conocida. Asigna su plaza manualmente:</p>
+        <div id="plaza-issues-section" class="incon-card">
+          <div class="incon-card-head">
+            <span class="material-symbols-outlined">wrong_location</span>
+            <div>
+              <h3>Equipos sin plaza identificada</h3>
+              <p>No se pudieron mapear automáticamente. Asigna su plaza manualmente:</p>
+            </div>
+          </div>
           <div class="table-wrapper">
             <table style="width: 100%; border-collapse: collapse;">
               <thead>
-                <tr style="background: var(--table-head-bg);">
-                  <th style="text-align: left; padding: 8px; border-bottom: 1px solid var(--border);">Friendly Name</th>
-                  <th style="text-align: left; padding: 8px; border-bottom: 1px solid var(--border);">Last Name (raw)</th>
-                  <th style="text-align: left; padding: 8px; border-bottom: 1px solid var(--border);">Tienda derivada</th>
-                  <th style="text-align: left; padding: 8px; border-bottom: 1px solid var(--border);">Asignar Plaza</th>
+                <tr>
+                  <th>Friendly Name</th>
+                  <th>Last Name (raw)</th>
+                  <th>Tienda derivada</th>
+                  <th>Asignar Plaza</th>
                 </tr>
               </thead>
               <tbody id="plaza-issues-table">
@@ -9631,8 +9719,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <span class="stock-banner-text"><strong>Plaza activa:</strong> <span id="garantia-plaza-label">Todas (región)</span> — los conteos se filtran a esta plaza.</span>
           </div>
 
-          <!-- ESTADOS — count cards (4 columnas responsivo) -->
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:28px;">
+          <!-- ESTADOS — count cards (4 columnas uniformes) -->
+          <div class="garantia-estado-grid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:24px;">
             
             <!-- ROBO -->
             <div class="estado-card robo" style="border:1px solid rgba(179,38,30,0.2); background:linear-gradient(135deg, #FFFFFF 0%, rgba(179,38,30,0.04) 100%); padding:18px; border-radius:12px; position:relative; overflow:hidden;">
@@ -15351,9 +15439,20 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var emptyState = document.getElementById('inconsistencias-empty-state');
       if (!section) return;
 
+      // Actualizar badge de conteo del encabezado
+      var badge = document.getElementById('incon-count-badge');
+      var countEl = document.getElementById('incon-count');
+      if (countEl) countEl.textContent = issues.length;
+      if (badge) badge.classList.toggle('zero', issues.length === 0);
+
       if (issues.length === 0) {
         section.style.display = 'none';
-        if (emptyState) emptyState.style.display = 'block';
+        if (emptyState) {
+          emptyState.style.display = 'block';
+          // Reiniciar la animación del check
+          var chk = emptyState.querySelector('.incon-empty-check svg');
+          if (chk) { var c = chk.cloneNode(true); chk.parentNode.replaceChild(c, chk); }
+        }
         return;
       }
       section.style.display = 'block';
