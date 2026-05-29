@@ -154,7 +154,7 @@
       box-shadow: 2px 0 8px rgba(0,0,0,0.15);
       transform: translateX(-100%);
       transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease-out;
-      z-index: 999;
+      z-index: 1200;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -471,7 +471,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s;
-      z-index: 998;
+      z-index: 1150;
     }
 
     .sidebar-backdrop.open {
@@ -1407,10 +1407,14 @@
     /* === DASHBOARDS MEJORADOS - MÁS ANIMADOS === */
     .dashboards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: 1fr;            /* filas de igual altura: alineación pareja */
+      gap: 20px;
       padding: 0;
+      align-items: stretch;
     }
+    /* Si queda una tarjeta sola al final (total impar), ocupa todo el ancho: sin huecos */
+    .dashboards-grid > .dashboard-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
     .dashboard-card {
       background: var(--card-bg);
@@ -4392,24 +4396,26 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .stock-banner-icon .material-symbols-outlined { font-size: 20px; }
     .stock-banner-text strong { font-weight: 700; }
 
-    /* Grid de 4 status cards */
+    /* Grid de 4 status cards — 4 columnas uniformes (compactas) */
     .estado-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       margin-bottom: 18px;
     }
+    @media (max-width: 900px) { .estado-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .estado-grid { grid-template-columns: 1fr; } }
     .estado-card {
       position: relative;
-      padding: 14px 16px;
+      padding: 12px 14px;
       border-radius: 12px;
       border: 1px solid;
       background: var(--card-bg);
       cursor: default;
       overflow: hidden;
       transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
-      display: flex; flex-direction: column; gap: 6px;
-      min-height: 90px;
+      display: flex; flex-direction: column; gap: 5px;
+      min-height: 74px;
     }
     .estado-card::before {
       content: "";
@@ -4453,7 +4459,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       flex-shrink: 0;
     }
     .estado-card-value {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 700;
       color: var(--ec-accent);
       line-height: 1;
