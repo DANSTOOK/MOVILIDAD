@@ -6568,6 +6568,25 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     /* ============ LEAFLET MAP CUSTOM STYLES ============ */
     #leaflet-map { font-family: 'Segoe UI', Arial, sans-serif; }
+
+    /* Chips reactivos de plaza bajo el mapa */
+    .map-plaza-chips {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px;
+    }
+    @media (max-width: 760px) { .map-plaza-chips { grid-template-columns: repeat(2, 1fr); } }
+    .map-plaza-chip {
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 8px;
+      padding: 10px 12px; border-radius: 12px; cursor: pointer; text-align: left;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-left: 4px solid var(--chip-color, #999);
+      transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+    }
+    .map-plaza-chip:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+    .map-plaza-chip:active { transform: translateY(-1px); }
+    .mpc-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--chip-color, #999); box-shadow: 0 0 0 3px color-mix(in srgb, var(--chip-color, #999) 22%, transparent); }
+    .mpc-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mpc-pct { font-size: 15px; font-weight: 800; color: var(--chip-color, #333); font-variant-numeric: tabular-nums; grid-row: 1 / 3; }
+    .mpc-meta { grid-column: 1 / 3; font-size: 10px; color: var(--text-light); }
     .ref-tooltip {
       background: rgba(255,255,255,0.9) !important;
       border: 1px solid #ddd !important;
@@ -9424,6 +9443,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <span style="font-size:11px; font-weight:400; color:var(--text-light); margin-left:auto;">Zoom, arrastrar y clic en zonas</span>
           </h3>
           <div id="leaflet-map" style="width:100%; height:480px; border-radius:12px; border:1px solid var(--border, #e0e0e0); z-index:1;"></div>
+          <!-- Chips de plaza: resumen reactivo (clic = volar a la plaza) -->
+          <div id="map-plaza-chips" class="map-plaza-chips"></div>
           <!-- Leyenda flotante sobre el mapa -->
           <div id="map-legend" style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
             <span style="display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-light);">
@@ -12203,10 +12224,21 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       L.marker([32.56, -116.8], { icon: borderIcon, interactive: false }).addTo(_leafletMap);
     }
 
+    // Vuela el mapa a una plaza y abre su popup (reactividad desde los chips)
+    function flyToPlaza(plazaName) {
+      var geo = PLAZA_GEO[plazaName];
+      if (!_leafletMap || !geo) return;
+      _leafletMap.flyTo(geo.center, 10, { duration: 0.8 });
+      var marker = _mapMarkers[plazaName];
+      if (marker) setTimeout(function(){ marker.openPopup(); }, 850);
+    }
+
     function updateMapPlazas() {
       if (!D || !D.length) return;
       if (!_leafletMap) initLeafletMap();
       if (!_leafletMap) return;
+
+      var chipsHtml = '';
 
       Object.keys(PLAZA_GEO).forEach(function(plazaName) {
         var geo = PLAZA_GEO[plazaName];
@@ -12260,7 +12292,18 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             '</div>';
           marker.setPopupContent(popupHtml);
         }
+
+        // Chip resumen de la plaza (clickeable)
+        chipsHtml += '<button class="map-plaza-chip" onclick="flyToPlaza(\'' + plazaName + '\')" style="--chip-color:' + statusColor + ';">' +
+          '<span class="mpc-dot"></span>' +
+          '<span class="mpc-name">' + (geo.label || plazaName) + '</span>' +
+          '<span class="mpc-pct">' + dispPct.toFixed(1) + '%</span>' +
+          '<span class="mpc-meta">' + totalPlaza + ' eq · ' + critPlaza + ' off</span>' +
+        '</button>';
       });
+
+      var chipsBox = document.getElementById('map-plaza-chips');
+      if (chipsBox) chipsBox.innerHTML = chipsHtml;
     }
 
     function renderAll() {
