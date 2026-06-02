@@ -1942,8 +1942,11 @@
       pointer-events: none;
     }
     /* Ocultar el shimmer cuando ya hay canvas (gráfico pintado) o estado vacío */
+    /* :has() nativo (Chrome 105+, Firefox 121+, Safari 15.4+) */
     .chart-wrap:has(canvas)::after,
     .chart-wrap:has(.dashboard-empty)::after { display: none; }
+    /* Fallback para navegadores sin :has() — clase añadida por JS */
+    .chart-wrap.chart-loaded::after { display: none; }
     [data-theme="dark"] .chart-wrap::after {
       background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.11) 37%, rgba(255,255,255,0.05) 63%);
       background-size: 400% 100%;
@@ -6583,7 +6586,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .map-plaza-chip:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
     .map-plaza-chip:active { transform: translateY(-1px); }
-    .mpc-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--chip-color, #999); box-shadow: 0 0 0 3px color-mix(in srgb, var(--chip-color, #999) 22%, transparent); }
+    .mpc-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--chip-color, #999); box-shadow: 0 0 0 3px rgba(128,128,128,0.22); }
     .mpc-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mpc-pct { font-size: 15px; font-weight: 800; color: var(--chip-color, #333); font-variant-numeric: tabular-nums; grid-row: 1 / 3; }
     .mpc-meta { grid-column: 1 / 3; font-size: 10px; color: var(--text-light); }
@@ -9249,10 +9252,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         </div>
         <div id="export-menu" style="display:none; position:absolute; right:30px; top:90px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:1000; min-width:140px;">
           <button onclick="exportResumenAsPNG()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; cursor:pointer; color:var(--text); font-size:12px; border-bottom:1px solid var(--border); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">
-            📷 Descargar PNG
+            <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">image</span> Descargar PNG
           </button>
           <button onclick="exportResumenAsPDF()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; cursor:pointer; color:var(--text); font-size:12px; transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">
-            📄 Descargar PDF
+            <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">picture_as_pdf</span> Descargar PDF
           </button>
         </div>
         <!-- DASHBOARD EJECUTIVO - KPIs NÚMEROS SOLAMENTE -->
@@ -10521,7 +10524,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                   🗑️ Limpiar todos
                 </button>
                 <button onclick="saveCostConfig()" style="flex:1; padding:8px 12px; background:var(--primary); color:white; border:none; border-radius:4px; font-size:12px; font-weight:600; cursor:pointer;">
-                  💾 Guardar Costos
+                  <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">save</span> Guardar Costos
                 </button>
               </div>
             </div>
@@ -14003,7 +14006,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function saveCostConfig() {
       var config = getCostConfig();
-      localStorage.setItem('oxxoCostConfig', JSON.stringify(config));
+      try { localStorage.setItem('oxxoCostConfig', JSON.stringify(config)); } catch(e) { console.warn('localStorage no disponible:', e); }
       renderCostConfigTable();
       alert('✅ Configuración de costos guardada');
     }
@@ -14042,7 +14045,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       var config = getCostConfig();
       config[model] = amount;
-      localStorage.setItem('oxxoCostConfig', JSON.stringify(config));
+      try { localStorage.setItem('oxxoCostConfig', JSON.stringify(config)); } catch(e) {}
       document.getElementById('new-cost-model').value = '';
       document.getElementById('new-cost-amount').value = '';
       renderCostConfigTable();
@@ -14052,7 +14055,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       if (!confirm('¿Eliminar "' + model + '"?')) return;
       var config = getCostConfig();
       delete config[model];
-      localStorage.setItem('oxxoCostConfig', JSON.stringify(config));
+      try { localStorage.setItem('oxxoCostConfig', JSON.stringify(config)); } catch(e) {}
       renderCostConfigTable();
     }
 
@@ -14163,6 +14166,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var chart = echarts.init(dom, theme.isDark ? 'dark' : null, { renderer: 'canvas' });
         chart.getZr().on('click', function(){}); // init zrender
         dashboardCharts[containerId] = chart;
+        // Fallback para :has() — marca el wrapper cuando el gráfico está pintado
+        chart.on('finished', function(){
+          var wrap = dom.parentElement;
+          if (wrap && wrap.classList.contains('chart-wrap')) wrap.classList.add('chart-loaded');
+        });
         return chart;
       } catch(e) {
         console.error('Error initializing chart:', e);
@@ -16203,7 +16211,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         shadowIntensity: document.getElementById('cfg-shadow-intensity').value,
         theme: (document.getElementById('cfg-theme') || {}).value || 'light'
       };
-      localStorage.setItem('oxxoConfig', JSON.stringify(cfg));
+      try { localStorage.setItem('oxxoConfig', JSON.stringify(cfg)); } catch(e) {}
       applyCriticalThresholds(cfg);
       applyTheme(cfg.theme);
       applyConfigDOM(cfg) // Si hay datos cargados, re-renderiza con los nuevos umbrales/etiquetas/orden
@@ -19611,8 +19619,19 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', injectExpandButtons);
     } else { injectExpandButtons(); }
-    // Re-inyectar tras render dinámico de dashboards
-    setInterval(injectExpandButtons, 3000);
+    // Re-inyectar tras render dinámico; se detiene cuando ya no hay nuevas tarjetas
+    var _expandIntervalId = setInterval(function(){
+      var prevCount = document.querySelectorAll('.dashboard-card[data-expand-ready]').length;
+      injectExpandButtons();
+      var nowCount = document.querySelectorAll('.dashboard-card[data-expand-ready]').length;
+      // Si lleva 2 rondas consecutivas sin cambios, no hay más tarjetas que inyectar
+      if(nowCount === prevCount && nowCount > 0 && !_expandNeedsRetry){
+        _expandNeedsRetry = true; // dar una ronda extra de gracia
+      } else if(_expandNeedsRetry && nowCount === prevCount){
+        clearInterval(_expandIntervalId);
+      } else { _expandNeedsRetry = false; }
+    }, 3000);
+    var _expandNeedsRetry = false;
   })();
   </script>
 
@@ -20162,8 +20181,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     return toastContainer;
   }
+  // Alias de escHTML global para consistencia (evita duplicación y posibles XSS por usar la incorrecta)
   function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    if (typeof window.escHTML === 'function') return window.escHTML(s);
+    return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
   }
   function toast(opts) {
     if (typeof opts === 'string') opts = { msg: opts };
@@ -20270,7 +20291,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     badge.title = total + ' equipos críticos';
     target.appendChild(badge);
   }
-  setInterval(updateSidebarBadge, 1500);
+  setInterval(updateSidebarBadge, 5000); // Reducido de 1.5s a 5s (suficiente, menos CPU)
   document.addEventListener('DOMContentLoaded', updateSidebarBadge);
 
   // ---- PREMIUM TOOLTIP ----
@@ -20749,7 +20770,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       card.setAttribute('data-cap-added', '1');
       const btn = document.createElement('button');
       btn.className = 'card-capture-btn';
-      btn.innerHTML = '📷';
+      btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">photo_camera</span>';
       btn.title = 'Copiar nombre/datos';
       btn.onclick = (e) => {
         e.stopPropagation();
