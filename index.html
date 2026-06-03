@@ -10762,7 +10762,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           'Tijuana Centro': PLAZA_CENTRO_DB
         };
       } catch(e) {
-        console.error('Error loading plaza databases:', e);
       }
     }
 
@@ -10776,7 +10775,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         };
         localStorage.setItem('oxxoPlazaDatabases', JSON.stringify(data));
       } catch(e) {
-        console.error('Error saving plaza databases:', e);
       }
     }
 
@@ -10883,7 +10881,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           swalSuccess('Base de datos cargada', 'Base de ' + plaza + ' cargada correctamente');
         } catch(err) {
           alert('❌ Error al cargar la base de ' + plaza + ': ' + err.message);
-          console.error(err);
         }
       };
       reader.readAsText(file, 'UTF-8');
@@ -10944,11 +10941,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           attempts++;
           if (typeof XLSX !== 'undefined') {
             clearInterval(checkXLSX);
-            console.log('✓ XLSX library loaded successfully');
             resolve();
           } else if (attempts >= maxAttempts) {
             clearInterval(checkXLSX);
-            console.error('✗ XLSX library failed to load after 10 seconds');
             reject(new Error('XLSX library failed to load'));
           }
         }, 100);
@@ -10978,14 +10973,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           );
           if (matchedSheet) {
             sheet = workbook.Sheets[matchedSheet];
-            console.log('Sheet found by partial match: ' + matchedSheet);
           }
         }
 
         // If still not found, use first sheet as fallback
         if (!sheet && workbook.SheetNames.length > 0) {
           sheet = workbook.Sheets[workbook.SheetNames[0]];
-          console.warn('Using first sheet as fallback: ' + workbook.SheetNames[0]);
         }
 
         if (!sheet) {
@@ -11002,10 +10995,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           throw new Error('El archivo Excel está vacío o no tiene datos válidos');
         }
 
-        console.log('Parsed ' + rows.length + ' rows from sheet: ' + sheetName);
         return rows;
       } catch (e) {
-        console.error('Error parsing XLSX:', e);
         throw e // Re-throw so handleFile can catch and display the error
       }
     }
@@ -11022,11 +11013,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             transformHeader: h => h.trim()
           });
           if (result.errors && result.errors.length > 0) {
-            console.warn('Papa Parse warnings:', result.errors);
           }
           return result.data || [];
         } catch(e) {
-          console.warn('Papa Parse failed, falling back to simple parser:', e);
         }
       }
 
@@ -11085,8 +11074,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         allowOutsideClick: false,
         didOpen: function(modal) {
           if (icon === 'success') {
-            // Auto-close success alerts después de 2 segundos
-            setTimeout(function() { Swal.close(); }, 2000);
+            // Auto-close success alerts después de 5 segundos
+            setTimeout(function() { Swal.close(); }, 5000);
           }
         }
       });
@@ -11320,7 +11309,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var fileInput = document.getElementById(fileInputId);
 
       if (!dropzone || !fileInput) {
-        console.error('Dropzone or file input not found:', dropzoneId, fileInputId);
         return;
       }
 
@@ -11373,7 +11361,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         }
       });
 
-      console.log('File upload setup complete for:', fileInputId);
     }
 
     /* Validar columnas mínimas del archivo cargado */
@@ -11426,7 +11413,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       reader.onerror = () => {
         swalError('Error al leer archivo', 'Verifica que el archivo sea válido e intenta de nuevo');
-        console.error('FileReader error:', reader.error);
       };
 
       reader.onload = e => {
@@ -11478,7 +11464,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             }
             updateButtonState();
           } catch (err) {
-            console.error('Error processing file:', err);
             alert('Error al procesar archivo: ' + err.message) // Reset the dropzone on error
             if (type === 'report') {
               document.getElementById('drop-zone-1').classList.remove('success');
@@ -11500,7 +11485,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             .then(processFile)
             .catch(err => {
               alert('Error: La librería de Excel no se pudo cargar. Recarga la página e intenta de nuevo.');
-              console.error('XLSX library load error:', err);
             });
         } else {
           // CSV doesn't need to wait
@@ -11533,7 +11517,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         try {
           renderAll();
         } catch(e) {
-          console.error('renderAll error:', e);
         }
         document.getElementById('loading').classList.remove('show');
         var cfg = getCfg();
@@ -11686,7 +11669,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         closeStoreCorrectionModal();
         proceedToResults();
       } catch (e) {
-        console.error('Error al procesar correcciones:', e);
         closeStoreCorrectionModal();
         proceedToResults();
       }
@@ -12318,7 +12300,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       // Validación crítica: Si D está vacío, no renderizar
       if (!D || D.length === 0) {
-        console.error('renderAll - CRÍTICO: D está vacío, no se puede renderizar');
         // Mostrar mensaje de error al usuario
         try {
           var errorDiv = document.getElementById('loading');
@@ -12985,7 +12966,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     function renderResumenKpis(stats) {
       // Validar que stats tenga los datos necesarios
       if (!stats) {
-        console.error('renderResumenKpis - ERROR: stats es nulo');
         return;
       }
 
@@ -13143,7 +13123,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           chart.setOption(option, true);
           chart.resize(); // Asegurar que se ajuste al tamaño del contenedor
         } catch(e) {
-          console.error('renderGaugeKpi error:', e);
           // Fallback visual si ECharts falla
           renderGaugeKpiFallback(container, value, label, unit, color);
         }
@@ -13594,7 +13573,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function renderDashboards() {
       if (typeof echarts === 'undefined') {
-        console.warn('ECharts no está cargado todavía; saltando dashboards');
         return;
       }
       destroyDashboards();
@@ -14158,7 +14136,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       if (!dom) return null;
 
       if (typeof echarts === 'undefined') {
-        console.error('Error: echarts library not loaded');
         return null;
       }
 
@@ -14177,7 +14154,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         });
         return chart;
       } catch(e) {
-        console.error('Error initializing chart:', e);
         return null;
       }
     }
@@ -14296,7 +14272,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var result = Papa.parse(csvText, options);
         return result.data || [];
       } catch(e) {
-        console.error('Papa Parse error:', e);
         return [];
       }
     }
@@ -14307,7 +14282,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       try {
         return Papa.unparse(data, options);
       } catch(e) {
-        console.error('Papa stringify error:', e);
         return '';
       }
     }
@@ -14368,7 +14342,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var blob = new Blob([content], { type: mimeType || 'text/plain' });
         saveAs(blob, filename);
       } catch(e) {
-        console.error('FileSaver error:', e);
       }
     }
 
@@ -14397,7 +14370,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       try {
         saveAs(blob, filename);
       } catch(e) {
-        console.error('FileSaver error:', e);
       }
     }
 
@@ -15560,7 +15532,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           saveAs(blob, filename);
           return;
         } catch(e) {
-          console.warn('FileSaver fallback:', e);
         }
       }
 
@@ -15641,7 +15612,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
           XLSX.writeFile(wb, buildExportFilename('Movilidad', 'xlsx'));
         } catch (err) {
-          console.error('Error generando XLSX:', err);
           alert('Error al generar XLSX: ' + (err.message || err));
         }
       }).catch(() => alert('Librería XLSX no disponible. Verifica conexión.'));
@@ -15910,7 +15880,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           URL.revokeObjectURL(link.href);
         }
       } catch(e) {
-        console.error('Download chart error:', e);
         alert('Error al descargar: ' + e.message);
       }
       var menuId = 'menu-' + chartId;
@@ -16422,7 +16391,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         if (!chart) return null;
         return chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#ffffff' });
       } catch (e) {
-        console.error('Error al obtener DataURL de EChart', chartId, e);
         return null;
       }
     }
@@ -16978,7 +16946,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         // Notificación elegante tipo toast
         showEmailToast('✓ Archivo .eml descargado — Doble clic para abrir en Outlook', 'success');
       } catch (e) {
-        console.error('downloadEMLForOutlook:', e);
         alert('Error al generar el archivo .eml: ' + (e.message || e));
       }
     }
@@ -17019,7 +16986,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         }
         window.location.href = url;
       } catch (e) {
-        console.error('openInOutlook:', e);
         alert('No se pudo abrir el cliente de correo. Usa "Copiar HTML" y pégalo manualmente en Outlook.');
       }
     }
@@ -17307,7 +17273,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                   cloneCanvas.parentNode.replaceChild(img, cloneCanvas);
                 }
               } catch (e) {
-                console.error('Error al capturar canvas:', e);
               }
             }
             topTwoDashWrap.appendChild(cardClone);
@@ -17433,7 +17398,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         pdf.save(fname);
         stage.innerHTML = '';
       } catch (err) {
-        console.error('Error generando PDF:', err);
         alert('Error generando PDF: ' + (err.message || err));
       } finally {
         loadingEl.classList.remove('show');
@@ -17496,7 +17460,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         alert('✓ PNG descargado: ' + filename);
       } catch (err) {
-        console.error('Error al generar PNG:', err);
         alert('Error al generar PNG: ' + err.message);
       } finally {
         if (loadingEl) loadingEl.classList.remove('show');
@@ -17580,7 +17543,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         alert('✓ PDF descargado: ' + filename);
       } catch (err) {
-        console.error('Error al generar PDF:', err);
         alert('Error al generar PDF: ' + err.message);
       } finally {
         if (loadingEl) loadingEl.classList.remove('show');
@@ -17997,7 +17959,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               proceedToResults();
             }
           } catch(e) {
-            console.error('Error en auto-carga de datos:', e);
           }
         }, 100);
       }
@@ -18592,7 +18553,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var w = probe.offsetWidth;
         document.body.removeChild(probe);
         if (w > 30) {
-          console.warn('[icon-fallback] Material Symbols font no cargó — usando emojis Unicode.');
           applyFallback() // Observador con debounce — solo escuchamos cambios significativos
           // y no en cada mutación. Esto evita lag de scroll severo.
           var debounceTimer = null;
@@ -19221,7 +19181,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             });
           });
           
-          console.log('🤖 Robot animation initialized with GSAP');
         }
         
         // Start when DOM is ready
