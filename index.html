@@ -2414,8 +2414,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       animation: sectionEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
       /* === OPTIMIZACIONES DE RENDIMIENTO ===
          contain: aísla el reflow/repaint a la sección activa, así el
-         scroll no recalcula layout de todo el documento. */
+         scroll no recalcula layout de todo el documento.
+         will-change: permite al navegador optimizar las transformaciones. */
       contain: layout style paint;
+      will-change: opacity, transform;
     }
     /* Transición de entrada de pestaña: fade + slide sutil (continuidad espacial) */
     @keyframes sectionEnter {
@@ -8499,6 +8501,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       animation: rippleAnim 0.6s ease-out;
       pointer-events: none;
       z-index: 1;
+      will-change: transform, opacity;  /* GPU optimization para ripple smooth */
     }
     @keyframes rippleAnim {
       to { transform: scale(4); opacity: 0; }
@@ -12311,6 +12314,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function renderAll() {
       lastRunAt = Date.now();
+      insightShown = false;  // Resetear flag de alerta para mostrarla nuevamente con nuevos datos
 
       // Validación crítica: Si D está vacío, no renderizar
       if (!D || D.length === 0) {
@@ -14904,7 +14908,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
 
     function toggleCruceSelectAll(checked) {
-      document.querySelectorAll('#cruce-table .cruce-sel-cb').forEach(function(cb) {
+      var checkboxes = document.querySelectorAll('#cruce-table .cruce-sel-cb');  // Cachear una sola vez
+      checkboxes.forEach(function(cb) {
         cb.checked = checked;
         if (checked) cruceSelection.add(cb.dataset.key);
         else cruceSelection.delete(cb.dataset.key);
@@ -14913,11 +14918,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
 
     function updateSelectAllState() {
-      var all = document.querySelectorAll('#cruce-table .cruce-sel-cb');
+      var all = document.querySelectorAll('#cruce-table .cruce-sel-cb');  // Cachear una sola vez
       var selAll = document.getElementById('cruce-select-all');
       if (!selAll || !all.length) { if (selAll) { selAll.checked = false; selAll.indeterminate = false; } return; }
       var checkedCount = 0;
-      all.forEach(function(cb){ if (cb.checked) checkedCount++; });
+      for (var i = 0; i < all.length; i++) { if (all[i].checked) checkedCount++; }  // Usar for en vez de forEach (más rápido)
       selAll.checked = checkedCount === all.length;
       selAll.indeterminate = checkedCount > 0 && checkedCount < all.length;
     }
@@ -14933,7 +14938,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function clearCruceSelection() {
       cruceSelection.clear();
-      document.querySelectorAll('#cruce-table .cruce-sel-cb').forEach(function(cb){ cb.checked = false; });
+      var checkboxes = document.querySelectorAll('#cruce-table .cruce-sel-cb');  // Cachear una sola vez
+      for (var i = 0; i < checkboxes.length; i++) { checkboxes[i].checked = false; }  // for loop más rápido que forEach
       updateBulkBar();
       updateSelectAllState();
     }
@@ -15257,7 +15263,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var hideAtt = document.getElementById('detalle-hide-attended'); if (hideAtt) hideAtt.checked = true;
       var search = document.getElementById('detalle-search'); if (search) search.value = '';
       var pdd = document.getElementById('plaza-dropdown-detalle'); if (pdd) pdd.value = '';
-      document.querySelectorAll('#detalle tr.filter-row input[data-dcol]').forEach(function(inp){ inp.value = ''; });
+      var filterInputs = document.querySelectorAll('#detalle tr.filter-row input[data-dcol]');  // Cachear una sola vez
+      for (var i = 0; i < filterInputs.length; i++) { filterInputs[i].value = ''; }  // for loop más rápido
       renderDetalle();
     }
 
@@ -19643,7 +19650,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   <!-- ============ ANIMACIONES REACTIVAS (personalidad por pestaña) ============ -->
   <style>
     /* Micro-interacciones sutiles en hover/clic */
-    .dashboard-card { transition: transform .18s ease, box-shadow .18s ease; }
+    .dashboard-card { transition: transform .18s ease, box-shadow .18s ease; will-change: transform, box-shadow; }
     tbody tr { transition: background-color .15s ease; }
     /* Efecto ripple en pestañas y botones clave */
     .ripple-host { position: relative; overflow: hidden; }
@@ -19661,6 +19668,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: var(--primary); border-radius: 3px 3px 0 0;
       transition: left .25s cubic-bezier(.4,0,.2,1), width .25s cubic-bezier(.4,0,.2,1);
       pointer-events: none; z-index: 1;
+      will-change: left, width;  /* GPU optimization para transiciones smooth */
     }
 
     /* Íconos de pestaña con 'pop' al activarse */
@@ -19929,7 +19937,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     // Trigger after entrance animation completes
     setTimeout(updateAll, 1000);
     // Re-check periodically to catch programmatic updates
-    setInterval(updateAll, 2500);
+    setInterval(updateAll, 8000);  // Reducido de 2.5s a 8s (suficientemente reactivo, sin lag)
   }
 
   if (document.readyState === 'loading') {
@@ -20354,7 +20362,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       makeConfetti();
     }
   }
-  setInterval(checkPerfect, 5000);
+  setInterval(checkPerfect, 10000);  // Aumentado de 5s a 10s (verificación menos frecuente)
 
   // ---- WELCOME TOAST after splash ----
   setTimeout(() => {
@@ -20543,6 +20551,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   }
   let insightDismissed = false;
   let insightTimer = null;
+  let insightShown = false;  // Flag para mostrar solo una vez por carga
   function dismissInsight() {
     const ex = document.getElementById('auto-insight');
     if (ex) {
@@ -20556,12 +20565,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     if (insightDismissed) return;
     const ins = insightFor();
     const existing = document.getElementById('auto-insight');
-    if (!ins) { if (existing) dismissInsight(); return; }
-    if (existing) {
-      existing.querySelector('.insight-title').textContent = ins.title;
-      existing.querySelector('.insight-msg').textContent = ins.msg;
-      return;
-    }
+    if (!ins) { if (existing) dismissInsight(); insightShown = false; return; }
+    // Solo mostrar si es la primera vez que se detecta esta alerta en esta carga
+    if (existing) return;  // Si ya existe, no recrear
+    if (insightShown) return;  // Si ya fue mostrada en esta sesión de datos, no repetir
+
+    insightShown = true;  // Marcar como mostrada
     const banner = document.createElement('div');
     banner.id = 'auto-insight';
     banner.className = 'insight-banner';
@@ -20582,13 +20591,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     if (target && target.parentElement) {
       target.parentElement.insertBefore(banner, target);
     }
-    // Auto-dismiss after 10 seconds
+    // Auto-dismiss after 5 seconds (solo una vez)
     clearTimeout(insightTimer);
     insightTimer = setTimeout(() => {
       dismissInsight();
-    }, 10000);
+    }, 5000);  // 5 segundos exactos
   }
-  setInterval(renderInsight, 4500);
+  setInterval(renderInsight, 12000);  // Aumentado de 4.5s a 12s (la alerta ya dura 5s, no necesita re-renderizar)
 
   // ---- TOUCH SWIPE BETWEEN TABS (mobile) ----
   let touchStartX = 0;
@@ -20690,7 +20699,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     gauge.querySelector('.health-gauge-num').textContent = health.toFixed(0) + '%';
     gauge.querySelector('.health-gauge-bar-fill').style.width = health + '%';
   }
-  setInterval(updateHealthGauge, 2500);
+  setInterval(updateHealthGauge, 8000);  // Reducido de 2.5s a 8s (suficiente para visualización de salud)
 
   // ---- KIOSK / TV MODE - auto-rotate tabs ----
   let kioskTimer = null;
@@ -20787,7 +20796,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       card.appendChild(btn);
     });
   }
-  setInterval(addCaptureButtons, 2500);
+  setInterval(addCaptureButtons, 15000);  // Reducido de 2.5s a 15s (botones no cambian frecuentemente)
 
   // ---- "HACE X MIN" timestamps next to data ----
   let lastDataLoad = Date.now();
