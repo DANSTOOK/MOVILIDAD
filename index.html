@@ -9261,36 +9261,35 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">picture_as_pdf</span> Descargar PDF
           </button>
         </div>
-        <!-- DASHBOARD EJECUTIVO - KPIs NÚMEROS SOLAMENTE -->
+        <!-- DASHBOARD EJECUTIVO - CRUCE DE DATOS CRÍTICOS -->
         <div style="background: linear-gradient(135deg, rgba(226,0,26,0.08) 0%, rgba(226,0,26,0.02) 100%); border-radius: 12px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(226,0,26,0.15);">
           <div style="margin-bottom: 10px;">
             <h3 style="font-size: 13px; font-weight: 700; margin: 0; color: var(--text); display: flex; align-items: center; gap: 6px;">
-              <span class="material-symbols-outlined" style="font-size: 18px; color: #E2001A;">speed</span>
-              KPIs Críticos
+              <span class="material-symbols-outlined" style="font-size: 18px; color: #E2001A;">warning</span>
+              Equipos Críticos (≥4 días offline)
             </h3>
-            <p style="font-size: 10px; color: var(--text-light); margin: 2px 0 0 0;">Métricas en tiempo real</p>
+            <p style="font-size: 10px; color: var(--text-light); margin: 2px 0 0 0;">Datos actualizados en tiempo real</p>
           </div>
-          <div id="resumen-kpis-section" class="resumen-kpis" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
-            <div class="kpi-gauge-card" style="background: var(--surface); border: 2px solid rgba(31, 122, 78, 0.2); border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); min-height: 100px; display: flex; flex-direction: column; justify-content: center; transition: all 0.3s ease;">
-              <div id="kpi-disp-hh-value" style="font-size: 36px; font-weight: 700; color: #1F7A4E; margin-bottom: 4px;">--</div>
-              <div style="font-size:10px; font-weight:700; color:var(--text); text-transform: uppercase; letter-spacing: 0.3px;">Disp. HH</div>
-              <div style="font-size: 9px; color: var(--text-light); margin-top: 2px;">Handhelds</div>
-            </div>
-            <div class="kpi-gauge-card" style="background: var(--surface); border: 2px solid rgba(245, 166, 35, 0.2); border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); min-height: 100px; display: flex; flex-direction: column; justify-content: center; transition: all 0.3s ease;">
-              <div id="kpi-disp-tt-value" style="font-size: 36px; font-weight: 700; color: #F5A623; margin-bottom: 4px;">--</div>
-              <div style="font-size:10px; font-weight:700; color:var(--text); text-transform: uppercase; letter-spacing: 0.3px;">Disp. TT</div>
-              <div style="font-size: 9px; color: var(--text-light); margin-top: 2px;">Tablets</div>
-            </div>
-            <div class="kpi-gauge-card" style="background: var(--surface); border: 2px solid rgba(226, 0, 26, 0.2); border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); min-height: 100px; display: flex; flex-direction: column; justify-content: center; transition: all 0.3s ease;">
-              <div id="kpi-total-bd-value" style="font-size: 36px; font-weight: 700; color: #E2001A; margin-bottom: 4px;">--</div>
-              <div style="font-size:10px; font-weight:700; color:var(--text); text-transform: uppercase; letter-spacing: 0.3px;">Total BD</div>
-              <div style="font-size: 9px; color: var(--text-light); margin-top: 2px;">Equipos</div>
-            </div>
-            <div class="kpi-gauge-card" style="background: var(--surface); border: 2px solid rgba(179, 38, 30, 0.2); border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); min-height: 100px; display: flex; flex-direction: column; justify-content: center; transition: all 0.3s ease;">
-              <div id="kpi-offline-pct-value" style="font-size: 36px; font-weight: 700; color: #B3261E; margin-bottom: 4px;">--</div>
-              <div style="font-size:10px; font-weight:700; color:var(--text); text-transform: uppercase; letter-spacing: 0.3px;">Offline %</div>
-              <div style="font-size: 9px; color: var(--text-light); margin-top: 2px;">General</div>
-            </div>
+          <div id="resumen-cruce-table-container" style="overflow-x: auto; border-radius: 8px; background: var(--surface);">
+            <table id="resumen-cruce-table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+              <thead>
+                <tr style="background: var(--surface); border-bottom: 2px solid var(--border);">
+                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Últim Conex.</th>
+                  <th style="padding: 10px 12px; text-align: center; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Días</th>
+                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Equipo</th>
+                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">CR</th>
+                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Tienda</th>
+                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Asesor</th>
+                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="resumen-cruce-tbody" style="color: var(--text);">
+                <tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-light);">Cargando datos...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding: 8px 12px; background: rgba(0,0,0,0.02); border-top: 1px solid var(--border); border-radius: 0 0 8px 8px; margin-top: 0; font-size: 10px; color: var(--text-light);">
+            <strong id="resumen-cruce-count">0</strong> equipos críticos (≥4 días) encontrados
           </div>
         </div>
         <div id="hhcount" style="display:none;"></div>
@@ -12960,6 +12959,54 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       // === RENDERIZAR COST KPIs ===
       renderCostKPIs();
+
+      // === RENDERIZAR TABLA CRUCE EN RESUMEN ===
+      renderResumenCruceTable();
+    }
+
+    /**
+     * Renderiza tabla de equipos críticos en la sección RESUMEN EJECUTIVO
+     */
+    function renderResumenCruceTable() {
+      try {
+        var Dscope = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
+        // Filtrar solo equipos críticos (≥4 días offline) y ordenar por días descendente
+        var criticos = Dscope.filter(function(d) { return isCritical(d); })
+          .sort(function(a, b) { return b.days_ago - a.days_ago; })
+          .slice(0, 15); // Mostrar máximo 15 para mantener compacto
+
+        var html = '';
+        if (criticos.length === 0) {
+          html = '<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-light);">✓ No hay equipos críticos. ¡Excelente!</td></tr>';
+        } else {
+          criticos.forEach(function(d, idx) {
+            var st = statusOf(d);
+            var dias = Number(d.days_ago) || 0;
+            // Color de severidad según días offline
+            var diasColor = dias > 20 ? '#B3261E' : dias > 10 ? '#F5A623' : '#1F7A4E';
+            var rowBg = idx % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.02)';
+
+            html += '<tr style="border-bottom: 1px solid var(--border); background: ' + rowBg + ';">';
+            html += '<td style="padding: 10px 12px;">' + (d['Last Seen'] || '—') + '</td>';
+            html += '<td style="padding: 10px 12px; text-align: center; font-weight: 600; color: ' + diasColor + ';">' + dias + '</td>';
+            html += '<td style="padding: 10px 12px;">' + getEquipmentLabel(d.equipo_type) + '</td>';
+            html += '<td style="padding: 10px 12px; font-weight: 600;">' + (d.CR || '—') + '</td>';
+            html += '<td style="padding: 10px 12px;">' + (d.TIENDA || '—') + '</td>';
+            html += '<td style="padding: 10px 12px;">' + (d.ASESOR || '—') + '</td>';
+            html += '<td style="padding: 10px 12px;"><span style="display: inline-block; padding: 3px 8px; background: ' + st.bg + '; color: ' + st.fg + '; border-radius: 4px; font-size: 11px; font-weight: 600;">' + st.txt + '</span></td>';
+            html += '</tr>';
+          });
+        }
+        document.getElementById('resumen-cruce-tbody').innerHTML = html;
+
+        // Actualizar contador
+        var countEl = document.getElementById('resumen-cruce-count');
+        if (countEl) {
+          countEl.textContent = criticos.length;
+        }
+      } catch (e) {
+        console.warn('Error renderizando tabla cruce en resumen:', e);
+      }
     }
 
     /**
