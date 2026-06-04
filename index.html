@@ -11048,7 +11048,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function isCritical(d) {
       if (!d) return false;
-      return d.minutes_ago >= getCriticalThresholdFor(d);
+      // Use days_ago directly instead of minutes_ago (which uses fixed reference date)
+      // This ensures consistency regardless of when report was loaded
+      return d.days_ago >= 4;
     }
 
     function normalizeCR(cr) {
