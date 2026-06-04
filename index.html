@@ -5138,10 +5138,28 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .summary-by-type-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-      padding: 12px 14px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 24px;
       align-items: stretch;
+    }
+
+    /* Responsivo para tablets */
+    @media (max-width: 768px) {
+      .summary-by-type-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 16px;
+      }
+    }
+
+    /* Responsivo para móviles */
+    @media (max-width: 480px) {
+      .summary-by-type-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 12px;
+      }
     }
     .summary-card {
       position: relative;
@@ -12915,34 +12933,101 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         renderResumenKpis(s);
       }, 100);
 
-      // === RESUMEN POR TIPO (tabla) ===
+      // === RESUMEN POR TIPO (cards interactivas mejoradas) ===
       var rows = [
-        { name: 'HH',     icon: 'inventory_2', total: s.hhTotalBD, offline: s.hhCritical, disp: s.dispHH },
-        { name: 'TABLET', icon: 'tablet', total: s.ttTotalBD, offline: s.ttCritical, disp: s.dispTT }
+        { name: 'HH',     icon: 'inventory_2', emoji: '📱', total: s.hhTotalBD, offline: s.hhCritical, disp: s.dispHH, color: '#1F7A4E', colorLight: '#C8E6C9', colorDark: '#155724' },
+        { name: 'TABLET', icon: 'tablet', emoji: '📲', total: s.ttTotalBD, offline: s.ttCritical, disp: s.dispTT, color: '#0066CC', colorLight: '#E3F2FD', colorDark: '#003399' }
       ];
       var html = '';
-      rows.forEach(r => {
+      rows.forEach((r, idx) => {
         var dispNum = parseFloat(r.disp);
-        var dispColor = dispNum >= 99 ? '#1F7A4E' : dispNum >= 97 ? '#F5A623' : '#B3261E';
-        html += `<div style="padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-                           display: flex; flex-direction: column; gap: 8px; animation: slideUp 0.3s ease-out;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="material-symbols-outlined" style="color: ${dispColor}; font-size: 24px;">${r.icon}</span>
-            <span style="font-weight: 600; font-size: 13px; color: var(--text);">${r.name}</span>
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
-            <div style="padding: 8px; background: rgba(0,0,0,0.03); border-radius: 4px; text-align: center;">
-              <div style="color: var(--text-light); font-size: 11px;">Total</div>
-              <div style="font-weight: 700; color: var(--text); font-size: 14px;">${r.total}</div>
+        var offlinePct = 100 - dispNum;
+        // Color dinámico según disponibilidad
+        var statusColor = dispNum >= 99 ? '#1F7A4E' : dispNum >= 97 ? '#F5A623' : '#B3261E';
+        var statusBg = dispNum >= 99 ? 'rgba(31, 122, 78, 0.1)' : dispNum >= 97 ? 'rgba(245, 166, 35, 0.1)' : 'rgba(179, 38, 30, 0.1)';
+
+        // Barra de progreso visual
+        var progressPct = dispNum;
+        var progressColor = dispNum >= 99 ? '#1F7A4E' : dispNum >= 97 ? '#F5A623' : '#B3261E';
+
+        html += `<div style="padding: 20px; background: linear-gradient(135deg, ${r.colorLight} 0%, var(--surface) 100%);
+                           border: 2px solid ${r.color}; border-radius: 14px;
+                           cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                           box-shadow: 0 4px 12px rgba(0,0,0,0.08); animation: slideUp 0.4s ease-out;
+                           display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden;"
+             onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.12)';"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';"
+             onclick="console.log('Filtrar por ${r.name}');">
+
+          <!-- Decoración background -->
+          <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px;
+                      background: radial-gradient(circle, ${r.color} 0%, transparent 70%);
+                      opacity: 0.1; border-radius: 50%;"></div>
+
+          <!-- Header con nombre e icono -->
+          <div style="display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 48px; height: 48px; background: ${r.color}; border-radius: 10px;
+                          display: flex; align-items: center; justify-content: center;
+                          box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                <span class="material-symbols-outlined" style="font-size: 28px; color: white;">${r.icon}</span>
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 18px; color: ${r.colorDark};">${r.name}</div>
+                <div style="font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Equipos de Movilidad</div>
+              </div>
             </div>
-            <div style="padding: 8px; background: rgba(179,38,30,0.08); border-radius: 4px; text-align: center;">
-              <div style="color: #B3261E; font-size: 11px;">Offline</div>
-              <div style="font-weight: 700; color: #B3261E; font-size: 14px;">${r.offline}</div>
+            <div style="text-align: right;">
+              <div style="font-size: 28px;">📊</div>
             </div>
           </div>
-          <div style="padding: 8px; background: rgba(0,0,0,0.03); border-radius: 4px; text-align: center;">
-            <div style="color: var(--text-light); font-size: 11px;">Disponibilidad</div>
-            <div style="font-weight: 700; font-size: 16px; color: ${dispColor};">${r.disp}%</div>
+
+          <!-- Métricas en grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; z-index: 1;">
+            <!-- Total -->
+            <div style="padding: 12px; background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid ${r.color};">
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px;">Total</div>
+              <div style="font-size: 26px; font-weight: 800; color: ${r.color};">${r.total}</div>
+              <div style="font-size: 10px; color: var(--text-light); margin-top: 4px;">en BD</div>
+            </div>
+            <!-- Offline -->
+            <div style="padding: 12px; background: rgba(179, 38, 30, 0.08); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #B3261E;">
+              <div style="font-size: 11px; font-weight: 600; color: #B3261E; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px;">Offline ≥4D</div>
+              <div style="font-size: 26px; font-weight: 800; color: #B3261E;">${r.offline}</div>
+              <div style="font-size: 10px; color: #B3261E; margin-top: 4px;">críticos</div>
+            </div>
+          </div>
+
+          <!-- Barra de disponibilidad -->
+          <div style="position: relative; z-index: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px;">Disponibilidad</div>
+              <div style="font-size: 18px; font-weight: 800; color: ${progressColor};">${r.disp}%</div>
+            </div>
+            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden;">
+              <div style="width: ${progressPct}%; height: 100%; background: linear-gradient(90deg, ${progressColor} 0%, ${progressColor}dd 100%);
+                          border-radius: 10px; transition: width 0.6s ease-out; box-shadow: 0 0 8px ${progressColor}40;"></div>
+            </div>
+          </div>
+
+          <!-- Badge de estado -->
+          <div style="display: flex; gap: 8px; position: relative; z-index: 1;">
+            <div style="flex: 1; padding: 8px 12px; background: ${statusBg}; border-radius: 8px; border: 1px solid ${statusColor}; text-align: center;">
+              <div style="font-size: 10px; font-weight: 600; color: ${statusColor}; text-transform: uppercase; letter-spacing: 0.2px;">
+                ${dispNum >= 99 ? '✓ Excelente' : dispNum >= 97 ? '⚠ Bueno' : '⛔ Crítico'}
+              </div>
+            </div>
+          </div>
+
+          <!-- CTA interactivo -->
+          <div style="padding: 10px; background: ${r.color}; border-radius: 8px; text-align: center; cursor: pointer;
+                      transition: background 0.3s; position: relative; z-index: 1;"
+               onmouseover="this.style.background='${r.colorDark}';"
+               onmouseout="this.style.background='${r.color}';">
+            <div style="font-size: 12px; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+              Ver detalles
+            </div>
           </div>
         </div>`;
       });
