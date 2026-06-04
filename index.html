@@ -17095,22 +17095,73 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             '<div style="display:inline-block; background:#E2001A; color:white; padding:10px 22px; border-radius:6px; font-size:18px; font-weight:700; letter-spacing:1px;">OXXO MOVILIDAD</div>'
         : '<div style="text-align:center; padding-top:120px;">' +
             '<div style="display:inline-block; background:#E2001A; color:white; padding:16px 28px; border-radius:8px; font-size:24px; font-weight:700; letter-spacing:1px;">OXXO MOVILIDAD</div>';
+      // Build plaza breakdown for summary
+      var plazaBreakdown = '';
+      if (typeof getActivePlazaFilter === 'function' && getActivePlazaFilter()) {
+        // Single plaza mode - show overall metrics
+        plazaBreakdown = '';
+      } else {
+        // Multi-plaza mode - show breakdown
+        var plazas = {};
+        var allData = D || [];
+        allData.forEach(d => {
+          var p = d.PLAZA || 'Sin Plaza';
+          if (!plazas[p]) {
+            plazas[p] = { total: 0, critical: 0, hh: 0, tt: 0, hhCrit: 0, ttCrit: 0 };
+          }
+          plazas[p].total++;
+          if (d.equipo_type === 'HH') {
+            plazas[p].hh++;
+            if (isCritical && isCritical(d)) plazas[p].hhCrit++;
+          } else {
+            plazas[p].tt++;
+            if (isCritical && isCritical(d)) plazas[p].ttCrit++;
+          }
+          if (isCritical && isCritical(d)) plazas[p].critical++;
+        });
+
+        if (Object.keys(plazas).length > 1) {
+          plazaBreakdown = '<h3 style="font-size:13px; color:#E2001A; margin:24px 0 12px 0; border-bottom:1px solid #E2001A; padding-bottom:6px;">Resumen por Plaza</h3>' +
+            '<table style="width:100%; border-collapse:collapse; font-size:11px;">' +
+            '<thead><tr style="background:#F5F5F5;">' +
+            '<th style="border:1px solid #E0E0E0; padding:5px 6px; text-align:left;">Plaza</th>' +
+            '<th style="border:1px solid #E0E0E0; padding:5px 6px; text-align:right;">Total</th>' +
+            '<th style="border:1px solid #E0E0E0; padding:5px 6px; text-align:right;">Críticos</th>' +
+            '<th style="border:1px solid #E0E0E0; padding:5px 6px; text-align:right;">% Crítico</th>' +
+            '</tr></thead><tbody>';
+
+          Object.keys(plazas).sort().forEach((plaza, idx) => {
+            var p = plazas[plaza];
+            var pctCrit = p.total > 0 ? Math.round((p.critical / p.total) * 100) : 0;
+            var bg = idx % 2 === 0 ? 'white' : '#FAFAFA';
+            plazaBreakdown += '<tr style="background:' + bg + ';">' +
+              '<td style="border:1px solid #E0E0E0; padding:4px 6px;">' + escHTML(plaza) + '</td>' +
+              '<td style="border:1px solid #E0E0E0; padding:4px 6px; text-align:right;">' + p.total + '</td>' +
+              '<td style="border:1px solid #E0E0E0; padding:4px 6px; text-align:right; color:#B3261E; font-weight:600;">' + p.critical + '</td>' +
+              '<td style="border:1px solid #E0E0E0; padding:4px 6px; text-align:right;">' + pctCrit + '%</td>' +
+              '</tr>';
+          });
+          plazaBreakdown += '</tbody></table>';
+        }
+      }
+
       div.innerHTML =
         headerBlock +
           '<h1 style="margin:32px 0 8px 0; font-size:30px; color:#1C1B1F;">Reporte Consolidado</h1>' +
           '<p style="font-size:14px; color:#E2001A; font-weight:700; margin:6px 0 0 0; letter-spacing:0.5px;">' + escHTML(plazaTitulo) + '</p>' +
           '<p style="font-size:16px; color:#49454F; margin:6px 0 0 0;">' + escHTML(fechaTxt) + '</p>' +
         '</div>' +
-        '<div style="margin-top:80px; border-top:2px solid #E2001A; padding-top:24px;">' +
-          '<table style="width:100%; border-collapse:collapse; font-size:13px;">' +
-            '<tr><td style="padding:8px 0; font-weight:600;">Total tiendas en universo:</td><td style="text-align:right;">' + stats.totalBD + '</td></tr>' +
-            '<tr><td style="padding:8px 0; font-weight:600;">Equipos en reporte (válidos):</td><td style="text-align:right;">' + stats.totalReport + '</td></tr>' +
-            '<tr><td style="padding:8px 0; font-weight:600; color:#B3261E;">Equipos apagados ≥4 días:</td><td style="text-align:right; color:#B3261E; font-weight:700;">' + stats.totalCritical + '</td></tr>' +
-            '<tr><td style="padding:8px 0; font-weight:600;">% Offline HH:</td><td style="text-align:right;">' + stats.hhPct + '%</td></tr>' +
-            '<tr><td style="padding:8px 0; font-weight:600;">% Offline TT:</td><td style="text-align:right;">' + stats.ttPct + '%</td></tr>' +
+        '<div style="margin-top:60px; border-top:2px solid #E2001A; padding-top:18px;">' +
+          '<table style="width:100%; border-collapse:collapse; font-size:12px;">' +
+            '<tr><td style="padding:6px 0; font-weight:600;">Total tiendas en universo:</td><td style="text-align:right;">' + stats.totalBD + '</td></tr>' +
+            '<tr><td style="padding:6px 0; font-weight:600;">Equipos en reporte (válidos):</td><td style="text-align:right;">' + stats.totalReport + '</td></tr>' +
+            '<tr><td style="padding:6px 0; font-weight:600; color:#B3261E;">Equipos apagados ≥4 días:</td><td style="text-align:right; color:#B3261E; font-weight:700;">' + stats.totalCritical + '</td></tr>' +
+            '<tr><td style="padding:6px 0; font-weight:600;">% Offline HH:</td><td style="text-align:right;">' + stats.hhPct + '%</td></tr>' +
+            '<tr><td style="padding:6px 0; font-weight:600;">% Offline TT:</td><td style="text-align:right;">' + stats.ttPct + '%</td></tr>' +
           '</table>' +
+          plazaBreakdown +
         '</div>' +
-        '<div style="position:absolute; bottom:48px; left:56px; right:56px; text-align:center; font-size:11px; color:#9aa0a6;">Generado automáticamente desde el dashboard OXXO Movilidad</div>';
+        '<div style="position:absolute; bottom:48px; left:56px; right:56px; text-align:center; font-size:10px; color:#9aa0a6;">Generado automáticamente desde el dashboard OXXO Movilidad</div>';
       return div;
     }
 
