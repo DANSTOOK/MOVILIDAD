@@ -17116,27 +17116,27 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function buildPDFSectionNode(title, contentHTML) {
       var div = document.createElement('div');
-      div.style.cssText = 'width:794px; padding:36px 48px; font-family:Roboto,Arial,sans-serif; color:#1C1B1F; box-sizing:border-box;';
+      div.style.cssText = 'width:794px; padding:28px 40px; font-family:Roboto,Arial,sans-serif; color:#1C1B1F; box-sizing:border-box; background:white;';
       div.innerHTML =
-        '<h2 style="font-size:18px; color:#E2001A; border-bottom:2px solid #E2001A; padding-bottom:6px; margin:0 0 16px 0;">' + escHTML(title) + '</h2>' +
-        '<div style="font-size:11px;">' + contentHTML + '</div>';
+        '<h2 style="font-size:15px; color:#E2001A; border-bottom:2px solid #E2001A; padding-bottom:5px; margin:0 0 12px 0; font-weight:700;">' + escHTML(title) + '</h2>' +
+        '<div style="font-size:10px; line-height:1.4;">' + contentHTML + '</div>';
       return div;
     }
 
     function buildResumenSectionHTML(stats) {
       var html = '';
-      html += '<table style="width:100%; border-collapse:collapse; margin-bottom:16px;">';
-      html += '<thead><tr style="background:#F8F1F5;">'
-            + '<th style="border:1px solid #E0E0E0; padding:6px 8px; text-align:left;">Tipo</th>'
-            + '<th style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">Total (BD)</th>'
-            + '<th style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">Apagados ≥4D</th>'
-            + '<th style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">% Offline</th>'
+      html += '<table style="width:100%; border-collapse:collapse; margin-bottom:12px; font-size:11px;">';
+      html += '<thead><tr style="background:#F8F1F5; border-bottom:2px solid #E2001A;">'
+            + '<th style="border:1px solid #E0E0E0; padding:7px 8px; text-align:left; font-weight:600;">Tipo</th>'
+            + '<th style="border:1px solid #E0E0E0; padding:7px 8px; text-align:right; font-weight:600;">Total (BD)</th>'
+            + '<th style="border:1px solid #E0E0E0; padding:7px 8px; text-align:right; font-weight:600;">Apagados ≥4D</th>'
+            + '<th style="border:1px solid #E0E0E0; padding:7px 8px; text-align:right; font-weight:600;">% Offline</th>'
             + '</tr></thead><tbody>';
-      html += '<tr><td style="border:1px solid #E0E0E0; padding:6px 8px;">HH</td>'
+      html += '<tr style="background:white;"><td style="border:1px solid #E0E0E0; padding:6px 8px;">HH</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">' + stats.hhTotalBD + '</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right; color:#B3261E; font-weight:700;">' + stats.hhCritical + '</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">' + stats.hhPct + '%</td></tr>';
-      html += '<tr><td style="border:1px solid #E0E0E0; padding:6px 8px;">TABLET</td>'
+      html += '<tr style="background:#FAFAFA;"><td style="border:1px solid #E0E0E0; padding:6px 8px;">TABLET</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">' + stats.ttTotalBD + '</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right; color:#B3261E; font-weight:700;">' + stats.ttCritical + '</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">' + stats.ttPct + '%</td></tr>';
@@ -17146,10 +17146,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function buildTableSectionHTML(rows, columns) {
       if (!rows.length) return '<p style="color:#1F7A4E"><em>Sin registros que mostrar.</em></p>';
-      var html = '<table style="width:100%; border-collapse:collapse;">';
+      var html = '<table style="width:100%; border-collapse:collapse; font-size:9px;">';
       html += '<thead><tr style="background:#F8F1F5;">';
       columns.forEach(c => {
-        html += '<th style="border:1px solid #E0E0E0; padding:5px 6px; text-align:left; font-size:10px;">' + escHTML(c.label) + '</th>';
+        html += '<th style="border:1px solid #E0E0E0; padding:6px 5px; text-align:left; font-size:9px; font-weight:600; word-wrap:break-word;">' + escHTML(c.label) + '</th>';
       });
       html += '</tr></thead><tbody>';
       rows.forEach((r, idx) => {
@@ -17157,7 +17157,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         html += '<tr style="background:' + bg + ';">';
         columns.forEach(c => {
           var v = c.value(r);
-          html += '<td style="border:1px solid #E0E0E0; padding:4px 6px; font-size:10px;">' + escHTML(v) + '</td>';
+          // Truncate long values to fit in PDF
+          if (typeof v === 'string' && v.length > 45) {
+            v = v.substring(0, 42) + '...';
+          }
+          html += '<td style="border:1px solid #E0E0E0; padding:4px 5px; font-size:8.5px; word-wrap:break-word; max-width:100px; overflow:hidden;">' + escHTML(v) + '</td>';
         });
         html += '</tr>';
       });
