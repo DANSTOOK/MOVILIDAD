@@ -16901,52 +16901,283 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
      * Esta es la forma más confiable de "integración con Outlook" sin
      * requerir API de Microsoft Graph, OAuth ni complementos.
      */
+    /**
+     * Genera un archivo Excel en memoria (sin descargar)
+     * @returns {Promise<Uint8Array>} Buffer del Excel
+     */
+    async function generateExcelBuffer() {
+      return new Promise(function(resolve, reject) {
+        ensureXLSXLoaded().then(function() {
+          try {
+            var sorted = ((typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice()).sort(function(a, b) { return b.days_ago - a.days_ago; });
+            // Hoja 1: Detalle completo
+            var detalleRows = sorted.map(function(d) {
+              return {
+                'Última Conexión': d['Last Seen'] || '',
+                'Días Offline': d.days_ago,
+                'CR': d.CR || '',
+                'Plaza': d.PLAZA || '',
+                'Tienda': d.TIENDA || '',
+                'Asesor': d.ASESOR || '',
+                'Equipo': getEquipmentLabel(d.equipo_type),
+                'Serie': formatSerialNumber(d['Serial Number']),
+                'Comentario': getComment(d) || '',
+                'Nota': getNote(d) || '',
+                'Modelo': d.Model || '',
+                'Estado': statusOf(d).txt
+              };
+            });
+            // Hoja 2: Críticos ≥4D
+            var criticosRows = sorted.filter(function(d) { return isCritical(d); }).map(function(d) {
+              return {
+                'Días Offline': d.days_ago,
+                'CR': d.CR || '',
+                'Tienda': d.TIENDA || '',
+                'Asesor': d.ASESOR || '',
+                'Equipo': getEquipmentLabel(d.equipo_type),
+                'Serie': formatSerialNumber(d['Serial Number']),
+                'Comentario': getComment(d) || '',
+                'Nota': getNote(d) || '',
+                'Última Conexión': d['Last Seen'] || ''
+              };
+            });
+            // Hoja 3: Resumen ejecutivo
+            var stats = getResumenStats();
+            var resumenRows = [
+              { 'Métrica': 'Total tiendas (BD)', 'Valor': stats.totalBD },
+              { 'Métrica': 'Equipos en reporte (válidos)', 'Valor': stats.totalReport },
+              { 'Métrica': 'Apagados ≥4D total', 'Valor': stats.totalCritical },
+              { 'Métrica': 'HH ≥4D', 'Valor': stats.hhCritical },
+              { 'Métrica': 'TABLET ≥4D', 'Valor': stats.ttCritical },
+              { 'Métrica': '% Offline HH', 'Valor': stats.hhPct + '%' },
+              { 'Métrica': '% Offline TABLET', 'Valor': stats.ttPct + '%' },
+              { 'Métrica': '% Disponibilidad HH', 'Valor': stats.dispHH + '%' },
+              { 'Métrica': '% Disponibilidad TABLET', 'Valor': stats.dispTT + '%' }
+            ];
+
+            var wb = XLSX.utils.book_new();
+            var wsDetalle = XLSX.utils.json_to_sheet(detalleRows);
+            var wsCriticos = XLSX.utils.json_to_sheet(criticosRows);
+            var wsResumen = XLSX.utils.json_to_sheet(resumenRows);
+            XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+            XLSX.utils.book_append_sheet(wb, wsCriticos, 'Críticos ≥4D');
+            XLSX.utils.book_append_sheet(wb, wsDetalle, 'Detalle');
+
+            // Obtener buffer del Excel sin descargarlo
+            var excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            resolve(new Uint8Array(excelBuffer));
+          } catch (err) {
+            reject(err);
+          }
+        }).catch(reject);
+      });
+    }
+
+    /**
+     * Genera un archivo PDF en memoria (sin descargar)
+     * @returns {Promise<Uint8Array>} Buffer del PDF
+     */
+    async function generatePDFBuffer() {
+      return new Promise(function(resolve, reject) {
+        if (!window.jspdf || !window.html2canvas) {
+          reject(new Error('Librerías PDF no disponibles'));
+          return;
+        }
+
+        try {
+          var jsPDFCtor = window.jspdf.jsPDF;
+          var pdf = new jsPDFCtor({ unit:'mm', format:'a4', orientation:'portrait' });
+          var stage = document.createElement('div');
+          stage.style.display = 'none';
+          document.body.appendChild(stage);
+
+          var fecha = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
+          var stats = getResumenStats();
+          var cover = buildPDFCoverNode(stats, fecha);
+          stage.appendChild(cover);
+
+          // Capturar portada
+          html2canvas(cover, { scale: 1.2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas) {
+            var imgData = canvas.toDataURL('image/jpeg', 0.85);
+            var imgWidth = 210;
+            var imgHeight = (canvas.height * imgWidth) / canvas.width;
+            var yPos = 0;
+
+            if (imgHeight <= 297) {
+              pdf.addImage(imgData, 'JPEG', 0, yPos, imgWidth, imgHeight);
+            } else {
+              pdf.addImage(imgData, 'JPEG', 0, yPos, imgWidth, imgHeight);
+              while (imgHeight > yPos + 297) {
+                yPos += 297;
+                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', 0, -yPos, imgWidth, imgHeight);
+              }
+            }
+
+            // Agregar resumen ejecutivo
+            pdf.addPage();
+            var Dscope = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
+            var topAsesoresMap = {};
+            Dscope.filter(function(d) { return isCritical(d); }).forEach(function(d) {
+              var a = (d.ASESOR || '—').trim() || '—';
+              topAsesoresMap[a] = (topAsesoresMap[a] || 0) + 1;
+            });
+            var topAsesores = Object.keys(topAsesoresMap)
+              .map(function(k) { return { asesor:k, count: topAsesoresMap[k] }; })
+              .sort(function(a,b) { return b.count - a.count; }).slice(0, 10);
+
+            var resumenHTML = buildResumenSectionHTML(stats);
+            if (topAsesores.length) {
+              resumenHTML += '<h3 style="font-size:13px; margin:14px 0 6px 0;">Top asesores con equipos críticos</h3>';
+              resumenHTML += buildTableSectionHTML(topAsesores, [
+                { label:'Asesor', value:function(r) { return r.asesor; } },
+                { label:'Equipos ≥4D', value:function(r) { return r.count; } }
+              ]);
+            }
+            var nodeResumen = buildPDFSectionNode('Resumen ejecutivo', resumenHTML);
+            stage.innerHTML = '';
+            stage.appendChild(nodeResumen);
+
+            html2canvas(nodeResumen, { scale: 1.2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas2) {
+              var imgData2 = canvas2.toDataURL('image/jpeg', 0.85);
+              var imgWidth2 = 210;
+              var imgHeight2 = (canvas2.height * imgWidth2) / canvas2.width;
+              var yPos2 = 0;
+
+              if (imgHeight2 <= 297) {
+                pdf.addImage(imgData2, 'JPEG', 0, yPos2, imgWidth2, imgHeight2);
+              } else {
+                pdf.addImage(imgData2, 'JPEG', 0, yPos2, imgWidth2, imgHeight2);
+                while (imgHeight2 > yPos2 + 297) {
+                  yPos2 += 297;
+                  pdf.addPage();
+                  pdf.addImage(imgData2, 'JPEG', 0, -yPos2, imgWidth2, imgHeight2);
+                }
+              }
+
+              // Obtener el buffer del PDF
+              var pdfBuffer = pdf.output('arraybuffer');
+              document.body.removeChild(stage);
+              resolve(new Uint8Array(pdfBuffer));
+            }).catch(reject);
+          }).catch(reject);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
     function downloadEMLForOutlook() {
       if (!D || !D.length) { alert('No hay datos cargados.'); return; }
       try {
-        // 1. Construir HTML del correo (ya respeta plaza, dashboards, etc.)
-        var htmlBody = buildEmailHTML() // 2. Construir asunto institucional
-        var fechaTitulo = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
-        var plazaActiva = (typeof getActivePlazaFilter === 'function') ? getActivePlazaFilter() : null;
-        var subject = 'ESTATUS DE EQUIPOS DE MOVILIDAD ' + fechaTitulo;
-        if (plazaActiva) subject += ' - ' + plazaActiva.toUpperCase() // 3. Encode subject usando MIME encoded-word (RFC 2047) para soportar acentos
-        function encodeMimeHeader(s) {
-          // base64 UTF-8 con prefijo =?UTF-8?B?...?=
+        // Mostrar loading
+        var loadingEl = document.getElementById('loading');
+        loadingEl.classList.add('show');
+        var loadingTxt = loadingEl.querySelector('.loading-text');
+        if (loadingTxt) loadingTxt.textContent = 'Preparando email con adjuntos...';
+
+        // Generar Excel y PDF en paralelo
+        Promise.all([generateExcelBuffer(), generatePDFBuffer()]).then(function(results) {
           try {
-            var b64 = btoa(unescape(encodeURIComponent(s)));
-            return '=?UTF-8?B?' + b64 + '?=';
-          } catch (e) { return s; }
-        }
-        var subjectEnc = encodeMimeHeader(subject) // 4. Construir el .eml.
-        // Para que las imágenes data: dentro del HTML se vean correctamente en
-        // Outlook desktop, las dejamos inline (Outlook 2016+ las soporta).
-        // Wrap del HTML en quoted-printable sería más portable, pero
-        // 7bit ASCII + UTF-8 declarado funciona en la mayoría de clientes.
-        var fechaRFC = new Date().toUTCString();
-        var boundary = '----=_OXXO_' + Date.now();
+            var excelBuffer = results[0];
+            var pdfBuffer = results[1];
 
-        var headers = [
-          'MIME-Version: 1.0',
-          'Date: ' + fechaRFC,
-          'Subject: ' + subjectEnc,
-          'X-Unsent: 1',                       // Marca como borrador (no enviado)
-          'Content-Type: text/html; charset=utf-8',
-          'Content-Transfer-Encoding: 8bit'
-        ].join('\r\n');
+            // 1. Construir HTML del correo
+            var htmlBody = buildEmailHTML();
 
-        var emlContent = headers + '\r\n\r\n' + htmlBody + '\r\n' // 5. Descargar el archivo
-        var blob = new Blob([emlContent], { type: 'message/rfc822;charset=utf-8' });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'Correo_Movilidad_' + (plazaActiva || 'Region') + '_' +
-                     new Date().toISOString().split('T')[0] + '.eml';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-        // Notificación elegante tipo toast
-        showEmailToast('✓ Archivo .eml descargado — Doble clic para abrir en Outlook', 'success');
+            // 2. Construir asunto institucional
+            var fechaTitulo = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
+            var plazaActiva = (typeof getActivePlazaFilter === 'function') ? getActivePlazaFilter() : null;
+            var subject = 'ESTATUS DE EQUIPOS DE MOVILIDAD ' + fechaTitulo;
+            if (plazaActiva) subject += ' - ' + plazaActiva.toUpperCase();
+
+            // 3. Encode subject usando MIME encoded-word (RFC 2047)
+            function encodeMimeHeader(s) {
+              try {
+                var b64 = btoa(unescape(encodeURIComponent(s)));
+                return '=?UTF-8?B?' + b64 + '?=';
+              } catch (e) { return s; }
+            }
+            var subjectEnc = encodeMimeHeader(subject);
+
+            // 4. Construir el .eml con adjuntos (MIME multipart/mixed)
+            var fechaRFC = new Date().toUTCString();
+            var boundary = '----=_OXXO_' + Date.now();
+            var boundaryAttach = '----=_OXXO_ATTACH_' + Date.now();
+
+            // Headers principales
+            var headers = [
+              'MIME-Version: 1.0',
+              'Date: ' + fechaRFC,
+              'Subject: ' + subjectEnc,
+              'X-Unsent: 1',
+              'Content-Type: multipart/mixed; boundary="' + boundary + '"'
+            ].join('\r\n');
+
+            // Construir cuerpo multipart
+            var emlContent = headers + '\r\n\r\n';
+
+            // Parte 1: HTML del email
+            emlContent += '--' + boundary + '\r\n';
+            emlContent += 'Content-Type: text/html; charset=utf-8\r\n';
+            emlContent += 'Content-Transfer-Encoding: 8bit\r\n\r\n';
+            emlContent += htmlBody + '\r\n\r\n';
+
+            // Parte 2: Excel attachment
+            emlContent += '--' + boundary + '\r\n';
+            emlContent += 'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; name="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.xlsx"\r\n';
+            emlContent += 'Content-Disposition: attachment; filename="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.xlsx"\r\n';
+            emlContent += 'Content-Transfer-Encoding: base64\r\n\r\n';
+
+            // Convertir Excel a base64
+            var excelBase64 = btoa(String.fromCharCode.apply(null, excelBuffer));
+            // Agregar líneas de 76 caracteres (estándar MIME)
+            for (var i = 0; i < excelBase64.length; i += 76) {
+              emlContent += excelBase64.substr(i, 76) + '\r\n';
+            }
+            emlContent += '\r\n';
+
+            // Parte 3: PDF attachment
+            emlContent += '--' + boundary + '\r\n';
+            emlContent += 'Content-Type: application/pdf; name="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.pdf"\r\n';
+            emlContent += 'Content-Disposition: attachment; filename="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.pdf"\r\n';
+            emlContent += 'Content-Transfer-Encoding: base64\r\n\r\n';
+
+            // Convertir PDF a base64
+            var pdfBase64 = btoa(String.fromCharCode.apply(null, pdfBuffer));
+            // Agregar líneas de 76 caracteres
+            for (var i = 0; i < pdfBase64.length; i += 76) {
+              emlContent += pdfBase64.substr(i, 76) + '\r\n';
+            }
+            emlContent += '\r\n';
+
+            // Cierre del multipart
+            emlContent += '--' + boundary + '--\r\n';
+
+            // 5. Descargar el archivo .eml
+            var blob = new Blob([emlContent], { type: 'message/rfc822;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'Correo_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.eml';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+
+            // Ocultar loading
+            if (loadingEl) loadingEl.classList.remove('show');
+
+            // Notificación elegante tipo toast
+            showEmailToast('✓ Email con adjuntos (Excel + PDF) descargado — Doble clic para abrir en Outlook', 'success');
+          } catch (e) {
+            if (loadingEl) loadingEl.classList.remove('show');
+            alert('Error al generar adjuntos: ' + (e.message || e));
+          }
+        }).catch(function(err) {
+          if (loadingEl) loadingEl.classList.remove('show');
+          alert('Error al preparar Excel/PDF: ' + (err.message || err));
+        });
       } catch (e) {
         alert('Error al generar el archivo .eml: ' + (e.message || e));
       }
