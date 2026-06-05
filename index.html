@@ -18961,12 +18961,18 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       html += '<th style="padding:8px; border:1px solid var(--border); text-align:center;">Impresoras</th>';
       html += '<th style="padding:8px; border:1px solid var(--border); text-align:center;">Acción</th>';
       html += '</tr></thead><tbody>';
+      // Muestra el valor, o "Sin stock" (gris) cuando es 0.
+      function cellVal(v){
+        return (Number(v) > 0)
+          ? '<span style="font-weight:600;">' + v + '</span>'
+          : '<span style="color:#999; font-style:italic; font-size:11px;">Sin stock</span>';
+      }
       stockPlazas.forEach(function(p, i){
         html += '<tr>';
         html += '<td style="padding:7px; border:1px solid var(--border);">' + escHTML(p.plaza) + '</td>';
-        html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;">' + p.hh + '</td>';
-        html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;">' + p.tt + '</td>';
-        html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;">' + p.imp + '</td>';
+        html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;">' + cellVal(p.hh) + '</td>';
+        html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;">' + cellVal(p.tt) + '</td>';
+        html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;">' + cellVal(p.imp) + '</td>';
         html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;"><button onclick="removeStockRow(' + i + ')" style="background:#B3261E;color:white;border:none;padding:4px 10px;border-radius:3px;cursor:pointer;font-size:11px;">Eliminar</button></td>';
         html += '</tr>';
       });
