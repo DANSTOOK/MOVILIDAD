@@ -17652,226 +17652,216 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       if (!window.jspdf || !window.html2canvas) { alert('Librerías PDF no disponibles. Verifica conexión.'); return; }
 
       var loadingEl = document.getElementById('loading');
-      loadingEl.classList.add('show');
-      var loadingTxt = loadingEl.querySelector('.loading-text');
-      if (loadingTxt) loadingTxt.textContent = 'Generando PDF consolidado...';
+      if (loadingEl) { loadingEl.classList.add('show'); var lt = loadingEl.querySelector('.loading-text'); if(lt) lt.textContent = 'Generando PDF…'; }
+
+      // ── helper: crea un nodo off-screen, lo captura y lo elimina ──────────
+      async function pdfPage(html, isFirst) {
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;font-family:"Segoe UI",Arial,sans-serif;color:#1C1B1F;box-sizing:border-box;';
+        wrap.innerHTML = html;
+        document.body.appendChild(wrap);
+        await captureNodeToPDF(pdf, wrap, isFirst);
+        document.body.removeChild(wrap);
+      }
 
       try {
         var jsPDFCtor = window.jspdf.jsPDF;
         var pdf = new jsPDFCtor({ unit:'mm', format:'a4', orientation:'portrait' });
-        var stage = document.getElementById('pdf-stage');
-        stage.innerHTML = '';
 
-        var fecha = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
-        var stats = getResumenStats() // 1. Portada
-        var cover = buildPDFCoverNode(stats, fecha);
-        stage.appendChild(cover);
-        await captureNodeToPDF(pdf, cover, true) // 2. Resumen + Top asesores (todo respeta el filtro de plaza)
-        var Dscope = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
-        var topAsesoresMap = {};
-        Dscope.filter(d => isCritical(d)).forEach(d => {
-          var a = (d.ASESOR || '—').trim() || '—';
-          topAsesoresMap[a] = (topAsesoresMap[a] || 0) + 1;
-        });
-        var topAsesores = Object.keys(topAsesoresMap)
-          .map(k => ({ asesor:k, count: topAsesoresMap[k] }))
-          .sort((a,b) => b.count - a.count).slice(0, 10);
+        var s       = getResumenStats();
+        var Dscope  = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
+        var criticos = Dscope.filter(function(d){ return isCritical(d); }).sort(function(a,b){ return b.days_ago - a.days_ago; });
+        var fecha   = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
+        var plaza   = (typeof getActivePlazaFilter==='function' && getActivePlazaFilter()) ? getActivePlazaFilter().toUpperCase() : 'TODAS LAS PLAZAS';
+        var usabPct = Dscope.length > 0 ? ((Dscope.length - criticos.length) / Dscope.length * 100).toFixed(1) : '100.0';
 
-        var resumenHTML = buildResumenSectionHTML(stats);
-        if (topAsesores.length) {
-          resumenHTML += '<h3 style="font-size:13px; margin:14px 0 6px 0;">Top asesores con equipos críticos</h3>';
-          resumenHTML += buildTableSectionHTML(topAsesores, [
-            { label:'Asesor', value:r => r.asesor },
-            { label:'Equipos ≥4D', value:r => r.count }
-          ]);
+        function dispColor(v){ return parseFloat(v)>=99?'#1F7A4E':parseFloat(v)>=97?'#E8A800':'#B3261E'; }
+        function fmt(n){ return Number(n||0).toLocaleString('es-MX'); }
+
+        // ══════════════════════════════════════════════
+        // PÁG 1 — PORTADA
+        // ══════════════════════════════════════════════
+        await pdfPage(`
+          <div style="min-height:1100px;display:flex;flex-direction:column;justify-content:space-between;">
+            <!-- Header rojo -->
+            <div style="background:linear-gradient(135deg,#E2001A 0%,#9B000F 100%);padding:48px 52px 40px;color:white;">
+              <div style="font-size:11px;font-weight:600;letter-spacing:2px;opacity:.85;margin-bottom:12px;">OXXO · REPORTE DE MOVILIDAD</div>
+              <div style="font-size:30px;font-weight:800;line-height:1.15;margin-bottom:8px;">ESTATUS DE EQUIPOS<br>DE MOVILIDAD</div>
+              <div style="font-size:13px;opacity:.9;margin-bottom:24px;">${fecha} — ${plaza}</div>
+              <div style="display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:6px 18px;font-size:13px;font-weight:700;">
+                Usabilidad general: ${usabPct}%
+              </div>
+            </div>
+
+            <!-- KPI cards 3-columnas -->
+            <div style="padding:28px 40px 0;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:14px;">Indicadores clave</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
+                ${[
+                  {label:'Total BD',     val:fmt(s.totalBD),      sub:'equipos',   color:'#424242'},
+                  {label:'En Reporte',   val:fmt(s.totalReport),  sub:'equipos',   color:'#424242'},
+                  {label:'Apagados ≥4D', val:fmt(criticos.length),sub:'críticos',  color:'#B3261E'},
+                  {label:'Disp. HH',     val:s.dispHH+'%',        sub:'handhelds', color:dispColor(s.dispHH)},
+                  {label:'Disp. TT',     val:s.dispTT+'%',        sub:'tablets',   color:dispColor(s.dispTT)},
+                  {label:'Usabilidad',   val:usabPct+'%',         sub:'disponible',color:dispColor(usabPct)}
+                ].map(function(k){
+                  return '<div style="background:#f9f9f9;border:1px solid #ebebeb;border-radius:10px;padding:14px 16px;border-left:4px solid '+k.color+';">'
+                       + '<div style="font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">'+k.label+'</div>'
+                       + '<div style="font-size:26px;font-weight:800;color:'+k.color+';line-height:1;">'+k.val+'</div>'
+                       + '<div style="font-size:9px;color:#bbb;margin-top:4px;">'+k.sub+'</div>'
+                       + '</div>';
+                }).join('')}
+              </div>
+
+              <!-- Resumen HH/TT -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+                ${[
+                  {name:'HH — Handhelds', total:s.hhTotalBD, offline:s.hhCritical, disp:s.dispHH, color:'#1F7A4E'},
+                  {name:'TT — Tablets',   total:s.ttTotalBD, offline:s.ttCritical, disp:s.dispTT, color:'#0066CC'}
+                ].map(function(r){
+                  var dc=dispColor(r.disp); var pct=parseFloat(r.disp);
+                  return '<div style="border:1.5px solid '+r.color+';border-radius:10px;padding:16px 18px;background:linear-gradient(135deg,rgba(0,0,0,.02),transparent);">'
+                       + '<div style="font-weight:700;font-size:12px;color:'+r.color+';margin-bottom:10px;">'+r.name+'</div>'
+                       + '<div style="display:flex;gap:10px;margin-bottom:10px;">'
+                       + '<div style="flex:1;background:#f4f4f4;border-radius:6px;padding:8px;text-align:center;"><div style="font-size:9px;color:#999;">Total</div><div style="font-size:18px;font-weight:800;color:'+r.color+';">'+fmt(r.total)+'</div></div>'
+                       + '<div style="flex:1;background:rgba(179,38,30,.07);border-radius:6px;padding:8px;text-align:center;"><div style="font-size:9px;color:#B3261E;">Offline ≥4D</div><div style="font-size:18px;font-weight:800;color:#B3261E;">'+fmt(r.offline)+'</div></div>'
+                       + '</div>'
+                       + '<div style="font-size:9px;color:#999;margin-bottom:4px;">Disponibilidad</div>'
+                       + '<div style="background:#eee;border-radius:4px;height:6px;overflow:hidden;margin-bottom:4px;">'
+                       + '<div style="width:'+pct+'%;height:100%;background:'+dc+';border-radius:4px;"></div></div>'
+                       + '<div style="font-size:13px;font-weight:800;color:'+dc+';">'+r.disp+'%</div>'
+                       + '</div>';
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Footer portada -->
+            <div style="padding:20px 40px;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-size:9px;color:#bbb;">Generado automáticamente · OXXO Movilidad</div>
+              <div style="font-size:9px;color:#bbb;">${new Date().toLocaleString('es-MX')}</div>
+            </div>
+          </div>
+        `, true);
+
+        // ══════════════════════════════════════════════
+        // PÁG 2+ — EQUIPOS OFFLINE ≥4D (CRUCE)
+        // ══════════════════════════════════════════════
+        if (criticos.length > 0) {
+          var ROWS_PER_PAGE = 28;
+          var totalCrucePages = Math.ceil(criticos.length / ROWS_PER_PAGE);
+          for (var cp = 0; cp < totalCrucePages; cp++) {
+            var pageRows = criticos.slice(cp * ROWS_PER_PAGE, (cp+1) * ROWS_PER_PAGE);
+            var tableRows = pageRows.map(function(d){
+              var dias = Number(d.days_ago)||0;
+              var dc   = dias>20?'#B3261E':dias>9?'#E8A800':'#1F7A4E';
+              var cmt  = getComment(d)||'';
+              return '<tr style="border-bottom:1px solid #f0f0f0;">'
+                + '<td style="padding:5px 8px;font-size:10px;color:#666;">'+(d['Last Seen']||'—')+'</td>'
+                + '<td style="padding:5px 8px;font-size:11px;font-weight:700;color:'+dc+';text-align:center;">'+dias+'</td>'
+                + '<td style="padding:5px 8px;font-size:10px;">'+(getEquipmentLabel(d.equipo_type)||'—')+'</td>'
+                + '<td style="padding:5px 8px;font-size:10px;font-weight:600;">'+(d.CR||'—')+'</td>'
+                + '<td style="padding:5px 8px;font-size:10px;">'+(d.TIENDA||'—')+'</td>'
+                + '<td style="padding:5px 8px;font-size:10px;">'+(d.ASESOR||'—')+'</td>'
+                + '<td style="padding:5px 8px;font-size:10px;color:#666;">'+cmt+'</td>'
+                + '</tr>';
+            }).join('');
+            await pdfPage(`
+              <div style="padding:28px 32px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #E2001A;">
+                  <div>
+                    <div style="font-size:15px;font-weight:800;color:#E2001A;">Equipos Offline ≥4 días</div>
+                    <div style="font-size:10px;color:#999;margin-top:2px;">${criticos.length} equipos críticos${totalCrucePages>1?' · Página '+(cp+1)+'/'+totalCrucePages:''}</div>
+                  </div>
+                  <div style="background:#E2001A;color:white;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;">${plaza}</div>
+                </div>
+                <table style="width:100%;border-collapse:collapse;">
+                  <thead>
+                    <tr style="background:#E2001A;color:white;">
+                      <th style="padding:7px 8px;font-size:9px;font-weight:700;text-align:left;letter-spacing:.3px;">ÚLTIMA CONEX.</th>
+                      <th style="padding:7px 8px;font-size:9px;font-weight:700;text-align:center;">DÍAS</th>
+                      <th style="padding:7px 8px;font-size:9px;font-weight:700;text-align:left;">TIPO</th>
+                      <th style="padding:7px 8px;font-size:9px;font-weight:700;text-align:left;">CR</th>
+                      <th style="padding:7px 8px;font-size:9px;font-weight:700;text-align:left;">TIENDA</th>
+                      <th style="padding:7px 8px;font-size:9px;font-weight:700;text-align:left;">ASESOR</th>
+                      <th style="padding:7px 8px;font-size:9px;font-weight:700;text-align:left;">COMENTARIO</th>
+                    </tr>
+                  </thead>
+                  <tbody>${tableRows}</tbody>
+                </table>
+              </div>
+            `, false);
+          }
         }
-        var nodeResumen = buildPDFSectionNode('Resumen ejecutivo', resumenHTML);
-        stage.appendChild(nodeResumen);
-        await captureNodeToPDF(pdf, nodeResumen, false);
 
-        // 3. Dashboards — usando ECharts getDataURL (nativo, sin html2canvas, sin DOM visible)
-        // Forzar render por si la pestaña RESUMEN no estaba activa
+        // ══════════════════════════════════════════════
+        // PÁG DASHBOARDS — ECharts getDataURL (sin html2canvas)
+        // ══════════════════════════════════════════════
         try { renderDashboards(); } catch(e) {}
+        await new Promise(function(r){ setTimeout(r, 700); });
 
-        // Pequeña pausa para que ECharts termine de dibujar
-        await new Promise(function(r){ setTimeout(r, 600); });
-
-        // IDs de todos los gráficos en orden de aparición
         var chartIds = [
-          'chart-asesores-llamadas',
-          'chart-top5-tiendas',
-          'chart-hh-tt-offline',
-          'chart-criticidad-cr',
-          'chart-criticidad-pago',
-          'chart-dias-tienda',
-          'chart-modelos-equipos',
-          'chart-responsabilidad',
-          'chart-top5-criticidades',
-          'chart-tendencia-historica'
+          'chart-asesores-llamadas','chart-top5-tiendas','chart-hh-tt-offline',
+          'chart-criticidad-cr','chart-criticidad-pago','chart-dias-tienda',
+          'chart-modelos-equipos','chart-responsabilidad','chart-top5-criticidades','chart-tendencia-historica'
         ];
-
-        // Recopilar imágenes de todos los charts disponibles
         var chartImages = [];
-        chartIds.forEach(function(id) {
-          var dom = document.getElementById(id);
-          if (!dom) return;
+        chartIds.forEach(function(id){
+          var dom = document.getElementById(id); if(!dom) return;
           try {
-            var inst = echarts.getInstanceByDom(dom);
-            if (!inst) return;
-            var url = inst.getDataURL({ type: 'jpeg', pixelRatio: 2, backgroundColor: '#ffffff' });
-            if (url && url.length > 100) {
-              // Obtener título del card padre
+            var inst = echarts.getInstanceByDom(dom); if(!inst) return;
+            var url = inst.getDataURL({ type:'jpeg', pixelRatio:2, backgroundColor:'#fff' });
+            if(url && url.length>200){
               var card = dom.closest('.dashboard-card');
-              var title = card ? (card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : id) : id;
-              chartImages.push({ url: url, title: title });
+              var title = card&&card.querySelector('h3') ? card.querySelector('h3').textContent.replace(/[^\w\s%áéíóúñÁÉÍÓÚÑ]/g,'').trim() : id;
+              chartImages.push({ url:url, title:title });
             }
-          } catch(e) {}
+          } catch(e){}
         });
 
         if (chartImages.length > 0) {
-          // Construir página(s) de dashboards — 2 columnas, 3 filas por página = 6 por hoja
-          var COLS = 2;
           var PER_PAGE = 6;
-          var pages = Math.ceil(chartImages.length / PER_PAGE);
-
-          for (var pg = 0; pg < pages; pg++) {
-            var slice = chartImages.slice(pg * PER_PAGE, (pg + 1) * PER_PAGE);
-            var dashWrap = document.createElement('div');
-            dashWrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;padding:28px 32px;font-family:Roboto,Arial,sans-serif;color:#1C1B1F;box-sizing:border-box;background:white;';
-            var grid = '<h2 style="font-size:16px;color:#E2001A;border-bottom:2px solid #E2001A;padding-bottom:6px;margin:0 0 14px 0;">Dashboards analíticos' + (pages > 1 ? ' (' + (pg+1) + '/' + pages + ')' : '') + '</h2>';
-            grid += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">';
-            slice.forEach(function(ch) {
-              grid += '<div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">'
-                   +  '<div style="padding:6px 10px;background:#f8f8f8;font-size:10px;font-weight:700;color:#E2001A;border-bottom:1px solid #eee;">' + ch.title + '</div>'
-                   +  '<img src="' + ch.url + '" style="width:100%;display:block;" alt="' + ch.title + '">'
+          var dpages = Math.ceil(chartImages.length / PER_PAGE);
+          for (var dp = 0; dp < dpages; dp++) {
+            var dslice = chartImages.slice(dp*PER_PAGE, (dp+1)*PER_PAGE);
+            var dGrid = dslice.map(function(ch){
+              return '<div style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);">'
+                   + '<div style="padding:5px 10px;background:#fafafa;font-size:9px;font-weight:700;color:#E2001A;border-bottom:1px solid #eee;letter-spacing:.3px;">'+ch.title+'</div>'
+                   + '<img src="'+ch.url+'" style="width:100%;display:block;" alt="'+ch.title+'">'
                    + '</div>';
-            });
-            grid += '</div>';
-            dashWrap.innerHTML = grid;
-            document.body.appendChild(dashWrap);
-            await captureNodeToPDF(pdf, dashWrap, false);
-            document.body.removeChild(dashWrap);
+            }).join('');
+            await pdfPage(`
+              <div style="padding:24px 28px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #E2001A;">
+                  <div style="font-size:15px;font-weight:800;color:#E2001A;">Dashboards Analíticos${dpages>1?' ('+(dp+1)+'/'+dpages+')':''}</div>
+                  <div style="font-size:10px;color:#999;">${fecha}</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">${dGrid}</div>
+              </div>
+            `, false);
           }
         }
 
-        // 4. Cruce (críticos ≥4D, top 25 — OPTIMIZED from 40 for faster PDF generation)
-        var cruceRows = Dscope.slice().sort((a,b) => b.days_ago - a.days_ago).filter(d => isCritical(d)).slice(0, 25);
-        var cruceHTML = buildTableSectionHTML(cruceRows, [
-          { label:'Días', value:r => r.days_ago },
-          { label:'Tipo', value:r => getEquipmentLabel(r.equipo_type) },
-          { label:'CR', value:r => r.CR || '—' },
-          { label:'Tienda', value:r => r.TIENDA || '—' },
-          { label:'Asesor', value:r => r.ASESOR || '—' },
-          { label:'Comentario', value:r => getComment(r) || '—' },
-          { label:'Nota', value:r => getNote(r) || '—' }
-        ]);
-        var nodeCruce = buildPDFSectionNode('CRUCE — Equipos críticos (≥4 días, top 25)', cruceHTML);
-        stage.appendChild(nodeCruce);
-        await captureNodeToPDF(pdf, nodeCruce, false) // 5. Detalle completo (con comentarios y notas — subset de plaza)
-        var detalleRows = Dscope.slice().sort((a,b) => b.days_ago - a.days_ago);
-        var detalleHTML = buildTableSectionHTML(detalleRows, [
-          { label:'Última Conex.', value:r => r['Last Seen'] || '—' },
-          { label:'Días', value:r => r.days_ago },
-          { label:'CR', value:r => r.CR || '—' },
-          { label:'Tienda', value:r => r.TIENDA || '—' },
-          { label:'Asesor', value:r => r.ASESOR || '—' },
-          { label:'Tipo', value:r => getEquipmentLabel(r.equipo_type) },
-          { label:'Serie', value:r => r['Serial Number'] || '—' },
-          { label:'Comentario', value:r => getComment(r) || '—' },
-          { label:'Nota', value:r => getNote(r) || '—' }
-        ]);
-        var nodeDetalle = buildPDFSectionNode('DETALLE completo — universo validado', detalleHTML);
-        stage.appendChild(nodeDetalle);
-        await captureNodeToPDF(pdf, nodeDetalle, false) // 6. Stock / Garantía (estatus por tipo + tabla de stock)
-        var garData = (typeof loadGarantiaData === 'function') ? loadGarantiaData() : null;
-        var estatusCounts = (garData && garData.estatus) ? garData.estatus : null;
-        if (!estatusCounts) {
-          // Calcular on-the-fly si no hay datos guardados
-          estatusCounts = { garantia:{hh:0,tt:0,imp:0}, robo:{hh:0,tt:0,imp:0}, danada:{hh:0,tt:0,imp:0}, apagada:{hh:0,tt:0,imp:0} };
-          if (typeof mapCommentToEstado === 'function') {
-            Dscope.forEach(function(d){
-              var estado = mapCommentToEstado(getComment(d));
-              if (!estado) return;
-              var tipo = (d.equipo_type === 'HH') ? 'hh' : (d.equipo_type === 'TABLET') ? 'tt' : 'imp';
-              if (estado === 'GARANTÍA') estatusCounts.garantia[tipo]++;
-              else if (estado === 'ROBO') estatusCounts.robo[tipo]++;
-              else if (estado === 'DAÑADA') estatusCounts.danada[tipo]++;
-              else if (estado === 'APAGADA') estatusCounts.apagada[tipo]++;
-            });
-          }
-        }
-        var hayEstatus = ['garantia','robo','danada','apagada'].some(function(k){
-          var v = estatusCounts[k] || {};
-          return (v.hh||0) + (v.tt||0) + (v.imp||0) > 0;
-        });
-        var stockArr = (garData && Array.isArray(garData.stock)) ? garData.stock : [];
-
-        if (hayEstatus || stockArr.length) {
-          var garHTML = '';
-          if (hayEstatus) {
-            garHTML += '<h3 style="font-size:13px; margin:8px 0 6px 0; color:#F9A825;">Estatus por tipo</h3>';
-            garHTML += '<table style="width:100%; border-collapse:collapse; margin-bottom:14px; font-size:11px;">';
-            garHTML += '<thead><tr style="background:#F9A825; color:white;">';
-            garHTML += '<th style="padding:6px; border:1px solid #ddd;">Estatus</th>';
-            garHTML += '<th style="padding:6px; border:1px solid #ddd;">Hand Held</th>';
-            garHTML += '<th style="padding:6px; border:1px solid #ddd;">Tablet</th>';
-            garHTML += '<th style="padding:6px; border:1px solid #ddd;">Impresoras</th>';
-            garHTML += '</tr></thead><tbody>';
-            var labels = { garantia:'En garantía', robo:'Robo', danada:'Dañada', apagada:'Apagada' };
-            ['garantia','robo','danada','apagada'].forEach(function(k){
-              var v = estatusCounts[k] || { hh:0, tt:0, imp:0 };
-              garHTML += '<tr>';
-              garHTML += '<td style="padding:6px; border:1px solid #ddd; font-weight:600;">' + labels[k] + '</td>';
-              garHTML += '<td style="padding:6px; border:1px solid #ddd; text-align:center;">' + (v.hh||0) + '</td>';
-              garHTML += '<td style="padding:6px; border:1px solid #ddd; text-align:center;">' + (v.tt||0) + '</td>';
-              garHTML += '<td style="padding:6px; border:1px solid #ddd; text-align:center;">' + (v.imp||0) + '</td>';
-              garHTML += '</tr>';
-            });
-            garHTML += '</tbody></table>';
-          }
-          if (stockArr.length) {
-            garHTML += '<h3 style="font-size:13px; margin:14px 0 6px 0; color:#1B5E20;">Stock de equipo</h3>';
-            garHTML += '<table style="width:100%; border-collapse:collapse; font-size:11px;">';
-            garHTML += '<thead><tr style="background:#2E7D32; color:white;">';
-            garHTML += '<th style="padding:6px; border:1px solid #ddd;">Plaza</th>';
-            garHTML += '<th style="padding:6px; border:1px solid #ddd;">Cantidad HH</th>';
-            garHTML += '<th style="padding:6px; border:1px solid #ddd;">Cantidad TT</th>';
-            garHTML += '<th style="padding:6px; border:1px solid #ddd;">Impresoras</th>';
-            garHTML += '</tr></thead><tbody>';
-            stockArr.forEach(function(s){
-              garHTML += '<tr>';
-              garHTML += '<td style="padding:6px; border:1px solid #ddd; font-weight:600;">' + escHTML(s.plaza || '—') + '</td>';
-              garHTML += '<td style="padding:6px; border:1px solid #ddd; text-align:center;">' + (s.hh||0) + '</td>';
-              garHTML += '<td style="padding:6px; border:1px solid #ddd; text-align:center;">' + (s.tt||0) + '</td>';
-              garHTML += '<td style="padding:6px; border:1px solid #ddd; text-align:center;">' + (s.imp||0) + '</td>';
-              garHTML += '</tr>';
-            });
-            garHTML += '</tbody></table>';
-          }
-          var nodeGarantia = buildPDFSectionNode('Stock & Garantía', garHTML);
-          stage.appendChild(nodeGarantia);
-          await captureNodeToPDF(pdf, nodeGarantia, false);
-        }
-
-        // Footer institucional con número de página
+        // ══════════════════════════════════════════════
+        // FOOTER en cada página
+        // ══════════════════════════════════════════════
         var totalPages = pdf.internal.getNumberOfPages();
         var fechaCorta = new Date().toLocaleDateString('es-MX');
         for (var p = 1; p <= totalPages; p++) {
           pdf.setPage(p);
-          pdf.setFontSize(8);
-          pdf.setTextColor(150);
-          pdf.text('OXXO Movilidad · ' + fechaCorta, 14, 290);
-          pdf.text('Página ' + p + ' de ' + totalPages, 196, 290, { align: 'right' });
+          pdf.setFontSize(7); pdf.setTextColor(180);
+          pdf.text('OXXO Movilidad · ' + fechaCorta, 14, 291);
+          pdf.text('Pág. ' + p + ' / ' + totalPages, 196, 291, { align:'right' });
+          // línea separadora footer
+          pdf.setDrawColor(230); pdf.setLineWidth(0.2);
+          pdf.line(14, 288, 196, 288);
         }
 
-        var fname = buildExportFilename('Movilidad_Reporte', 'pdf');
-        pdf.save(fname);
-        stage.innerHTML = '';
+        pdf.save(buildExportFilename('Movilidad_Reporte','pdf'));
+
       } catch (err) {
         alert('Error generando PDF: ' + (err.message || err));
       } finally {
-        loadingEl.classList.remove('show');
-        if (loadingTxt) loadingTxt.textContent = 'Procesando datos...';
+        if (loadingEl) { loadingEl.classList.remove('show'); var lt2=loadingEl.querySelector('.loading-text'); if(lt2) lt2.textContent='Procesando datos…'; }
       }
     }
 
