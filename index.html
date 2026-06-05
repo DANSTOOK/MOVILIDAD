@@ -10533,7 +10533,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </summary>
             <div class="config-options" style="padding: 16px;">
               <p style="font-size: 12px; color: var(--text-light); margin: 0 0 16px 0;">
-                Asigna el costo en USD para cada modelo. Se usará para calcular el costo total en riesgo (equipos offline ≥3 días).
+                Asigna el costo en USD para cada modelo. Se usará para calcular el costo total en riesgo (equipos offline ≥4 días).
               </p>
               <!-- Tabla de costos dinámicas -->
               <table id="cost-config-table" style="width:100%; border-collapse:collapse; margin-bottom:16px; font-size:12px;">
@@ -12985,8 +12985,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       var labels = {
         'total-bd': 'Todos los equipos',
-        'apagados-hh': 'Handhelds offline (≥3 días)',
-        'apagados-tt': 'Tablets offline (≥3 días)',
+        'apagados-hh': 'Handhelds offline (≥4 días)',
+        'apagados-tt': 'Tablets offline (≥4 días)',
         'disp-hh': 'Handhelds disponibles',
         'disp-tt': 'Tablets disponibles',
         'total-reporte': 'Con sincronización reciente'
@@ -14034,16 +14034,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         if (type.includes('HH') || type === 'HANDHELD') {
           typeKey = 'HANDHELD';
           hhTotal++;
-          if (daysOffline < 3) hhOnline++;
+          if (daysOffline < 4) hhOnline++;
         } else if (type.includes('TABLET') || type === 'TABLET') {
           typeKey = 'TABLET';
           ttTotal++;
-          if (daysOffline < 3) ttOnline++;
+          if (daysOffline < 4) ttOnline++;
         } else if (type.includes('IMPRESORA')) {
           typeKey = 'IMPRESORA';
         }
 
-        if (daysOffline >= 3) atRisk++;
+        if (daysOffline >= 4) atRisk++;
 
         // Inicializar contador por tipo si no existe
         if (!stockByType[typeKey]) {
@@ -14166,7 +14166,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       report += '='.repeat(60) + '\n\n';
       report += 'HH Online:     ' + document.getElementById('stock-hh-online').textContent + '/' + document.getElementById('stock-hh-total').textContent + ' (' + document.getElementById('stock-hh-pct').textContent + ')\n';
       report += 'TT Online:     ' + document.getElementById('stock-tt-online').textContent + '/' + document.getElementById('stock-tt-total').textContent + ' (' + document.getElementById('stock-tt-pct').textContent + ')\n';
-      report += 'En Riesgo:     ' + document.getElementById('stock-at-risk').textContent + ' equipos (≥3 días offline)\n';
+      report += 'En Riesgo:     ' + document.getElementById('stock-at-risk').textContent + ' equipos (≥4 días offline)\n';
       report += 'Total BD:      ' + document.getElementById('stock-total-bd').textContent + '\n';
 
       var blob = new Blob([report], {type: 'text/plain; charset=utf-8'});
@@ -14260,8 +14260,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var totalCost = 0;
       for (var i = 0; i < D.length; i++) {
         var d = D[i];
-        var daysOffline = d['days_ago'] || 0;
-        if (daysOffline >= 3) {
+        // Alineado al umbral crítico del app (≥4 días) vía isCritical
+        if (isCritical(d)) {
           totalCost += calculateEquipmentCost(d);
         }
       }
@@ -16742,7 +16742,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
       html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
       html += '<div style="background:' + slate + '; padding:10px 16px;">';
-      html += '<span style="color:white; font-size:13px; font-weight:700;">RESUMEN DE COSTOS EN RIESGO (≥3 días offline)</span>';
+      html += '<span style="color:white; font-size:13px; font-weight:700;">RESUMEN DE COSTOS EN RIESGO (≥4 días offline)</span>';
       html += '</div>';
       html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse;">';
       html += '<thead><tr style="background:#f8f9fa;">';
