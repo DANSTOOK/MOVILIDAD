@@ -9279,35 +9279,110 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">picture_as_pdf</span> Descargar PDF
           </button>
         </div>
-        <!-- DASHBOARD EJECUTIVO - CRUCE DE DATOS CRÍTICOS -->
-        <div style="background: linear-gradient(135deg, rgba(226,0,26,0.08) 0%, rgba(226,0,26,0.02) 100%); border-radius: 12px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(226,0,26,0.15);">
-          <div style="margin-bottom: 10px;">
-            <h3 style="font-size: 13px; font-weight: 700; margin: 0; color: var(--text); display: flex; align-items: center; gap: 6px;">
-              <span class="material-symbols-outlined" style="font-size: 18px; color: #E2001A;">warning</span>
-              Equipos Críticos (≥4 días offline)
-            </h3>
-            <p style="font-size: 10px; color: var(--text-light); margin: 2px 0 0 0;">Datos actualizados en tiempo real</p>
+        <!-- DASHBOARD EJECUTIVO - KPIs CIRCULARES (misma lógica que CRUCE) -->
+        <div style="padding: 8px 14px 18px 14px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+            <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">compare_arrows</span>
+            <span style="font-size:13px; font-weight:700; color:var(--text);">Cruce de Datos</span>
           </div>
-          <div id="resumen-cruce-table-container" style="overflow-x: auto; border-radius: 8px; background: var(--surface);">
-            <table id="resumen-cruce-table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
-              <thead>
-                <tr style="background: var(--surface); border-bottom: 2px solid var(--border);">
-                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Últim Conex.</th>
-                  <th style="padding: 10px 12px; text-align: center; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Días</th>
-                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Equipo</th>
-                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">CR</th>
-                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Tienda</th>
-                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Asesor</th>
-                  <th style="padding: 10px 12px; text-align: left; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">Estado</th>
-                </tr>
-              </thead>
-              <tbody id="resumen-cruce-tbody" style="color: var(--text);">
-                <tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-light);">Cargando datos...</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div style="padding: 8px 12px; background: rgba(0,0,0,0.02); border-top: 1px solid var(--border); border-radius: 0 0 8px 8px; margin-top: 0; font-size: 10px; color: var(--text-light);">
-            <strong id="resumen-cruce-count">0</strong> equipos críticos (≥4 días) encontrados
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:16px;">
+
+            <!-- KPI 1: Total BD -->
+            <div class="kpi-circular-widget" style="cursor:default;">
+              <div class="kpi-circle-container">
+                <svg class="kpi-circle-svg" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="#999" stroke-width="6" stroke-dasharray="0 452.16" stroke-linecap="round" class="progress-circle" style="transform:rotate(-90deg);transform-origin:80px 80px;" id="rs-circle-total-bd"/>
+                  <circle cx="80" cy="80" r="60" fill="var(--surface)"/>
+                </svg>
+                <div class="kpi-circle-content">
+                  <div class="kpi-number" id="rs-total-bd">—</div>
+                  <div class="kpi-label">Total (BD)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 2: HH Apagadas -->
+            <div class="kpi-circular-widget" style="cursor:default;">
+              <div class="kpi-circle-container">
+                <svg class="kpi-circle-svg" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="#999" stroke-width="6" stroke-dasharray="0 452.16" stroke-linecap="round" class="progress-circle" style="transform:rotate(-90deg);transform-origin:80px 80px;" id="rs-circle-apagados-hh"/>
+                  <circle cx="80" cy="80" r="60" fill="var(--surface)"/>
+                </svg>
+                <div class="kpi-circle-content">
+                  <div class="kpi-number" id="rs-apagados-hh">—</div>
+                  <div class="kpi-label">HH Apagadas</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 3: TT Apagadas -->
+            <div class="kpi-circular-widget" style="cursor:default;">
+              <div class="kpi-circle-container">
+                <svg class="kpi-circle-svg" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="#999" stroke-width="6" stroke-dasharray="0 452.16" stroke-linecap="round" class="progress-circle" style="transform:rotate(-90deg);transform-origin:80px 80px;" id="rs-circle-apagados-tt"/>
+                  <circle cx="80" cy="80" r="60" fill="var(--surface)"/>
+                </svg>
+                <div class="kpi-circle-content">
+                  <div class="kpi-number" id="rs-apagados-tt">—</div>
+                  <div class="kpi-label">TT Apagadas</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 4: Disp. HH % -->
+            <div class="kpi-circular-widget" style="cursor:default;" id="rs-widget-disp-hh">
+              <div class="kpi-circle-container">
+                <svg class="kpi-circle-svg" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(31,122,78,0.08)" stroke-width="6"/>
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="#1F7A4E" stroke-width="6" stroke-dasharray="0 452.16" stroke-linecap="round" class="progress-circle" style="transform:rotate(-90deg);transform-origin:80px 80px;" id="rs-circle-disp-hh"/>
+                  <circle cx="80" cy="80" r="60" fill="var(--surface)"/>
+                </svg>
+                <div class="kpi-circle-content">
+                  <div class="kpi-number" id="rs-disp-hh">—</div>
+                  <div class="kpi-label">
+                    <span class="kpi-status-glyph material-symbols-outlined" id="rs-disp-hh-glyph" aria-hidden="true"></span>
+                    Disp. HH %
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 5: Disp. TT % -->
+            <div class="kpi-circular-widget" style="cursor:default;" id="rs-widget-disp-tt">
+              <div class="kpi-circle-container">
+                <svg class="kpi-circle-svg" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(245,166,35,0.08)" stroke-width="6"/>
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="#F5A623" stroke-width="6" stroke-dasharray="0 452.16" stroke-linecap="round" class="progress-circle" style="transform:rotate(-90deg);transform-origin:80px 80px;" id="rs-circle-disp-tt"/>
+                  <circle cx="80" cy="80" r="60" fill="var(--surface)"/>
+                </svg>
+                <div class="kpi-circle-content">
+                  <div class="kpi-number" id="rs-disp-tt">—</div>
+                  <div class="kpi-label">
+                    <span class="kpi-status-glyph material-symbols-outlined" id="rs-disp-tt-glyph" aria-hidden="true"></span>
+                    Disp. TT %
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 6: Tiendas -->
+            <div class="kpi-circular-widget" style="cursor:default;">
+              <div class="kpi-circle-container">
+                <svg class="kpi-circle-svg" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
+                  <circle cx="80" cy="80" r="72" fill="none" stroke="#999" stroke-width="6" stroke-dasharray="0 452.16" stroke-linecap="round" class="progress-circle" style="transform:rotate(-90deg);transform-origin:80px 80px;" id="rs-circle-tiendas"/>
+                  <circle cx="80" cy="80" r="60" fill="var(--surface)"/>
+                </svg>
+                <div class="kpi-circle-content">
+                  <div class="kpi-number" id="rs-tiendas">—</div>
+                  <div class="kpi-label">Tiendas</div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
         <div id="hhcount" style="display:none;"></div>
@@ -13098,58 +13173,89 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
      * NUEVO: Renderiza los 4 KPIs Críticos como números simples (sin gráficos)
      */
     function renderResumenKpis(stats) {
-      // Validar que stats tenga los datos necesarios
-      if (!stats) {
-        return;
+      if (!stats) return;
+
+      var dispHH  = parseFloat(stats.dispHH)  || 0;
+      var dispTT  = parseFloat(stats.dispTT)  || 0;
+      var totalBD = parseInt(stats.totalBD)   || 0;
+      var hhOff   = parseInt(stats.hhCritical)|| 0;
+      var ttOff   = parseInt(stats.ttCritical)|| 0;
+
+      // Tiendas únicas en la plaza activa
+      var Dscope = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
+      var uniqueStores = {};
+      Dscope.forEach(function(d){ if(d.CR) uniqueStores[d.CR_NORM || d.CR] = true; });
+      var tiendas = Object.keys(uniqueStores).length;
+
+      // Colores dinámicos según disponibilidad
+      function dispColor(v) { return v >= 99 ? '#1F7A4E' : v >= 97 ? '#F5A623' : '#B3261E'; }
+      function dispBg(v)    { return v >= 99 ? 'rgba(31,122,78,0.12)' : v >= 97 ? 'rgba(245,166,35,0.12)' : 'rgba(179,38,30,0.12)'; }
+      function dispGlyph(v) { return v >= 99 ? 'check_circle' : v >= 97 ? 'warning' : 'error'; }
+
+      // Helper: anima el círculo SVG (mismo mecanismo que updateKpiSvgCircles en CRUCE)
+      var CIRC = 2 * Math.PI * 72; // 452.39
+      function animCircle(circleId, pct) {
+        var el = document.getElementById(circleId);
+        if (!el) return;
+        var dash = Math.max(0, Math.min(1, pct / 100)) * CIRC;
+        el.style.strokeDasharray = dash.toFixed(2) + ' ' + CIRC.toFixed(2);
+      }
+      function setCircleColor(circleId, color) {
+        var el = document.getElementById(circleId);
+        if (el) el.setAttribute('stroke', color);
       }
 
-      // Validación adicional: si todos los valores son 0 o nan, algo está mal
-      var dispHH = parseFloat(stats.dispHH) || 0;
-      var dispTT = parseFloat(stats.dispTT) || 0;
-      var totalBD = parseInt(stats.totalBD) || 0;
-      var offlinePct = 100 - dispHH;
-
-      // Asegurar que los valores sean números válidos
-      if (isNaN(dispHH)) dispHH = 0;
-      if (isNaN(dispTT)) dispTT = 0;
-      if (isNaN(totalBD)) totalBD = 0;
-      if (isNaN(offlinePct)) offlinePct = 0;
-
-      // === FORMATEO VISUAL CORRECTO ===
-      // Redondear a 2 decimales para evitar errores de precisión flotante
-      dispHH = Math.round(dispHH * 100) / 100;
-      dispTT = Math.round(dispTT * 100) / 100;
-      offlinePct = Math.round(offlinePct * 100) / 100;
-      totalBD = Math.round(totalBD); // Asegurar que sea entero
-
-      // Actualizar valores en los divs de KPIs (solo números)
-      var hhEl = document.getElementById('kpi-disp-hh-value');
-      if (hhEl) hhEl.textContent = dispHH.toFixed(2) + '%';
-
-      var ttEl = document.getElementById('kpi-disp-tt-value');
-      if (ttEl) ttEl.textContent = dispTT.toFixed(2) + '%';
-
-      var bdEl = document.getElementById('kpi-total-bd-value');
-      if (bdEl) bdEl.textContent = totalBD;
-
-      var offEl = document.getElementById('kpi-offline-pct-value');
-      if (offEl) offEl.textContent = offlinePct.toFixed(2) + '%';
-
-      // === APLICAR COLORES DINÁMICOS A LOS KPIs DEL RESUMEN ===
-      // Remover clases previas y aplicar nuevas basadas en los valores
-      if (hhEl) {
-        hhEl.classList.remove('success', 'warning', 'error');
-        if (dispHH >= 99) hhEl.classList.add('success');
-        else if (dispHH >= 95) hhEl.classList.add('warning');
-        else hhEl.classList.add('error');
+      // Helper: escribe texto en el número del círculo
+      function setText(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = val;
+      }
+      // Helper: aplica color al número
+      function setColor(id, color) {
+        var el = document.getElementById(id);
+        if (el) el.style.color = color;
+      }
+      // Helper: aplica glyph + background al widget
+      function setGlyph(glyphId, widgetId, glyph, bg) {
+        var g = document.getElementById(glyphId);
+        if (g) g.textContent = glyph;
+        var w = document.getElementById(widgetId);
+        if (w) w.style.background = bg;
       }
 
-      if (ttEl) {
-        ttEl.classList.remove('success', 'warning', 'error');
-        if (dispTT >= 99) ttEl.classList.add('success');
-        else if (dispTT >= 95) ttEl.classList.add('warning');
-        else ttEl.classList.add('error');
-      }
+      // --- KPI 1: Total BD ---
+      setText('rs-total-bd', Number(totalBD).toLocaleString('es-MX'));
+      animCircle('rs-circle-total-bd', 100); // siempre lleno, gris neutro
+
+      // --- KPI 2: HH Apagadas ---
+      setText('rs-apagados-hh', hhOff);
+      animCircle('rs-circle-apagados-hh', totalBD > 0 ? (hhOff / totalBD * 100) : 0);
+      setCircleColor('rs-circle-apagados-hh', hhOff > 0 ? '#B3261E' : '#999');
+      setColor('rs-apagados-hh', hhOff > 0 ? '#B3261E' : 'var(--text)');
+
+      // --- KPI 3: TT Apagadas ---
+      setText('rs-apagados-tt', ttOff);
+      animCircle('rs-circle-apagados-tt', totalBD > 0 ? (ttOff / totalBD * 100) : 0);
+      setCircleColor('rs-circle-apagados-tt', ttOff > 0 ? '#B3261E' : '#999');
+      setColor('rs-apagados-tt', ttOff > 0 ? '#B3261E' : 'var(--text)');
+
+      // --- KPI 4: Disp. HH % ---
+      setText('rs-disp-hh', dispHH.toFixed(2) + '%');
+      setColor('rs-disp-hh', dispColor(dispHH));
+      animCircle('rs-circle-disp-hh', dispHH);
+      setCircleColor('rs-circle-disp-hh', dispColor(dispHH));
+      setGlyph('rs-disp-hh-glyph', 'rs-widget-disp-hh', dispGlyph(dispHH), dispBg(dispHH));
+
+      // --- KPI 5: Disp. TT % ---
+      setText('rs-disp-tt', dispTT.toFixed(2) + '%');
+      setColor('rs-disp-tt', dispColor(dispTT));
+      animCircle('rs-circle-disp-tt', dispTT);
+      setCircleColor('rs-circle-disp-tt', dispColor(dispTT));
+      setGlyph('rs-disp-tt-glyph', 'rs-widget-disp-tt', dispGlyph(dispTT), dispBg(dispTT));
+
+      // --- KPI 6: Tiendas ---
+      setText('rs-tiendas', Number(tiendas).toLocaleString('es-MX'));
+      animCircle('rs-circle-tiendas', 100);
     }
 
     /**
