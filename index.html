@@ -14609,7 +14609,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       try {
         var existing = echarts.getInstanceByDom(dom);
         if (existing) existing.dispose();
-        var chart = echarts.init(dom, theme.isDark ? 'dark' : null, { renderer: 'canvas' });
+        // devicePixelRatio alto = gráficas más nítidas (HD) en cualquier
+        // pantalla, incluidas las no-retina. Mantenemos canvas para que
+        // getDataURL (export a PDF/correo) siga funcionando.
+        var chart = echarts.init(dom, theme.isDark ? 'dark' : null, {
+          renderer: 'canvas',
+          devicePixelRatio: Math.max(2, window.devicePixelRatio || 1)
+        });
         chart.getZr().on('click', function(){}); // init zrender
         dashboardCharts[containerId] = chart;
         // Fallback para :has() — marca el wrapper cuando el gráfico está pintado
@@ -16328,7 +16334,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       try {
         if (format === 'png') {
-          var dataURL = chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: bgColor });
+          var dataURL = chart.getDataURL({ type: 'png', pixelRatio: 3, backgroundColor: bgColor });
           var link = document.createElement('a');
           link.href = dataURL;
           link.download = filename + '.png';
@@ -16337,7 +16343,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           document.body.removeChild(link);
         }
         else if (format === 'jpeg') {
-          var dataURL = chart.getDataURL({ type: 'jpeg', pixelRatio: 2, backgroundColor: bgColor });
+          var dataURL = chart.getDataURL({ type: 'jpeg', pixelRatio: 3, backgroundColor: bgColor });
           var link = document.createElement('a');
           link.href = dataURL;
           link.download = filename + '.jpeg';
@@ -16346,7 +16352,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           document.body.removeChild(link);
         }
         else if (format === 'svg') {
-          var dataURL = chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: bgColor });
+          var dataURL = chart.getDataURL({ type: 'png', pixelRatio: 3, backgroundColor: bgColor });
           var w = dom.offsetWidth || 600;
           var h = dom.offsetHeight || 400;
           var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w*2 + '" height="' + h*2 + '">';
@@ -16881,7 +16887,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       try {
         var chart = echarts.getInstanceByDom(dom);
         if (!chart) return null;
-        return chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#ffffff' });
+        return chart.getDataURL({ type: 'png', pixelRatio: 3, backgroundColor: '#ffffff' });
       } catch (e) {
         return null;
       }
