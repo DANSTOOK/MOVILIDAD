@@ -7462,12 +7462,21 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             width: 100%;
             height: 100%;
             inset: 0;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08));
+            /* Sin filter sobre el SVG: un filter rasteriza el vector y suaviza
+               los bordes. La sombra se mueve al contenedor (box-shadow) para
+               que el trazo del aro quede 100% nítido / HD. */
+            overflow: visible;
+          }
+          /* Bordes vectoriales de máxima precisión (anti-alias limpio) */
+          .kpi-circle-svg circle {
+            shape-rendering: geometricPrecision;
+            vector-effect: non-scaling-stroke;
           }
 
           .progress-circle {
             transition: stroke-dasharray 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
             stroke-linecap: round;
+            shape-rendering: geometricPrecision;
           }
 
           .kpi-circle-content {
@@ -7725,17 +7734,21 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             to { transform: rotate(360deg); }
           }
 
-          @keyframes circlePulse {
-            0%, 100% { filter: drop-shadow(0 0 6px var(--widget-glow, rgba(226,0,26,0.4))); }
-            50%      { filter: drop-shadow(0 0 14px var(--widget-glow, rgba(226,0,26,0.7))); }
+          /* Glow como box-shadow CIRCULAR en el contenedor (no como filter
+             sobre el aro): así el brillo se conserva pero el trazo del aro
+             queda 100% nítido en vez de difuminarse. */
+          @keyframes circleGlowPulse {
+            0%, 100% { box-shadow: 0 0 7px 0 var(--widget-glow, rgba(226,0,26,0.30)); }
+            50%      { box-shadow: 0 0 16px 1px var(--widget-glow, rgba(226,0,26,0.55)); }
           }
 
-          .kpi-circular-widget .progress-circle {
-            animation: circlePulse 3.6s ease-in-out infinite;
+          .kpi-circular-widget .kpi-circle-container {
+            border-radius: 50%;
+            animation: circleGlowPulse 3.6s ease-in-out infinite;
           }
 
-          .kpi-circular-widget:hover .progress-circle {
-            animation: circlePulse 1.5s ease-in-out infinite;
+          .kpi-circular-widget:hover .kpi-circle-container {
+            animation-duration: 1.5s;
           }
 
           .kpi-circular-widget .kpi-circle-svg {
