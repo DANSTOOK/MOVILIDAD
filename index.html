@@ -18895,6 +18895,17 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       label.textContent = plaza ? plaza : 'Todas (región completa)';
     }
 
+    // Persiste el stock en localStorage sin alert ni recargar historial, para
+    // que NO se pierda al cambiar de plaza ni al recargar la página.
+    function persistStockSilent() {
+      try {
+        var data = loadGarantiaData() || {};
+        data.stock = stockPlazas;
+        if (!data.fecha) data.fecha = new Date().toISOString();
+        localStorage.setItem(GARANTIA_STORE_KEY, JSON.stringify(data));
+      } catch (e) {}
+    }
+
     function addStockRow() {
       var plazaInput = document.getElementById('stock-plaza-input');
       var hhInput  = document.getElementById('stock-hh');
@@ -18904,11 +18915,25 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var hh  = parseInt((hhInput && hhInput.value) || 0, 10) || 0;
       var tt  = parseInt((ttInput && ttInput.value) || 0, 10) || 0;
       var imp = parseInt((impInput && impInput.value) || 0, 10) || 0;
+
+      // Una sola tabla por plaza: si ya existe esa plaza, no permitir duplicar.
+      var existe = stockPlazas.findIndex(function(p){
+        return (p.plaza || '').trim().toLowerCase() === plaza.trim().toLowerCase();
+      });
+      if (existe !== -1) {
+        swalAlert('Plaza ya registrada',
+          'Ya existe una tabla de stock para "' + plaza + '". Elimina esa fila primero si quieres cambiarla, o usa otra plaza.',
+          'warning', 'Entendido');
+        if (plazaInput) { plazaInput.focus(); plazaInput.select && plazaInput.select(); }
+        return;
+      }
+
       stockPlazas.push({ plaza: plaza, hh: hh, tt: tt, imp: imp });
       if (plazaInput) plazaInput.value = '';
       if (hhInput)  hhInput.value  = '0';
       if (ttInput)  ttInput.value  = '0';
       if (impInput) impInput.value = '0';
+      persistStockSilent();   // guardar de inmediato (sobrevive cambio de plaza/recarga)
       renderStockTable();
       renderStockWidget();  // Actualizar widget Stock de Equipos
       updateStockDashboard(); // Actualizar dashboard Inventario
@@ -18917,6 +18942,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     function removeStockRow(index) {
       if (!confirm('¿Eliminar este registro de stock?')) return;
       stockPlazas.splice(index, 1);
+      persistStockSilent();   // persistir el borrado
       renderStockTable();
       renderStockWidget();  // Actualizar widget Stock de Equipos
       updateStockDashboard(); // Actualizar dashboard Inventario
@@ -19069,10 +19095,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
      * recalcula desde comentarios, restaura stock guardado y pinta historial.
      */
     function refreshGarantiaTab() {
-      // Restaurar stock previo
-      var saved = loadGarantiaData();
-      if (saved && saved.stock && Array.isArray(saved.stock)) {
-        stockPlazas = saved.stock.slice();
+      // Restaurar stock previo SOLO si aún no hay nada en memoria. Antes esto
+      // se ejecutaba en cada entrada a la pestaña / cambio de plaza y pisaba
+      // las filas recién agregadas (de otras plazas), dejando una sola tabla.
+      if (!stockPlazas.length) {
+        var saved = loadGarantiaData();
+        if (saved && saved.stock && Array.isArray(saved.stock)) {
+          stockPlazas = saved.stock.slice();
+        }
       }
       // Recalcular conteos desde comentarios actuales (filtrado por plaza)
       recomputeEstatusFromComments();
