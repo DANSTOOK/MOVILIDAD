@@ -11045,7 +11045,47 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
 
     /* PARSE CSV - usando Papa Parse para mejor manejo de quoted fields y edge cases */
+    // Helpers seguros para min/max de arrays grandes.
+    // Math.max.apply(null, arr) revienta con "Maximum call stack size exceeded"
+    // cuando el array supera ~120k elementos. Estos recorren con reduce (sin límite).
+    function arrMax(arr) {
+      var m = -Infinity;
+      for (var i = 0; i < arr.length; i++) { if (arr[i] > m) m = arr[i]; }
+      return m;
+    }
+    function arrMin(arr) {
+      var m = Infinity;
+      for (var i = 0; i < arr.length; i++) { if (arr[i] < m) m = arr[i]; }
+      return m;
+    }
+
+    // Parsea una sola línea CSV respetando comillas dobles (RFC 4180).
+    // Maneja campos entrecomillados con comas internas y comillas escapadas ("").
+    function parseCSVLine(line) {
+      var out = [];
+      var cur = '';
+      var inQuotes = false;
+      for (var i = 0; i < line.length; i++) {
+        var ch = line[i];
+        if (inQuotes) {
+          if (ch === '"') {
+            if (line[i + 1] === '"') { cur += '"'; i++; }  // comilla escapada
+            else { inQuotes = false; }
+          } else { cur += ch; }
+        } else {
+          if (ch === '"') { inQuotes = true; }
+          else if (ch === ',') { out.push(cur); cur = ''; }
+          else { cur += ch; }
+        }
+      }
+      out.push(cur);
+      return out;
+    }
+
     function parseCSV(text) {
+      if (text == null) return [];          // guard null/undefined
+      text = String(text);
+
       // Intentar usar Papa Parse si está disponible, fallback a método simple
       if (typeof Papa !== 'undefined') {
         try {
@@ -11062,16 +11102,18 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         }
       }
 
-      // Fallback: parser simple
-      var lines = text.split('\n');
-      var headers = lines[0].split(',').map(h => h.trim());
+      // Fallback: parser que respeta comillas (maneja comas dentro de campos).
+      // Normaliza CRLF/CR a LF para soportar archivos de Windows/Mac.
+      var lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+      if (!lines.length) return [];
+      var headers = parseCSVLine(lines[0]).map(h => h.trim());
       var rows = [];
       for (var i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
-        var cells = lines[i].split(',');
+        var cells = parseCSVLine(lines[i]);
         var row = {};
         headers.forEach((h, idx) => {
-          row[h] = cells[idx] ? cells[idx].trim() : '';
+          row[h] = cells[idx] !== undefined ? String(cells[idx]).trim() : '';
         });
         rows.push(row);
       }
@@ -11110,6 +11152,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     function swalAlert(title, message, icon, confirmText) {
       icon = icon || 'info';
       confirmText = confirmText || 'OK';
+      // Fallback nativo si SweetAlert2 no cargó (p.ej. sin internet / CDN bloqueado).
+      // Sin esto, cualquier alerta crashea con "Swal is not defined".
+      if (typeof Swal === 'undefined') {
+        try { window.alert((title ? title + '\n\n' : '') + (message || '')); } catch(e) {}
+        return Promise.resolve({ isConfirmed: true, isDismissed: false });
+      }
       return Swal.fire({
         title: title,
         text: message,
@@ -11137,6 +11185,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     function swalConfirm(title, message, confirmText, cancelText) {
       confirmText = confirmText || 'Sí';
       cancelText = cancelText || 'No';
+      if (typeof Swal === 'undefined') {
+        var ok = false;
+        try { ok = window.confirm((title ? title + '\n\n' : '') + (message || '')); } catch(e) {}
+        return Promise.resolve({ isConfirmed: ok, isDismissed: !ok });
+      }
       return Swal.fire({
         title: title,
         text: message,
@@ -11259,7 +11312,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var pd = parseDate(row['Last Seen'] || '');
         if (pd) parsedDates.push(pd.getTime());
       });
-      var maxTs = parsedDates.length ? Math.max.apply(null, parsedDates) : null // Si no hay ninguna fecha válida, fallback al reloj del sistema.
+      var maxTs = parsedDates.length ? arrMax(parsedDates) : null // Si no hay ninguna fecha válida, fallback al reloj del sistema.
       // Si la fecha máxima es futura (data corrupta), también fallback al sistema.
       var nowMs = (maxTs && maxTs <= Date.now() + 60000) ? maxTs : Date.now();
       REFERENCE_NOW_MS = nowMs // Paso 2: construir registros usando nowMs como referencia.
@@ -15656,15 +15709,24 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
 
     /* EXPORT FUNCTIONS */
+    // Escapa un valor para CSV según RFC 4180:
+    // - Conserva el 0 y otros falsy válidos (no los convierte en vacío).
+    // - Entrecomilla si el valor contiene coma, comilla, salto de línea o CR.
+    // - Duplica las comillas internas.
+    function csvEscape(val) {
+      if (val === null || val === undefined) return '';
+      var s = String(val);
+      if (/[",\n\r]/.test(s)) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }
+
     function arrayToCSV(data, headers) {
-      var csv = headers.join(',') + '\n';
+      // BOM UTF-8 para que Excel respete acentos al abrir el CSV directamente.
+      var csv = '﻿' + headers.map(csvEscape).join(',') + '\r\n';
       data.forEach(row => {
-        var values = headers.map(h => {
-          var val = row[h] || '' // Escape quotes and wrap in quotes if contains comma
-          val = String(val).replace(/"/g, '""');
-          return val.includes(',') ? '"' + val + '"' : val;
-        });
-        csv += values.join(',') + '\n';
+        csv += headers.map(h => csvEscape(row[h])).join(',') + '\r\n';
       });
       return csv;
     }
@@ -19715,8 +19777,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       if (existing) existing.remove();
       var w = 100, h = 28;
       var values = points.map(function(p){ return p.v; });
-      var min = Math.min.apply(null, values);
-      var max = Math.max.apply(null, values);
+      var min = arrMin(values);
+      var max = arrMax(values);
       var range = (max - min) || 1;
       var step = w / (points.length - 1);
       var coords = points.map(function(p, i) {
