@@ -17687,43 +17687,71 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         }
         var nodeResumen = buildPDFSectionNode('Resumen ejecutivo', resumenHTML);
         stage.appendChild(nodeResumen);
-        await captureNodeToPDF(pdf, nodeResumen, false) // 3. Dashboards (capturar solo los 2 más importantes)
-        var dashGrid = document.querySelector('.dashboards-grid');
-        if (dashGrid) {
-          var wasResumenActive = document.getElementById('resumen').classList.contains('active');
-          if (!wasResumenActive) {
-            // forzar render para asegurar que charts existen
-            renderDashboards();
-          }
-          var dashWrap = document.createElement('div');
-          dashWrap.style.cssText = 'width:794px; padding:36px 48px; font-family:Roboto,Arial,sans-serif; color:#1C1B1F; box-sizing:border-box; background:white;';
-          dashWrap.innerHTML = '<h2 style="font-size:18px; color:#E2001A; border-bottom:2px solid #E2001A; padding-bottom:6px; margin:0 0 16px 0;">Dashboards analíticos</h2>';
+        await captureNodeToPDF(pdf, nodeResumen, false);
 
-          // OPTIMIZATION: Build lightweight HTML instead of cloning heavy DOM elements
-          var dashCards = dashGrid.querySelectorAll('.dashboard-card');
-          var topTwoDashHTML = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">';
-          var dashCardCount = 0;
+        // 3. Dashboards — usando ECharts getDataURL (nativo, sin html2canvas, sin DOM visible)
+        // Forzar render por si la pestaña RESUMEN no estaba activa
+        try { renderDashboards(); } catch(e) {}
 
-          dashCards.forEach(function(card, idx) {
-            if (dashCardCount >= 2) return;
-            var origCanvas = card.querySelector('canvas');
-            if (origCanvas && origCanvas.width && origCanvas.height) {
-              try {
-                var dataURL = origCanvas.toDataURL('image/jpeg', 0.80); // Reduced quality for speed
-                if (dataURL && dataURL !== 'data:,') {
-                  topTwoDashHTML += '<div style="border:1px solid #E0E0E0; border-radius:6px; padding:8px;">' +
-                    '<img src="' + dataURL + '" style="width:100%; height:auto; max-height:250px; border-radius:4px;" alt="Dashboard">' +
-                    '</div>';
-                  dashCardCount++;
-                }
-              } catch (e) {}
+        // Pequeña pausa para que ECharts termine de dibujar
+        await new Promise(function(r){ setTimeout(r, 600); });
+
+        // IDs de todos los gráficos en orden de aparición
+        var chartIds = [
+          'chart-asesores-llamadas',
+          'chart-top5-tiendas',
+          'chart-hh-tt-offline',
+          'chart-criticidad-cr',
+          'chart-criticidad-pago',
+          'chart-dias-tienda',
+          'chart-modelos-equipos',
+          'chart-responsabilidad',
+          'chart-top5-criticidades',
+          'chart-tendencia-historica'
+        ];
+
+        // Recopilar imágenes de todos los charts disponibles
+        var chartImages = [];
+        chartIds.forEach(function(id) {
+          var dom = document.getElementById(id);
+          if (!dom) return;
+          try {
+            var inst = echarts.getInstanceByDom(dom);
+            if (!inst) return;
+            var url = inst.getDataURL({ type: 'jpeg', pixelRatio: 2, backgroundColor: '#ffffff' });
+            if (url && url.length > 100) {
+              // Obtener título del card padre
+              var card = dom.closest('.dashboard-card');
+              var title = card ? (card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : id) : id;
+              chartImages.push({ url: url, title: title });
             }
-          });
+          } catch(e) {}
+        });
 
-          topTwoDashHTML += '</div>';
-          dashWrap.innerHTML += topTwoDashHTML;
-          stage.appendChild(dashWrap);
-          await captureNodeToPDF(pdf, dashWrap, false);
+        if (chartImages.length > 0) {
+          // Construir página(s) de dashboards — 2 columnas, 3 filas por página = 6 por hoja
+          var COLS = 2;
+          var PER_PAGE = 6;
+          var pages = Math.ceil(chartImages.length / PER_PAGE);
+
+          for (var pg = 0; pg < pages; pg++) {
+            var slice = chartImages.slice(pg * PER_PAGE, (pg + 1) * PER_PAGE);
+            var dashWrap = document.createElement('div');
+            dashWrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;padding:28px 32px;font-family:Roboto,Arial,sans-serif;color:#1C1B1F;box-sizing:border-box;background:white;';
+            var grid = '<h2 style="font-size:16px;color:#E2001A;border-bottom:2px solid #E2001A;padding-bottom:6px;margin:0 0 14px 0;">Dashboards analíticos' + (pages > 1 ? ' (' + (pg+1) + '/' + pages + ')' : '') + '</h2>';
+            grid += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">';
+            slice.forEach(function(ch) {
+              grid += '<div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">'
+                   +  '<div style="padding:6px 10px;background:#f8f8f8;font-size:10px;font-weight:700;color:#E2001A;border-bottom:1px solid #eee;">' + ch.title + '</div>'
+                   +  '<img src="' + ch.url + '" style="width:100%;display:block;" alt="' + ch.title + '">'
+                   + '</div>';
+            });
+            grid += '</div>';
+            dashWrap.innerHTML = grid;
+            document.body.appendChild(dashWrap);
+            await captureNodeToPDF(pdf, dashWrap, false);
+            document.body.removeChild(dashWrap);
+          }
         }
 
         // 4. Cruce (críticos ≥4D, top 25 — OPTIMIZED from 40 for faster PDF generation)
