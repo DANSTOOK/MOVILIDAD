@@ -17417,67 +17417,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       });
     }
 
+    // Genera el PDF (mismo render nativo HD que la descarga directa) y lo
+    // devuelve como Uint8Array para adjuntarlo al correo.
     async function generatePDFBuffer() {
-      return new Promise(function(resolve, reject) {
-        if (!window.jspdf || !window.html2canvas) {
-          reject(new Error('Librerías PDF no disponibles. Verifica conexión a internet.'));
-          return;
-        }
-        // Stage visible pero fuera de la ventana para que html2canvas pueda medir
-        var stage = document.createElement('div');
-        stage.style.cssText = 'position:fixed; left:-9999px; top:0; width:794px; background:#fff; z-index:-1;';
-        document.body.appendChild(stage);
-
-        try {
-          var jsPDFCtor = window.jspdf.jsPDF;
-          var pdf = new jsPDFCtor({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-
-          var fecha = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
-          var stats = getResumenStats();
-
-          // Portada
-          var cover = buildPDFCoverNode(stats, fecha);
-          stage.innerHTML = '';
-          stage.appendChild(cover);
-
-          _pdfAddNode(pdf, cover, true).then(function() {
-            // Resumen ejecutivo
-            var Dscope = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
-            var topAsesoresMap = {};
-            Dscope.filter(function(d) { return isCritical(d); }).forEach(function(d) {
-              var a = (d.ASESOR || '—').trim() || '—';
-              topAsesoresMap[a] = (topAsesoresMap[a] || 0) + 1;
-            });
-            var topAsesores = Object.keys(topAsesoresMap)
-              .map(function(k) { return { asesor: k, count: topAsesoresMap[k] }; })
-              .sort(function(a, b) { return b.count - a.count; }).slice(0, 10);
-
-            var resumenHTML = buildResumenSectionHTML(stats);
-            if (topAsesores.length) {
-              resumenHTML += '<h3 style="font-size:13px;margin:14px 0 6px 0;">Top asesores con equipos críticos</h3>';
-              resumenHTML += buildTableSectionHTML(topAsesores, [
-                { label: 'Asesor',      value: function(r) { return r.asesor; } },
-                { label: 'Equipos ≥4D', value: function(r) { return r.count;  } }
-              ]);
-            }
-            var nodeResumen = buildPDFSectionNode('Resumen ejecutivo', resumenHTML);
-            stage.innerHTML = '';
-            stage.appendChild(nodeResumen);
-
-            return _pdfAddNode(pdf, nodeResumen, false);
-          }).then(function() {
-            document.body.removeChild(stage);
-            var buf = pdf.output('arraybuffer');
-            resolve(new Uint8Array(buf));
-          }).catch(function(err) {
-            try { document.body.removeChild(stage); } catch(_) {}
-            reject(err);
-          });
-        } catch (err) {
-          try { document.body.removeChild(stage); } catch(_) {}
-          reject(err);
-        }
-      });
+      if (!window.jspdf) {
+        throw new Error('Librería PDF no disponible. Verifica conexión a internet.');
+      }
+      var pdf = await _buildMovilidadPDF();
+      return new Uint8Array(pdf.output('arraybuffer'));
     }
 
     function downloadEMLForOutlook() {
@@ -17910,336 +17857,267 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       }
     }
 
-    async function exportPDFConsolidado() {
-      if (!D || !D.length) { alert('No hay datos cargados.'); return; }
-      if (!window.jspdf || !window.html2canvas) { alert('Librerías PDF no disponibles. Verifica conexión.'); return; }
-
-      var loadingEl = document.getElementById('loading');
-      if (loadingEl) { loadingEl.classList.add('show'); var lt = loadingEl.querySelector('.loading-text'); if(lt) lt.textContent = 'Generando PDF…'; }
-
-      // ── helper: crea un nodo off-screen, lo captura y lo elimina ──────────
-      async function pdfPage(html, isFirst) {
-        var wrap = document.createElement('div');
-        wrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;font-family:"Segoe UI",Arial,sans-serif;color:#1C1B1F;box-sizing:border-box;';
-        wrap.innerHTML = html;
-        document.body.appendChild(wrap);
-        await captureNodeToPDF(pdf, wrap, isFirst);
-        document.body.removeChild(wrap);
+    // PDF 100% nativo jsPDF: texto vectorial nítido (HD a cualquier zoom),
+    // tablas dibujadas y gráficas en alta resolución (pixelRatio 3). Sin
+    // html2canvas → sin rasterizado borroso ni espacios en blanco.
+    // Construye el PDF nativo y devuelve el objeto jsPDF. Lo comparten la
+    // descarga directa (exportPDFConsolidado) y el adjunto del correo
+    // (generatePDFBuffer) para que ambos tengan la misma calidad HD.
+    async function _buildMovilidadPDF() {
+      function loadImg(url){
+        return new Promise(function(res){
+          var im = new Image();
+          im.onload  = function(){ res({ url:url, w:im.naturalWidth||1, h:im.naturalHeight||1 }); };
+          im.onerror = function(){ res({ url:url, w:1, h:1 }); };
+          im.src = url;
+        });
       }
 
-      try {
+      {
         var jsPDFCtor = window.jspdf.jsPDF;
-        var pdf = new jsPDFCtor({ unit:'mm', format:'a4', orientation:'portrait' });
+        var pdf = new jsPDFCtor({ unit:'mm', format:'a4', orientation:'portrait', compress:true });
+        var PW=210, PH=297, M=14, CW=PW-2*M;
 
-        var s       = getResumenStats();
-        var Dscope  = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
-        var criticos = Dscope.filter(function(d){ return isCritical(d); }).sort(function(a,b){ return b.days_ago - a.days_ago; });
-        var fecha   = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
-        var plaza   = (typeof getActivePlazaFilter==='function' && getActivePlazaFilter()) ? getActivePlazaFilter().toUpperCase() : 'TODAS LAS PLAZAS';
-        var usabPct = Dscope.length > 0 ? ((Dscope.length - criticos.length) / Dscope.length * 100).toFixed(1) : '100.0';
-
-        function dispColor(v){ return parseFloat(v)>=99?'#1F7A4E':parseFloat(v)>=97?'#E8A800':'#B3261E'; }
+        // ── paleta + helpers de dibujo nativo ──
+        var RED='#E2001A', REDD='#9B000F', GREEN='#1F7A4E', BLUE='#0066CC',
+            AMBER='#E8A800', CRIT='#B3261E', SLATE='#37474F', WHITE='#FFFFFF';
+        function rgb(h){ h=h.replace('#',''); return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)]; }
+        function fill(h){ var c=rgb(h); pdf.setFillColor(c[0],c[1],c[2]); }
+        function strokeC(h){ var c=rgb(h); pdf.setDrawColor(c[0],c[1],c[2]); }
+        function txtC(h){ var c=rgb(h); pdf.setTextColor(c[0],c[1],c[2]); }
+        function font(style,size){ pdf.setFont('helvetica',style||'normal'); if(size) pdf.setFontSize(size); }
+        // dibuja texto tomando 'y' como borde superior (aprox baseline)
+        function T(str,x,y,size,style,hex,align){ font(style,size); if(hex) txtC(hex); pdf.text(String(str), x, y+size*0.34, {align:align||'left'}); }
+        function trunc(t,n){ t=String(t==null?'':t); return t.length>n ? t.slice(0,n-1)+'…' : t; }
         function fmt(n){ return Number(n||0).toLocaleString('es-MX'); }
+        function dispColor(v){ return parseFloat(v)>=99?GREEN:parseFloat(v)>=97?AMBER:CRIT; }
 
-        // ══════════════════════════════════════════════
-        // PÁG 1 — PORTADA
-        // ══════════════════════════════════════════════
-        await pdfPage(`
-          <div style="min-height:1100px;display:flex;flex-direction:column;justify-content:space-between;">
-            <!-- Header rojo -->
-            <div style="background:linear-gradient(135deg,#E2001A 0%,#9B000F 100%);padding:48px 52px 40px;color:white;">
-              <div style="font-size:11px;font-weight:600;letter-spacing:2px;opacity:.85;margin-bottom:12px;">OXXO · REPORTE DE MOVILIDAD</div>
-              <div style="font-size:30px;font-weight:800;line-height:1.15;margin-bottom:8px;">ESTATUS DE EQUIPOS<br>DE MOVILIDAD</div>
-              <div style="font-size:13px;opacity:.9;margin-bottom:24px;">${fecha} — ${plaza}</div>
-              <div style="display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:6px 18px;font-size:13px;font-weight:700;">
-                Usabilidad general: ${usabPct}%
-              </div>
-            </div>
+        var s        = getResumenStats();
+        var Dscope   = (typeof getPlazaScopedData==='function')?getPlazaScopedData():D.slice();
+        var criticos = Dscope.filter(isCritical).sort(function(a,b){ return b.days_ago-a.days_ago; });
+        var fecha    = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'}).toUpperCase();
+        var plaza    = (typeof getActivePlazaFilter==='function' && getActivePlazaFilter()) ? getActivePlazaFilter().toUpperCase() : 'TODAS LAS PLAZAS';
+        var usabPct  = Dscope.length>0 ? ((Dscope.length-criticos.length)/Dscope.length*100).toFixed(1) : '100.0';
 
-            <!-- KPI cards 3-columnas -->
-            <div style="padding:28px 40px 0;">
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:14px;">Indicadores clave</div>
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
-                ${[
-                  {label:'Total BD',     val:fmt(s.totalBD),      sub:'equipos',   color:'#424242', icon:'📦'},
-                  {label:'En Reporte',   val:fmt(s.totalReport),  sub:'sincronizados',color:'#1F7A4E', icon:'✓'},
-                  {label:'Críticos',     val:fmt(criticos.length),sub:'offline ≥4D', color:'#B3261E', icon:'⚠'},
-                  {label:'Disp. HH',     val:s.dispHH+'%',        sub:'handhelds', color:dispColor(s.dispHH), icon:'📱'},
-                  {label:'Disp. TT',     val:s.dispTT+'%',        sub:'tablets',   color:dispColor(s.dispTT), icon:'🖥'},
-                  {label:'Usabilidad',   val:usabPct+'%',         sub:'general',   color:dispColor(usabPct), icon:'⭐'}
-                ].map(function(k){
-                  var bgGrad=k.color==='#E2001A'?'linear-gradient(135deg,rgba(226,0,26,.08),transparent)':
-                             k.color==='#1F7A4E'?'linear-gradient(135deg,rgba(31,122,78,.08),transparent)':
-                             k.color==='#0066CC'?'linear-gradient(135deg,rgba(0,102,204,.08),transparent)':
-                             'linear-gradient(135deg,rgba(66,66,66,.06),transparent)';
-                  return '<div style="background:white;border:1.5px solid #f0f0f0;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:5px solid '+k.color+';">'
-                       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">'
-                       + '<div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#999;margin-bottom:2px;">'+k.label+'</div></div>'
-                       + '<div style="font-size:18px;">'+k.icon+'</div>'
-                       + '</div>'
-                       + '<div style="font-size:24px;font-weight:900;color:'+k.color+';margin-bottom:4px;line-height:1;">'+k.val+'</div>'
-                       + '<div style="font-size:10px;color:#aaa;">'+k.sub+'</div>'
-                       + '</div>';
-                }).join('')}
-              </div>
+        var y = 0;
+        function ensureSpace(h){ if(y+h > PH-14){ pdf.addPage(); y=16; return true; } return false; }
 
-              <!-- Resumen HH/TT -->
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
-                ${[
-                  {name:'HH — Handhelds', total:s.hhTotalBD, offline:s.hhCritical, disp:s.dispHH, color:'#1F7A4E'},
-                  {name:'TT — Tablets',   total:s.ttTotalBD, offline:s.ttCritical, disp:s.dispTT, color:'#0066CC'}
-                ].map(function(r){
-                  var dc=dispColor(r.disp); var pct=parseFloat(r.disp);
-                  return '<div style="border:1.5px solid '+r.color+';border-radius:10px;padding:16px 18px;background:linear-gradient(135deg,rgba(0,0,0,.02),transparent);">'
-                       + '<div style="font-weight:700;font-size:12px;color:'+r.color+';margin-bottom:10px;">'+r.name+'</div>'
-                       + '<div style="display:flex;gap:10px;margin-bottom:10px;">'
-                       + '<div style="flex:1;background:#f4f4f4;border-radius:6px;padding:8px;text-align:center;"><div style="font-size:9px;color:#999;">Total</div><div style="font-size:18px;font-weight:800;color:'+r.color+';">'+fmt(r.total)+'</div></div>'
-                       + '<div style="flex:1;background:rgba(179,38,30,.07);border-radius:6px;padding:8px;text-align:center;"><div style="font-size:9px;color:#B3261E;">Offline ≥4D</div><div style="font-size:18px;font-weight:800;color:#B3261E;">'+fmt(r.offline)+'</div></div>'
-                       + '</div>'
-                       + '<div style="font-size:9px;color:#999;margin-bottom:4px;">Disponibilidad</div>'
-                       + '<div style="background:#eee;border-radius:4px;height:6px;overflow:hidden;margin-bottom:4px;">'
-                       + '<div style="width:'+pct+'%;height:100%;background:'+dc+';border-radius:4px;"></div></div>'
-                       + '<div style="font-size:13px;font-weight:800;color:'+dc+';">'+r.disp+'%</div>'
-                       + '</div>';
-                }).join('')}
-              </div>
-            </div>
-
-            <!-- Footer portada -->
-            <div style="padding:20px 40px;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
-              <div style="font-size:9px;color:#bbb;">Generado automáticamente · OXXO Movilidad</div>
-              <div style="font-size:9px;color:#bbb;">${new Date().toLocaleString('es-MX')}</div>
-            </div>
-          </div>
-        `, true);
-
-        // ══════════════════════════════════════════════
-        // PÁG 2+ — EQUIPOS OFFLINE ≥4D (CRUCE)
-        // ══════════════════════════════════════════════
-        if (criticos.length > 0) {
-          var ROWS_PER_PAGE = 28;
-          var totalCrucePages = Math.ceil(criticos.length / ROWS_PER_PAGE);
-          for (var cp = 0; cp < totalCrucePages; cp++) {
-            var pageRows = criticos.slice(cp * ROWS_PER_PAGE, (cp+1) * ROWS_PER_PAGE);
-            var tableRows = pageRows.map(function(d,idx){
-              var dias = Number(d.days_ago)||0;
-              var dc   = dias>20?'#B3261E':dias>9?'#E8A800':'#1F7A4E';
-              // Fecha formateada (formatDateDayjs entiende D/M/Y y evita "Invalid Date").
-              var fechaTxt = (typeof formatDateDayjs === 'function')
-                ? formatDateDayjs(d['Last Seen'], 'DD/MM/YYYY HH:mm')
-                : (d['Last Seen']||'—');
-              // Truncar textos largos para que no desborden la fila/columna.
-              function trunc(t, n){ t = String(t||''); return t.length>n ? t.slice(0,n-1)+'…' : t; }
-              var cmt    = trunc(getComment(d)||'—', 38);
-              var tienda = trunc(d.TIENDA||'—', 26);
-              var asesor = trunc(d.ASESOR||'—', 24);
-              var bgRow = idx%2?'#ffffff':'#f9f9f9';
-              return '<tr style="border-bottom:1px solid #f0f0f0;background:'+bgRow+';">'
-                + '<td style="padding:7px 8px;font-size:8.5px;color:#777;white-space:nowrap;">'+fechaTxt+'</td>'
-                + '<td style="padding:7px 8px;font-size:11px;font-weight:800;color:'+dc+';text-align:center;border-left:4px solid '+dc+';">'+dias+'</td>'
-                + '<td style="padding:7px 8px;font-size:9.5px;font-weight:600;color:#333;white-space:nowrap;">'+(getEquipmentLabel(d.equipo_type)||'—')+'</td>'
-                + '<td style="padding:7px 8px;font-size:9.5px;font-weight:700;color:#E2001A;white-space:nowrap;">'+(d.CR||'—')+'</td>'
-                + '<td style="padding:7px 8px;font-size:9.5px;">'+tienda+'</td>'
-                + '<td style="padding:7px 8px;font-size:9.5px;">'+asesor+'</td>'
-                + '<td style="padding:7px 8px;font-size:9px;color:#888;">'+cmt+'</td>'
-                + '</tr>';
-            }).join('');
-            await pdfPage(`
-              <div style="padding:32px 36px;font-family:'Segoe UI',Arial,sans-serif;">
-                <!-- Header premium CRUCE -->
-                <div style="background:linear-gradient(135deg,#E2001A,#B3261E);padding:20px 24px;border-radius:10px;margin-bottom:24px;color:white;">
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                    <div>
-                      <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;">⚠ EQUIPOS CRÍTICOS</div>
-                      <div style="font-size:12px;opacity:.9;margin-top:3px;">Offline ≥4 días · ${criticos.length} equipos${totalCrucePages>1?' · Página '+(cp+1)+'/'+totalCrucePages:''}</div>
-                    </div>
-                    <div style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;">🏪 ${plaza}</div>
-                  </div>
-                  <div style="border-top:1px solid rgba(255,255,255,.2);padding-top:10px;font-size:11px;opacity:.85;">
-                    Estos equipos no han tenido conexión en 4 o más días. Requieren atención inmediata.
-                  </div>
-                </div>
-                <!-- Tabla mejorada -->
-                <table style="width:100%;border-collapse:collapse;box-shadow:0 2px 8px rgba(0,0,0,.08);border-radius:8px;overflow:hidden;">
-                  <thead>
-                    <tr style="background:linear-gradient(135deg,#E2001A,#B3261E);color:white;">
-                      <th style="padding:10px 10px;font-size:9px;font-weight:800;text-align:left;letter-spacing:.5px;text-transform:uppercase;">ÚLTIMA CONEX.</th>
-                      <th style="padding:10px 10px;font-size:9px;font-weight:800;text-align:center;letter-spacing:.5px;text-transform:uppercase;">DÍAS</th>
-                      <th style="padding:10px 10px;font-size:9px;font-weight:800;text-align:left;letter-spacing:.5px;text-transform:uppercase;">TIPO</th>
-                      <th style="padding:10px 10px;font-size:9px;font-weight:800;text-align:left;letter-spacing:.5px;text-transform:uppercase;">CR</th>
-                      <th style="padding:10px 10px;font-size:9px;font-weight:800;text-align:left;letter-spacing:.5px;text-transform:uppercase;">TIENDA</th>
-                      <th style="padding:10px 10px;font-size:9px;font-weight:800;text-align:left;letter-spacing:.5px;text-transform:uppercase;">ASESOR</th>
-                      <th style="padding:10px 10px;font-size:9px;font-weight:800;text-align:left;letter-spacing:.5px;text-transform:uppercase;">COMENTARIO</th>
-                    </tr>
-                  </thead>
-                  <tbody>${tableRows}</tbody>
-                </table>
-              </div>
-            `, false);
-          }
-        }
-
-        // ══════════════════════════════════════════════
-        // PÁG — STOCK & ESTATUS DE EQUIPOS
-        // ══════════════════════════════════════════════
-        var garData = (typeof loadGarantiaData === 'function') ? loadGarantiaData() : null;
-        var estatusCounts = (garData && garData.estatus) ? garData.estatus : null;
-        if (!estatusCounts) {
-          // Recalcular desde comentarios si no hay datos guardados
-          estatusCounts = { garantia:{hh:0,tt:0,imp:0}, robo:{hh:0,tt:0,imp:0}, danada:{hh:0,tt:0,imp:0}, apagada:{hh:0,tt:0,imp:0} };
-          if (typeof mapCommentToEstado === 'function') {
-            Dscope.forEach(function(d){
-              var estado = mapCommentToEstado(getComment(d));
-              if (!estado) return;
-              var tipo = (d.equipo_type === 'HH') ? 'hh' : (d.equipo_type === 'TABLET') ? 'tt' : 'imp';
-              if (estado === 'GARANTÍA') estatusCounts.garantia[tipo]++;
-              else if (estado === 'ROBO') estatusCounts.robo[tipo]++;
-              else if (estado === 'DAÑADA') estatusCounts.danada[tipo]++;
-              else if (estado === 'APAGADA') estatusCounts.apagada[tipo]++;
+        // ── tabla genérica nativa con auto-paginado ──
+        // cols: [{label,w,align,chars}]  rows: [[{text,align,hex,bold}]]
+        function drawTable(cols, rows, headBg, redrawHead){
+          var headH=8, rowH=7;
+          function header(){
+            fill(headBg||SLATE); pdf.rect(M,y,CW,headH,'F');
+            var cx=M;
+            cols.forEach(function(c){
+              T(c.label, c.align==='center'?cx+c.w/2:cx+3, y+1.4, 7, 'bold', WHITE, c.align==='center'?'center':'left');
+              cx+=c.w;
             });
+            y+=headH;
           }
+          ensureSpace(headH+rowH); header();
+          rows.forEach(function(r){
+            if(ensureSpace(rowH) && redrawHead!==false){ header(); }
+            var x=M;
+            r.forEach(function(cell,ci){
+              var c=cols[ci];
+              T(trunc(cell.text,c.chars||40), c.align==='center'?x+c.w/2:x+3, y+1.5, 8, cell.bold?'bold':'normal', cell.hex||'#333333', c.align==='center'?'center':'left');
+              x+=c.w;
+            });
+            strokeC('#EEEEEE'); pdf.setLineWidth(0.1); pdf.line(M,y+rowH,M+CW,y+rowH);
+            y+=rowH;
+          });
+          y+=6;
         }
-        var hayEstatus = ['garantia','robo','danada','apagada'].some(function(k){
-          var v = estatusCounts[k] || {}; return (v.hh||0)+(v.tt||0)+(v.imp||0) > 0;
-        });
-        var stockArr = (garData && Array.isArray(garData.stock)) ? garData.stock : [];
-
-        if (hayEstatus || stockArr.length) {
-          var estLabels = { garantia:'En garantía', robo:'Robo', danada:'Dañada', apagada:'Apagada' };
-          var estColor  = { garantia:'#1976D2', robo:'#B3261E', danada:'#E8A800', apagada:'#B80018' };
-          var estatusRows = ['garantia','robo','danada','apagada'].map(function(k){
-            var v = estatusCounts[k] || {hh:0,tt:0,imp:0};
-            var total = (v.hh||0)+(v.tt||0)+(v.imp||0);
-            return '<tr style="border-bottom:1px solid #f0f0f0;background:'+ (estColor[k]+'10') +';border-left:4px solid '+estColor[k]+';">'
-              + '<td style="padding:9px 12px;font-size:11px;font-weight:700;color:#333;">'+estLabels[k]+'</td>'
-              + '<td style="padding:9px 12px;font-size:11px;text-align:center;font-weight:600;">'+(v.hh||0)+'</td>'
-              + '<td style="padding:9px 12px;font-size:11px;text-align:center;font-weight:600;">'+(v.tt||0)+'</td>'
-              + '<td style="padding:9px 12px;font-size:11px;text-align:center;font-weight:600;">'+(v.imp||0)+'</td>'
-              + '<td style="padding:9px 12px;font-size:12px;text-align:center;font-weight:800;color:'+estColor[k]+';">'+total+'</td>'
-              + '</tr>';
-          }).join('');
-
-          var stockRowsHTML = '';
-          if (stockArr.length) {
-            stockRowsHTML = stockArr.map(function(st, si){
-              var bg = si%2?'#ffffff':'#f9f9f9';
-              return '<tr style="border-bottom:1px solid #f0f0f0;background:'+bg+';">'
-                + '<td style="padding:9px 12px;font-size:11px;font-weight:600;">'+ (st.plaza||'—') +'</td>'
-                + '<td style="padding:9px 12px;font-size:11px;text-align:center;">'+(st.hh||0)+'</td>'
-                + '<td style="padding:9px 12px;font-size:11px;text-align:center;">'+(st.tt||0)+'</td>'
-                + '<td style="padding:9px 12px;font-size:11px;text-align:center;">'+(st.imp||0)+'</td>'
-                + '</tr>';
-            }).join('');
-          }
-
-          await pdfPage(`
-            <div style="padding:32px 36px;font-family:'Segoe UI',Arial,sans-serif;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:3px solid #1F7A4E;">
-                <div>
-                  <div style="font-size:17px;font-weight:900;color:#1F7A4E;text-transform:uppercase;letter-spacing:.5px;">📦 Stock & Estatus de Equipos</div>
-                  <div style="font-size:11px;color:#999;margin-top:3px;">${plaza}</div>
-                </div>
-                <div style="background:linear-gradient(135deg,#1F7A4E,#0E5C36);color:white;border-radius:10px;padding:8px 16px;font-size:11px;font-weight:700;">${fecha}</div>
-              </div>
-
-              ${hayEstatus ? `
-              <div style="font-size:12px;font-weight:800;color:#333;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">Estatus por tipo</div>
-              <table style="width:100%;border-collapse:collapse;margin-bottom:26px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-radius:8px;overflow:hidden;">
-                <thead><tr style="background:linear-gradient(135deg,#37474F,#263238);color:white;">
-                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:left;text-transform:uppercase;letter-spacing:.5px;">Estatus</th>
-                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Hand Held</th>
-                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Tablet</th>
-                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Impresoras</th>
-                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Total</th>
-                </tr></thead>
-                <tbody>${estatusRows}</tbody>
-              </table>` : ''}
-
-              ${stockArr.length ? `
-              <div style="font-size:12px;font-weight:800;color:#333;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">Stock de equipo</div>
-              <table style="width:100%;border-collapse:collapse;box-shadow:0 2px 8px rgba(0,0,0,.06);border-radius:8px;overflow:hidden;">
-                <thead><tr style="background:linear-gradient(135deg,#1F7A4E,#0E5C36);color:white;">
-                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:left;text-transform:uppercase;letter-spacing:.5px;">Plaza</th>
-                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">HH</th>
-                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">TT</th>
-                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Impresoras</th>
-                </tr></thead>
-                <tbody>${stockRowsHTML}</tbody>
-              </table>` : ''}
-            </div>
-          `, false);
+        function sectionBar(title, right, color){
+          ensureSpace(13);
+          fill(color||RED); pdf.roundedRect(M,y,CW,9,1.5,1.5,'F');
+          T(title, M+4, y+1.7, 9, 'bold', WHITE);
+          if(right) T(right, PW-M-4, y+1.9, 8, 'bold', '#FFE3E6', 'right');
+          y+=13;
         }
 
-        // ══════════════════════════════════════════════
-        // PÁG DASHBOARDS — ECharts getDataURL (sin html2canvas)
-        // ══════════════════════════════════════════════
-        try { renderDashboards(); } catch(e) {}
-        await new Promise(function(r){ setTimeout(r, 700); });
+        // ══ PORTADA / HEADER ══
+        fill(RED); pdf.rect(0,0,PW,50,'F');
+        fill(REDD); pdf.rect(0,47,PW,3,'F');
+        T('OXXO · REPORTE DE MOVILIDAD', M, 9, 8, 'bold', WHITE);
+        T('ESTATUS DE EQUIPOS DE MOVILIDAD', M, 17, 17, 'bold', WHITE);
+        T(fecha+'   ·   '+plaza, M, 31, 9.5, 'normal', '#FFE3E6');
+        font('bold',10);
+        var badge='Usabilidad '+usabPct+'%'; var bw=pdf.getTextWidth(badge)+10;
+        fill('#B3001A'); pdf.roundedRect(PW-M-bw, 9, bw, 8, 2,2,'F');
+        T(badge, PW-M-bw+5, 11.2, 10, 'bold', WHITE);
+        y=58;
 
-        var chartIds = [
-          'chart-asesores-llamadas','chart-top5-tiendas','chart-hh-tt-offline',
-          'chart-criticidad-cr','chart-criticidad-pago','chart-dias-tienda',
-          'chart-modelos-equipos','chart-responsabilidad','chart-top5-criticidades','chart-tendencia-historica'
+        // ══ KPI CARDS (3 x 2) ══
+        var kpis=[
+          {label:'TOTAL BD',     val:fmt(s.totalBD),       sub:'equipos',     color:'#424242'},
+          {label:'EN REPORTE',   val:fmt(s.totalReport),   sub:'sincronizados',color:GREEN},
+          {label:'CRÍTICOS ≥4D', val:fmt(criticos.length), sub:'offline',     color:CRIT},
+          {label:'DISP. HH',     val:s.dispHH+'%',         sub:'handhelds',   color:dispColor(s.dispHH)},
+          {label:'DISP. TT',     val:s.dispTT+'%',         sub:'tablets',     color:dispColor(s.dispTT)},
+          {label:'USABILIDAD',   val:usabPct+'%',          sub:'general',     color:dispColor(usabPct)}
         ];
-        var chartImages = [];
-        chartIds.forEach(function(id){
-          var dom = document.getElementById(id); if(!dom) return;
-          try {
-            var inst = echarts.getInstanceByDom(dom); if(!inst) return;
-            var url = inst.getDataURL({ type:'jpeg', pixelRatio:2, backgroundColor:'#fff' });
-            if(url && url.length>200){
-              var card = dom.closest('.dashboard-card');
-              var title = card&&card.querySelector('h3') ? card.querySelector('h3').textContent.replace(/[^\w\s%áéíóúñÁÉÍÓÚÑ]/g,'').trim() : id;
-              chartImages.push({ url:url, title:title });
-            }
-          } catch(e){}
+        var gap=5, cols=3, cardW=(CW-(cols-1)*gap)/cols, cardH=23;
+        kpis.forEach(function(k,i){
+          var x=M+(i%cols)*(cardW+gap), cy=y+Math.floor(i/cols)*(cardH+gap);
+          fill(WHITE); strokeC('#ECECEC'); pdf.setLineWidth(0.3); pdf.roundedRect(x,cy,cardW,cardH,2,2,'FD');
+          fill(k.color); pdf.roundedRect(x,cy,1.6,cardH,0.8,0.8,'F');
+          T(k.label, x+6, cy+4, 7, 'bold', '#999999');
+          T(k.val,  x+6, cy+9, 15, 'bold', k.color);
+          T(k.sub,  x+6, cy+18, 7, 'normal', '#AAAAAA');
         });
+        y += 2*cardH + gap + 7;
 
-        if (chartImages.length > 0) {
-          var PER_PAGE = 9;  // 3 columnas x 3 filas = 9 per page (better for A4)
-          var dpages = Math.ceil(chartImages.length / PER_PAGE);
-          for (var dp = 0; dp < dpages; dp++) {
-            var dslice = chartImages.slice(dp*PER_PAGE, (dp+1)*PER_PAGE);
-            var dGrid = dslice.map(function(ch){
-              return '<div style="border:1.5px solid #e8e8e8;border-radius:10px;overflow:hidden;box-shadow:0 3px 12px rgba(226,0,26,.08);transition:all .2s;background:white;">'
-                   + '<div style="padding:8px 12px;background:linear-gradient(135deg,#E2001A,#B3261E);color:white;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid rgba(0,0,0,.1);">'+ch.title+'</div>'
-                   + '<img src="'+ch.url+'" style="width:100%;display:block;min-height:140px;object-fit:cover;" alt="'+ch.title+'">'
-                   + '</div>';
-            }).join('');
-            await pdfPage(`
-              <div style="padding:32px 36px;font-family:'Segoe UI',Arial,sans-serif;">
-                <!-- Header premium -->
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:3px solid #E2001A;">
-                  <div>
-                    <div style="font-size:17px;font-weight:900;color:#E2001A;text-transform:uppercase;letter-spacing:.5px;">📊 Dashboards Analíticos</div>
-                    <div style="font-size:11px;color:#999;margin-top:3px;">${chartImages.length} gráficos analíticos${dpages>1?' · Página '+(dp+1)+'/'+dpages:''}</div>
-                  </div>
-                  <div style="background:linear-gradient(135deg,#E2001A,#B3261E);color:white;border-radius:10px;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:.5px;">${fecha}</div>
-                </div>
-                <!-- Grid 3 columnas -->
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">${dGrid}</div>
-              </div>
-            `, false);
+        // ══ HH / TT con barra de disponibilidad ══
+        var types=[
+          {name:'HH — HANDHELDS', total:s.hhTotalBD, off:s.hhCritical, disp:s.dispHH, color:GREEN},
+          {name:'TT — TABLETS',   total:s.ttTotalBD, off:s.ttCritical, disp:s.dispTT, color:BLUE}
+        ];
+        var tgap=6, tW=(CW-tgap)/2, tH=28;
+        types.forEach(function(t,i){
+          var x=M+i*(tW+tgap);
+          fill(WHITE); strokeC(t.color); pdf.setLineWidth(0.5); pdf.roundedRect(x,y,tW,tH,2,2,'FD');
+          T(t.name, x+6, y+4, 9, 'bold', t.color);
+          T('Total: '+fmt(t.total)+'      Offline ≥4D: '+fmt(t.off), x+6, y+11, 8, 'normal', '#555555');
+          var bx=x+6, by=y+18, bW=tW-12, bH=3, pct=parseFloat(t.disp)||0;
+          fill('#ECECEC'); pdf.roundedRect(bx,by,bW,bH,1.5,1.5,'F');
+          fill(dispColor(t.disp)); pdf.roundedRect(bx,by,Math.max(0,bW*pct/100),bH,1.5,1.5,'F');
+          T(t.disp+'% disponibilidad', x+6, y+22.5, 8, 'bold', dispColor(t.disp));
+        });
+        y += tH + 8;
+
+        // ══ ESTATUS + STOCK ══
+        var garData = (typeof loadGarantiaData==='function')?loadGarantiaData():null;
+        var estatusCounts = (garData&&garData.estatus)?garData.estatus:null;
+        if(!estatusCounts){
+          estatusCounts={garantia:{hh:0,tt:0,imp:0},robo:{hh:0,tt:0,imp:0},danada:{hh:0,tt:0,imp:0},apagada:{hh:0,tt:0,imp:0}};
+          if(typeof mapCommentToEstado==='function'){
+            Dscope.forEach(function(d){ var e=mapCommentToEstado(getComment(d)); if(!e)return;
+              var tp=(d.equipo_type==='HH')?'hh':(d.equipo_type==='TABLET')?'tt':'imp';
+              if(e==='GARANTÍA')estatusCounts.garantia[tp]++; else if(e==='ROBO')estatusCounts.robo[tp]++;
+              else if(e==='DAÑADA')estatusCounts.danada[tp]++; else if(e==='APAGADA')estatusCounts.apagada[tp]++; });
           }
         }
+        var hayEstatus=['garantia','robo','danada','apagada'].some(function(k){var v=estatusCounts[k]||{};return (v.hh||0)+(v.tt||0)+(v.imp||0)>0;});
+        var stockArr=(garData&&Array.isArray(garData.stock))?garData.stock:[];
 
-        // ══════════════════════════════════════════════
-        // FOOTER en cada página
-        // ══════════════════════════════════════════════
-        var totalPages = pdf.internal.getNumberOfPages();
-        var fechaCorta = new Date().toLocaleDateString('es-MX');
-        for (var p = 1; p <= totalPages; p++) {
-          pdf.setPage(p);
-          pdf.setFontSize(7); pdf.setTextColor(180);
-          pdf.text('OXXO Movilidad · ' + fechaCorta, 14, 291);
-          pdf.text('Pág. ' + p + ' / ' + totalPages, 196, 291, { align:'right' });
-          // línea separadora footer
-          pdf.setDrawColor(230); pdf.setLineWidth(0.2);
-          pdf.line(14, 288, 196, 288);
+        if(hayEstatus){
+          T('STOCK & ESTATUS DE EQUIPOS', M, y, 11, 'bold', GREEN); y+=7;
+          T('Estatus por tipo', M, y, 8.5, 'bold', '#555555'); y+=6;
+          var estLabels={garantia:'En garantía',robo:'Robo',danada:'Dañada',apagada:'Apagada'};
+          var estColor={garantia:'#1976D2',robo:CRIT,danada:AMBER,apagada:'#B80018'};
+          var erows=['garantia','robo','danada','apagada'].map(function(k){
+            var v=estatusCounts[k]||{hh:0,tt:0,imp:0}; var tot=(v.hh||0)+(v.tt||0)+(v.imp||0);
+            return [{text:estLabels[k],bold:true,hex:estColor[k]},{text:''+(v.hh||0),align:'center'},{text:''+(v.tt||0),align:'center'},{text:''+(v.imp||0),align:'center'},{text:''+tot,align:'center',bold:true,hex:estColor[k]}];
+          });
+          drawTable([
+            {label:'ESTATUS',w:CW*0.34,chars:28},
+            {label:'HAND HELD',w:CW*0.165,align:'center'},
+            {label:'TABLET',w:CW*0.165,align:'center'},
+            {label:'IMPRESORAS',w:CW*0.165,align:'center'},
+            {label:'TOTAL',w:CW*0.165,align:'center'}
+          ], erows, SLATE);
+        }
+        if(stockArr.length){
+          if(!hayEstatus){ T('STOCK & ESTATUS DE EQUIPOS', M, y, 11, 'bold', GREEN); y+=7; }
+          T('Stock de equipo', M, y, 8.5, 'bold', '#555555'); y+=6;
+          var srows=stockArr.map(function(st){ return [{text:st.plaza||'—'},{text:''+(st.hh||0),align:'center'},{text:''+(st.tt||0),align:'center'},{text:''+(st.imp||0),align:'center'}]; });
+          drawTable([
+            {label:'PLAZA',w:CW*0.40,chars:36},
+            {label:'HH',w:CW*0.20,align:'center'},
+            {label:'TT',w:CW*0.20,align:'center'},
+            {label:'IMPRESORAS',w:CW*0.20,align:'center'}
+          ], srows, GREEN);
         }
 
-        pdf.save(buildExportFilename('Movilidad_Reporte','pdf'));
+        // ══ EQUIPOS OFFLINE ≥4D ══
+        if(criticos.length>0){
+          sectionBar('EQUIPOS OFFLINE ≥4 DÍAS  ·  '+criticos.length+' equipos', plaza, RED);
+          var offRows=criticos.map(function(d){
+            var dias=Number(d.days_ago)||0; var dc=dias>20?CRIT:dias>9?AMBER:GREEN;
+            var fechaTxt=(typeof formatDateDayjs==='function')?formatDateDayjs(d['Last Seen'],'DD/MM/YY HH:mm'):(d['Last Seen']||'—');
+            return [
+              {text:fechaTxt,hex:'#777777'},
+              {text:''+dias,align:'center',bold:true,hex:dc},
+              {text:getEquipmentLabel(d.equipo_type)||'—'},
+              {text:d.CR||'—',bold:true,hex:RED},
+              {text:d.TIENDA||'—'},
+              {text:d.ASESOR||'—'},
+              {text:getComment(d)||'—',hex:'#888888'}
+            ];
+          });
+          drawTable([
+            {label:'ÚLT. CONEXIÓN',w:CW*0.17,chars:17},
+            {label:'DÍAS',w:CW*0.08,align:'center'},
+            {label:'TIPO',w:CW*0.09,chars:8},
+            {label:'CR',w:CW*0.10,chars:9},
+            {label:'TIENDA',w:CW*0.21,chars:26},
+            {label:'ASESOR',w:CW*0.18,chars:24},
+            {label:'COMENTARIO',w:CW*0.17,chars:24}
+          ], offRows, RED);
+        }
 
+        // ══ DASHBOARDS (imágenes HD, aspecto preservado) ══
+        try { renderDashboards(); } catch(e){}
+        await new Promise(function(r){ setTimeout(r,700); });
+        var chartIds=['chart-top5-tiendas','chart-hh-tt-offline','chart-criticidad-cr','chart-dias-tienda','chart-modelos-equipos','chart-responsabilidad','chart-top5-criticidades','chart-tendencia-historica','chart-asesores-llamadas','chart-criticidad-pago'];
+        var charts=[];
+        chartIds.forEach(function(id){ var dom=document.getElementById(id); if(!dom)return;
+          try{ var inst=echarts.getInstanceByDom(dom); if(!inst)return;
+            var url=inst.getDataURL({type:'png',pixelRatio:3,backgroundColor:'#ffffff'});
+            if(url&&url.length>200){ var card=dom.closest('.dashboard-card');
+              var t=card&&card.querySelector('h3')?card.querySelector('h3').textContent.replace(/[^\w\s%áéíóúñÁÉÍÓÚÑ]/g,'').trim():id;
+              charts.push({url:url,title:t}); }
+          }catch(e){} });
+
+        if(charts.length){
+          var dims=await Promise.all(charts.map(function(c){ return loadImg(c.url); }));
+          charts.forEach(function(c,i){ c.natW=dims[i].w; c.natH=dims[i].h; });
+          pdf.addPage(); y=16;
+          sectionBar('DASHBOARDS ANALÍTICOS', fecha, RED);
+          var cgap=6, cW=(CW-cgap)/2, cH=48, barH=6;
+          charts.forEach(function(ch,i){
+            var col=i%2;
+            if(col===0) ensureSpace(cH+cgap);
+            var x=M+col*(cW+cgap);
+            fill('#F7F7F7'); strokeC('#E6E6E6'); pdf.setLineWidth(0.3); pdf.roundedRect(x,y,cW,cH,2,2,'FD');
+            fill(RED); pdf.rect(x,y,cW,barH,'F');
+            T(trunc(ch.title,40), x+3, y+1.3, 7, 'bold', WHITE);
+            // imagen con aspecto preservado dentro del slot
+            var slotW=cW-4, slotH=cH-barH-3;
+            var sc=Math.min(slotW/ch.natW, slotH/ch.natH);
+            var iw=ch.natW*sc, ih=ch.natH*sc;
+            var ix=x+2+(slotW-iw)/2, iy=y+barH+1.5+(slotH-ih)/2;
+            try{ pdf.addImage(ch.url,'PNG',ix,iy,iw,ih,undefined,'FAST'); }catch(e){}
+            if(col===1) y+=cH+cgap;
+          });
+          if(charts.length%2===1) y+=cH+cgap;
+        }
+
+        // ══ FOOTER en todas las páginas ══
+        var totalPages=pdf.internal.getNumberOfPages();
+        var fechaCorta=new Date().toLocaleDateString('es-MX');
+        for(var p=1;p<=totalPages;p++){
+          pdf.setPage(p);
+          strokeC('#E6E6E6'); pdf.setLineWidth(0.2); pdf.line(M,PH-10,PW-M,PH-10);
+          font('normal',7); txtC('#AAAAAA');
+          pdf.text('OXXO Movilidad · '+fechaCorta, M, PH-6);
+          pdf.text('Pág. '+p+' / '+totalPages, PW-M, PH-6, {align:'right'});
+        }
+
+        return pdf;
+      }
+    }
+
+    async function exportPDFConsolidado() {
+      if (!D || !D.length) { alert('No hay datos cargados.'); return; }
+      if (!window.jspdf) { alert('Librería PDF no disponible. Verifica conexión.'); return; }
+      var loadingEl = document.getElementById('loading');
+      if (loadingEl) { loadingEl.classList.add('show'); var lt=loadingEl.querySelector('.loading-text'); if(lt) lt.textContent='Generando PDF…'; }
+      try {
+        var pdf = await _buildMovilidadPDF();
+        pdf.save(buildExportFilename('Movilidad_Reporte','pdf'));
       } catch (err) {
         alert('Error generando PDF: ' + (err.message || err));
       } finally {
