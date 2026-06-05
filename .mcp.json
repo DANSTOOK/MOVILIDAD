@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "reporte-movilidad": {
+      "command": "python",
+      "args": ["mcp-reporte/server.py"]
+    }
+  }
+}

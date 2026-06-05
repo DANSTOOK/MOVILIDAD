@@ -1,0 +1,18 @@
+{
+  "url": "https://TU-PORTAL/ruta/al/reporte.csv",
+  "auth_header": "",
+  "auth_value": "",
+  "output_dir": "",
+  "filename": "reporte_movilidad.csv",
+  "verify_ssl": true,
+  "timeout_seconds": 60,
+
+  "_comentarios": {
+    "url": "URL directa que descarga el reporte en crudo (CSV o XLSX).",
+    "auth_header": "Opcional. Nombre del header de auth, p.ej. 'Authorization' o 'x-api-key'. Dejar vacio si la URL es publica/sin token.",
+    "auth_value": "Opcional. Valor del header, p.ej. 'Bearer eyJ...' o tu API key.",
+    "output_dir": "Opcional. Carpeta donde guardar. Vacio = carpeta del proyecto (junto a index.html).",
+    "filename": "Nombre del archivo descargado.",
+    "verify_ssl": "Pon false si el proxy/red corporativa rompe el certificado SSL (mismo problema que el git push)."
+  }
+}

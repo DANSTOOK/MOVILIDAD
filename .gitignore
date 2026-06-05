@@ -1,0 +1,13 @@
+# Configuracion local del MCP (contiene URL/token — NO subir)
+mcp-reporte/config.local.json
+
+# Backups y archivos temporales
+*.bak
+*.backup
+index.html.bak
+index.html.backup
+push_output.log
+movilidad-updates.bundle
+
+# Entorno de preview local
+.claude/launch.json
