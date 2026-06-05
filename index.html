@@ -6644,6 +6644,79 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style id="mobile-polish">
+  /* ============================================================
+     OPTIMIZACIÓN MÓVIL / TABLET + FLUIDEZ TÁCTIL
+     (aditivo; no cambia funcionalidad)
+     ============================================================ */
+
+  /* Evitar inflado de fuentes en iOS/Android y scroll horizontal accidental */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  html, body { max-width: 100%; overflow-x: hidden; }
+
+  /* Quitar el delay de 300ms al tocar y mejorar respuesta táctil */
+  button, .tab, .bulk-btn, a, select, input[type="checkbox"], .kpi-clickable,
+  .export-card, .dashboard-card, [onclick] {
+    touch-action: manipulation;
+  }
+
+  /* Scroll con inercia + suave en todos los contenedores desplazables */
+  .tabs, .table-wrapper, .section, #results-screen, .modal-body, [style*="overflow"] {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Barra de pestañas: scroll horizontal limpio (oculta la barra fea) */
+  .tabs { scrollbar-width: none; scroll-behavior: smooth; }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  /* Tablas desplazables: pista visual de que se puede deslizar + scrollbar fina */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+  }
+  .table-wrapper::-webkit-scrollbar { height: 6px; }
+  .table-wrapper::-webkit-scrollbar-thumb { background: rgba(226,0,26,.35); border-radius: 3px; }
+
+  /* ---------- TABLETS (≤ 1024px) ---------- */
+  @media (max-width: 1024px) {
+    .dashboards-grid { grid-template-columns: 1fr 1fr !important; }
+  }
+
+  /* ---------- CELULARES (≤ 768px) ---------- */
+  @media (max-width: 768px) {
+    /* Una sola columna para grids de tarjetas/dashboards */
+    .dashboards-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+
+    /* Áreas táctiles cómodas: mínimo 40px de alto en controles */
+    button, .tab, .bulk-btn, select, .comment-select {
+      min-height: 40px;
+    }
+    /* Inputs/selects a 16px evita el zoom automático de iOS al enfocar */
+    input, select, textarea { font-size: 16px !important; }
+
+    /* Tablas más compactas para que quepan más columnas antes de scrollear */
+    .table-wrapper table { font-size: 12px; }
+    .table-wrapper th, .table-wrapper td { padding: 8px 8px !important; white-space: nowrap; }
+
+    /* Pestañas un poco más compactas */
+    .tabs { gap: 4px; padding: 0 8px; }
+    .tab { padding: 8px 12px; font-size: 13px; }
+
+    /* Reducir paddings de secciones para aprovechar el ancho */
+    .section { padding-left: 8px; padding-right: 8px; }
+  }
+
+  /* ---------- CELULARES PEQUEÑOS (≤ 480px) ---------- */
+  @media (max-width: 480px) {
+    h1 { font-size: 20px !important; }
+    h2 { font-size: 15px !important; }
+    .upload-card { padding: 18px 14px !important; }
+    /* Botón flotante de descarga del resumen un poco más chico */
+    #export-resumen-btn { width: 34px !important; height: 34px !important; }
+  }
+</style>
 </head>
 <body>
   <!-- Fondo ambiental reactivo: el tono refleja la salud global (verde/ámbar/rojo) -->
@@ -9355,18 +9428,18 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       </div>
 
       <!-- RESUMEN TAB -->
-      <div id="resumen" class="section">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:0 12px; justify-content:space-between;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span class="material-symbols-outlined" style="font-size:24px; color:var(--primary);">summarize</span>
-            <h2 style="font-size:17px; font-weight:700; margin:0; color:var(--text);">Resumen Ejecutivo</h2>
-          </div>
-          <button id="export-resumen-btn" onclick="toggleExportMenu()" style="background:var(--primary); color:white; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s;">
-            <span class="material-symbols-outlined" style="font-size:18px;">download</span>
-            Descargar
-          </button>
+      <div id="resumen" class="section" style="position:relative;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:0 12px;">
+          <span class="material-symbols-outlined" style="font-size:24px; color:var(--primary);">summarize</span>
+          <h2 style="font-size:17px; font-weight:700; margin:0; color:var(--text);">Resumen Ejecutivo</h2>
         </div>
-        <div id="export-menu" style="display:none; position:absolute; right:30px; top:90px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:1000; min-width:140px;">
+        <!-- Botón flotante compacto en la esquina superior derecha (no estorba) -->
+        <button id="export-resumen-btn" onclick="toggleExportMenu()" title="Descargar resumen"
+          style="position:absolute; top:0; right:12px; z-index:30; background:var(--primary); color:white; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(226,0,26,.32); transition:all 0.2s;"
+          onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='';">
+          <span class="material-symbols-outlined" style="font-size:20px;">download</span>
+        </button>
+        <div id="export-menu" style="display:none; position:absolute; right:12px; top:44px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:1000; min-width:140px;">
           <button onclick="exportResumenAsPNG()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; cursor:pointer; color:var(--text); font-size:12px; border-bottom:1px solid var(--border); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">
             <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">image</span> Descargar PNG
           </button>
