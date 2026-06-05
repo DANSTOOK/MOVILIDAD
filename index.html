@@ -17219,125 +17219,128 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function downloadEMLForOutlook() {
       if (!D || !D.length) { alert('No hay datos cargados.'); return; }
-      try {
-        // Mostrar loading
-        var loadingEl = document.getElementById('loading');
-        loadingEl.classList.add('show');
-        var loadingTxt = loadingEl.querySelector('.loading-text');
-        if (loadingTxt) loadingTxt.textContent = 'Preparando email con adjuntos...';
 
-        // Generar Excel y PDF en paralelo
-        Promise.all([generateExcelBuffer(), generatePDFBuffer()]).then(function(results) {
-          try {
-            var excelBuffer = results[0];
-            var pdfBuffer = results[1];
-
-            // 1. Construir HTML del correo
-            var htmlBody = buildEmailHTML();
-
-            // 2. Construir asunto institucional
-            var fechaTitulo = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
-            var plazaActiva = (typeof getActivePlazaFilter === 'function') ? getActivePlazaFilter() : null;
-            var subject = 'ESTATUS DE EQUIPOS DE MOVILIDAD ' + fechaTitulo;
-            if (plazaActiva) subject += ' - ' + plazaActiva.toUpperCase();
-
-            // 3. Encode subject usando MIME encoded-word (RFC 2047)
-            function encodeMimeHeader(s) {
-              try {
-                var b64 = btoa(unescape(encodeURIComponent(s)));
-                return '=?UTF-8?B?' + b64 + '?=';
-              } catch (e) { return s; }
-            }
-            var subjectEnc = encodeMimeHeader(subject);
-
-            // 4. Construir el .eml con adjuntos (MIME multipart/mixed)
-            var fechaRFC = new Date().toUTCString();
-            var boundary = '----=_OXXO_' + Date.now();
-            var boundaryAttach = '----=_OXXO_ATTACH_' + Date.now();
-
-            // Headers principales
-            var headers = [
-              'MIME-Version: 1.0',
-              'Date: ' + fechaRFC,
-              'Subject: ' + subjectEnc,
-              'X-Unsent: 1',
-              'Content-Type: multipart/mixed; boundary="' + boundary + '"'
-            ].join('\r\n');
-
-            // Construir cuerpo multipart
-            var emlContent = headers + '\r\n\r\n';
-
-            // Parte 1: HTML del email
-            emlContent += '--' + boundary + '\r\n';
-            emlContent += 'Content-Type: text/html; charset=utf-8\r\n';
-            emlContent += 'Content-Transfer-Encoding: 8bit\r\n\r\n';
-            emlContent += htmlBody + '\r\n\r\n';
-
-            // Parte 2: Excel attachment
-            emlContent += '--' + boundary + '\r\n';
-            emlContent += 'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; name="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.xlsx"\r\n';
-            emlContent += 'Content-Disposition: attachment; filename="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.xlsx"\r\n';
-            emlContent += 'Content-Transfer-Encoding: base64\r\n\r\n';
-
-            // Convertir buffer a base64 de forma segura (evita stack overflow en buffers grandes)
-            function uint8ToBase64(buf) {
-              var CHUNK = 8192;
-              var binary = '';
-              for (var b = 0; b < buf.length; b += CHUNK) {
-                binary += String.fromCharCode.apply(null, buf.subarray(b, b + CHUNK));
-              }
-              return btoa(binary);
-            }
-            function base64Lines(b64) {
-              var out = '';
-              for (var i = 0; i < b64.length; i += 76) out += b64.substr(i, 76) + '\r\n';
-              return out;
-            }
-
-            // Convertir Excel a base64
-            emlContent += base64Lines(uint8ToBase64(excelBuffer));
-            emlContent += '\r\n';
-
-            // Parte 3: PDF attachment
-            emlContent += '--' + boundary + '\r\n';
-            emlContent += 'Content-Type: application/pdf; name="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.pdf"\r\n';
-            emlContent += 'Content-Disposition: attachment; filename="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.pdf"\r\n';
-            emlContent += 'Content-Transfer-Encoding: base64\r\n\r\n';
-
-            // Convertir PDF a base64 (seguro)
-            emlContent += base64Lines(uint8ToBase64(pdfBuffer));
-            emlContent += '\r\n';
-
-            // Cierre del multipart
-            emlContent += '--' + boundary + '--\r\n';
-
-            // 5. Descargar el archivo .eml
-            var blob = new Blob([emlContent], { type: 'message/rfc822;charset=utf-8' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'Correo_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.eml';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-
-            // Ocultar loading
-            if (loadingEl) loadingEl.classList.remove('show');
-
-            // Notificación elegante tipo toast
-            showEmailToast('✓ Email con adjuntos (Excel + PDF) descargado — Doble clic para abrir en Outlook', 'success');
-          } catch (e) {
-            if (loadingEl) loadingEl.classList.remove('show');
-            alert('Error al generar adjuntos: ' + (e.message || e));
-          }
-        }).catch(function(err) {
-          if (loadingEl) loadingEl.classList.remove('show');
-          alert('Error al preparar Excel/PDF: ' + (err.message || err));
-        });
-      } catch (e) {
-        alert('Error al generar el archivo .eml: ' + (e.message || e));
+      // --- helpers internos ---
+      function uint8ToBase64(buf) {
+        var CHUNK = 8192, binary = '';
+        for (var b = 0; b < buf.length; b += CHUNK)
+          binary += String.fromCharCode.apply(null, buf.subarray(b, b + CHUNK));
+        return btoa(binary);
       }
+      function base64Lines(b64) {
+        var out = '';
+        for (var i = 0; i < b64.length; i += 76) out += b64.substr(i, 76) + '\r\n';
+        return out;
+      }
+      function encodeMimeHeader(s) {
+        try { return '=?UTF-8?B?' + btoa(unescape(encodeURIComponent(s))) + '?='; }
+        catch(e) { return s; }
+      }
+      function addAttachment(boundary, mime, filename, buf) {
+        var b64 = base64Lines(uint8ToBase64(buf));
+        return '--' + boundary + '\r\n'
+          + 'Content-Type: ' + mime + ';\r\n\tname="' + filename + '"\r\n'
+          + 'Content-Disposition: attachment;\r\n\tfilename="' + filename + '"\r\n'
+          + 'Content-Transfer-Encoding: base64\r\n'
+          + 'Content-ID: <' + filename.replace(/[^a-z0-9]/gi,'-') + '@oxxo>\r\n\r\n'
+          + b64 + '\r\n';
+      }
+
+      // --- mostrar loading con guard ---
+      var loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.classList.add('show');
+        var lt = loadingEl.querySelector('.loading-text');
+        if (lt) lt.textContent = 'Generando adjuntos (Excel + PDF)…';
+      }
+
+      var fecha       = new Date().toISOString().split('T')[0];
+      var plazaActiva = (typeof getActivePlazaFilter === 'function') ? getActivePlazaFilter() : null;
+      var sufijo      = (plazaActiva || 'Region') + '_' + fecha;
+
+      // --- generar Excel (obligatorio) y PDF (opcional) en paralelo ---
+      var excelPromise = generateExcelBuffer().catch(function(e) {
+        console.warn('Excel buffer falló:', e); return null;
+      });
+      var pdfPromise = generatePDFBuffer().catch(function(e) {
+        console.warn('PDF buffer falló:', e); return null;
+      });
+
+      Promise.all([excelPromise, pdfPromise]).then(function(results) {
+        var excelBuf = results[0];
+        var pdfBuf   = results[1];
+
+        try {
+          var htmlBody    = buildEmailHTML();
+          var fechaTitulo = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
+          var subject     = 'ESTATUS DE EQUIPOS DE MOVILIDAD ' + fechaTitulo;
+          if (plazaActiva) subject += ' - ' + plazaActiva.toUpperCase();
+
+          var boundary = 'OXXO_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
+          var fechaRFC = new Date().toUTCString();
+
+          var headers = [
+            'MIME-Version: 1.0',
+            'Date: ' + fechaRFC,
+            'Subject: ' + encodeMimeHeader(subject),
+            'X-Unsent: 1',
+            'Content-Type: multipart/mixed; boundary="' + boundary + '"'
+          ].join('\r\n');
+
+          var body = headers + '\r\n\r\n';
+
+          // Parte 1 — cuerpo HTML
+          body += '--' + boundary + '\r\n'
+               +  'Content-Type: text/html; charset=utf-8\r\n'
+               +  'Content-Transfer-Encoding: 8bit\r\n\r\n'
+               +  htmlBody + '\r\n\r\n';
+
+          // Parte 2 — Excel adjunto
+          if (excelBuf && excelBuf.length > 0) {
+            body += addAttachment(
+              boundary,
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+              'Reporte_Movilidad_' + sufijo + '.xlsx',
+              excelBuf
+            );
+          }
+
+          // Parte 3 — PDF adjunto
+          if (pdfBuf && pdfBuf.length > 0) {
+            body += addAttachment(
+              boundary,
+              'application/pdf',
+              'Reporte_Movilidad_' + sufijo + '.pdf',
+              pdfBuf
+            );
+          }
+
+          body += '--' + boundary + '--\r\n';
+
+          // Descargar .eml
+          var blob = new Blob([body], { type: 'message/rfc822; charset=utf-8' });
+          var url  = URL.createObjectURL(blob);
+          var a    = document.createElement('a');
+          a.href = url;
+          a.download = 'Correo_Movilidad_' + sufijo + '.eml';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+
+          if (loadingEl) loadingEl.classList.remove('show');
+
+          var adjMsg = [];
+          if (excelBuf) adjMsg.push('Excel');
+          if (pdfBuf)   adjMsg.push('PDF');
+          var adjTxt = adjMsg.length ? ' — Adjuntos: ' + adjMsg.join(' + ') : ' (sin adjuntos, error en generación)';
+          showEmailToast('✓ Correo descargado' + adjTxt + ' — Doble clic para abrir en Outlook', 'success');
+
+        } catch (e) {
+          if (loadingEl) loadingEl.classList.remove('show');
+          alert('Error al construir el .eml: ' + (e.message || e));
+        }
+      });
     }
 
     /**
