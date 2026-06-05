@@ -14438,13 +14438,20 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     /* Day.js Date Formatting */
     function formatDateDayjs(date, format) {
-      if (typeof dayjs === 'undefined') return date;
       if (!date) return '-';
-      try {
-        return dayjs(date).format(format || 'YYYY-MM-DD HH:mm');
-      } catch(e) {
-        return date;
+      // Los reportes traen fechas en formato D/M/Y (mexicano). dayjs() y new Date()
+      // NO parsean ese formato → devolvían "Invalid Date". Usamos parseDate(),
+      // que sí entiende D/M/YYYY h:mm:ss con AM/PM, para obtener un Date real.
+      var dObj = (date instanceof Date) ? date
+               : (typeof parseDate === 'function' ? parseDate(date) : null);
+      if (!dObj || isNaN(dObj.getTime())) {
+        // No parseable: mostrar el texto crudo (como CRUCE) en vez de "Invalid Date".
+        return (typeof date === 'string' && date.trim()) ? date : '-';
       }
+      if (typeof dayjs !== 'undefined') {
+        try { return dayjs(dObj).format(format || 'YYYY-MM-DD HH:mm'); } catch(e) {}
+      }
+      return dObj.toLocaleString('es-MX');
     }
 
     function getDaysAgoDayjs(dateStr) {
@@ -16325,7 +16332,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           maximumFractionDigits: 0
         });
       }
-      return String(value).trim() || '—';
+      var s = String(value).trim();
+      // El serial a veces llega como string en notación científica desde XLSX
+      // (p.ej. "2.51125E+13"). Lo normalizamos a entero completo.
+      if (/^[+-]?\d+(\.\d+)?[eE][+-]?\d+$/.test(s)) {
+        var n = Number(s);
+        if (!isNaN(n)) {
+          return n.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 0 });
+        }
+      }
+      return s || '—';
     }
 
     function loadConfig() {
