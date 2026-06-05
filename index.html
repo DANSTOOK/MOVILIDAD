@@ -16628,33 +16628,31 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       html += '</p>';
       html += '</div>';
 
-      // === KPI CARDS (4 tarjetas en fila) ===
+      // === KPI CARDS (3 tarjetas principales en fila) ===
       html += '<div style="padding:0 24px 16px 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
       html += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%; border-collapse:separate; border-spacing:8px 0;">';
       html += '<tr>';
-      // KPI 1: Total BD
-      html += '<td style="width:25%; background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px; text-align:center; vertical-align:top;">';
-      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Total BD</div>';
-      html += '<div style="font-size:24px; font-weight:800; color:#424242;">' + fmt(s.totalBD) + '</div>';
-      html += '<div style="font-size:10px; color:#9e9e9e;">tiendas</div>';
+      // KPI 1: Equipos Offline (desglose HH/TT)
+      html += '<td style="width:33.33%; background:white; border:1px solid #e5e7eb; border-radius:8px; padding:14px; text-align:center; vertical-align:top;">';
+      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; font-weight:600;">EQUIPOS OFFLINE ≥4D</div>';
+      html += '<div style="font-size:28px; font-weight:800; color:' + criticalRed + '; margin-bottom:6px;">' + s.totalCritical + '</div>';
+      html += '<div style="font-size:11px; color:#9e9e9e; margin-bottom:8px; border-top:1px solid #e5e7eb; padding-top:8px;">';
+      html += 'HH: <strong style="color:#424242;">' + s.hhCritical + '</strong> · TT: <strong style="color:#424242;">' + s.ttCritical + '</strong>';
+      html += '</div>';
       html += '</td>';
-      // KPI 2: En Reporte
-      html += '<td style="width:25%; background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px; text-align:center; vertical-align:top;">';
-      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">En Reporte</div>';
-      html += '<div style="font-size:24px; font-weight:800; color:' + slate + ';">' + fmt(s.totalReport) + '</div>';
-      html += '<div style="font-size:10px; color:#9e9e9e;">equipos</div>';
+      // KPI 2: Disponibilidad por tipo
+      html += '<td style="width:33.33%; background:white; border:1px solid #e5e7eb; border-radius:8px; padding:14px; text-align:center; vertical-align:top;">';
+      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; font-weight:600;">DISPONIBILIDAD POR TIPO</div>';
+      html += '<div style="font-size:11px; color:#9e9e9e; margin-bottom:4px;">';
+      html += '<div style="margin-bottom:6px;">HH: <span style="display:inline-block; background:' + dispColor(s.dispHH) + '; color:white; padding:2px 10px; border-radius:10px; font-weight:700; font-size:12px;">' + s.dispHH + '%</span></div>';
+      html += '<div>TT: <span style="display:inline-block; background:' + dispColor(s.dispTT) + '; color:white; padding:2px 10px; border-radius:10px; font-weight:700; font-size:12px;">' + s.dispTT + '%</span></div>';
+      html += '</div>';
       html += '</td>';
-      // KPI 3: Apagados
-      html += '<td style="width:25%; background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px; text-align:center; vertical-align:top;">';
-      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Apagados ≥4D</div>';
-      html += '<div style="font-size:24px; font-weight:800; color:' + criticalRed + ';">' + s.totalCritical + '</div>';
-      html += '<div style="font-size:10px; color:#9e9e9e;">equipos</div>';
-      html += '</td>';
-      // KPI 4: Usabilidad
-      html += '<td style="width:25%; background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px; text-align:center; vertical-align:top;">';
-      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Usabilidad</div>';
-      html += '<div style="font-size:24px; font-weight:800; color:' + usabilidadColor + ';">' + usabilidadPct + '%</div>';
-      html += '<div style="font-size:10px; color:#9e9e9e;">disponible</div>';
+      // KPI 3: Usabilidad General
+      html += '<td style="width:33.33%; background:white; border:1px solid #e5e7eb; border-radius:8px; padding:14px; text-align:center; vertical-align:top;">';
+      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; font-weight:600;">USABILIDAD GENERAL</div>';
+      html += '<div style="font-size:28px; font-weight:800; color:' + usabilidadColor + '; margin-bottom:6px;">' + usabilidadPct + '%</div>';
+      html += '<div style="font-size:11px; color:#9e9e9e;">' + (totalEquipos - equiposCriticos) + ' de ' + totalEquipos + ' disponibles</div>';
       html += '</td>';
       html += '</tr></table>';
       html += '</div>';
@@ -16814,28 +16812,32 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       if (hayEstatus) {
         html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
         html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
-        html += '<div style="background:' + slate + '; padding:10px 16px;">';
-        html += '<span style="color:white; font-size:13px; font-weight:700;">ESTATUS DE EQUIPOS — ' + escHTML(plazaTitulo) + '</span>';
+        html += '<div style="background:' + oxxoRed + '; padding:12px 16px;">';
+        html += '<span style="color:white; font-size:13px; font-weight:700;">⚠ ESTATUS DE EQUIPOS — ' + escHTML(plazaTitulo) + '</span>';
         html += '</div>';
         html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse;">';
         html += '<thead><tr style="background:#f8f9fa;">';
-        html += '<th style="' + tdBase + 'text-align:left; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0;">Estatus</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0;">Hand Held</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0;">Tablet</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0;">Impresoras</th>';
+        html += '<th style="' + tdBase + 'text-align:left; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0;">ESTATUS</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0;">HAND HELD</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0;">TABLET</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0;">IMPRESORAS</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0;">TOTAL</th>';
         html += '</tr></thead><tbody>';
 
         var estLabels = { garantia:'En garantía', robo:'Robo', danada:'Dañada', apagada:'Apagada' };
-        var estDots = { garantia:'#1976D2', robo:criticalRed, danada:warmYellow, apagada:slateDark };
+        var estDots = { garantia:'#1976D2', robo:criticalRed, danada:warmYellow, apagada:'#B80018' };
+        var estBG = { garantia:'rgba(25,118,210,.06)', robo:'rgba(179,38,30,.06)', danada:'rgba(245,166,35,.06)', apagada:'rgba(184,0,24,.08)' };
         var rowIdx = 0;
         ['garantia','robo','danada','apagada'].forEach(function(k){
           var v = estatusCounts[k] || { hh:0, tt:0, imp:0 };
-          var rowBg = (rowIdx % 2 === 1) ? 'background:#fafafa;' : '';
-          html += '<tr style="' + rowBg + '">';
-          html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + dot(estDots[k]) + escHTML(estLabels[k]) + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + (v.hh||0) + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + (v.tt||0) + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + (v.imp||0) + '</td>';
+          var total = (v.hh||0) + (v.tt||0) + (v.imp||0);
+          var rowBg = 'background:' + estBG[k] + ';';
+          html += '<tr style="' + rowBg + 'border-left:4px solid ' + estDots[k] + ';">';
+          html += '<td style="' + tdBase + tdBorder + 'font-weight:700; color:#424242;">' + escHTML(estLabels[k]) + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center; font-weight:600;">' + (v.hh||0) + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center; font-weight:600;">' + (v.tt||0) + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center; font-weight:600;">' + (v.imp||0) + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center; font-weight:700; color:' + estDots[k] + ';">' + total + '</td>';
           html += '</tr>';
           rowIdx++;
         });
