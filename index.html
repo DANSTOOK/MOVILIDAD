@@ -12423,22 +12423,22 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       // - >= 1 y < 4 días → RECIENTE
       // - < 1 día → EN LÍNEA
 
-      if (!d) return { cls: 'unknown', txt: '?' };
+      if (!d) return { cls: 'unknown', txt: '?', bg: 'rgba(0,0,0,0.06)', fg: '#666' };
 
       var days = d.days_ago || 0;
-      var cls, txt // Lógica DIRECTA: usar SOLO la columna de días
+      var cls, txt, bg, fg;
       if (days >= 4) {
-        cls = 'offline';
-        txt = 'Offline';
+        cls = 'offline'; txt = 'Offline';
+        bg  = 'rgba(179,38,30,0.12)'; fg = '#B3261E';
       } else if (days >= 1) {
-        cls = 'recent';
-        txt = 'Reciente';
+        cls = 'recent'; txt = 'Reciente';
+        bg  = 'rgba(245,166,35,0.12)'; fg = '#D4850A';
       } else {
-        cls = 'online';
-        txt = 'En línea';
+        cls = 'online'; txt = 'En línea';
+        bg  = 'rgba(31,122,78,0.12)'; fg = '#1F7A4E';
       }
 
-      return { cls: cls, txt: txt };
+      return { cls: cls, txt: txt, bg: bg, fg: fg };
     }
 
     // Estado vacío reutilizable: ícono + mensaje + acción (en vez de tabla en blanco)
@@ -13112,53 +13112,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       // === RENDERIZAR COST KPIs ===
       renderCostKPIs();
 
-      // === RENDERIZAR TABLA CRUCE EN RESUMEN ===
-      renderResumenCruceTable();
-    }
-
-    /**
-     * Renderiza tabla de equipos críticos en la sección RESUMEN EJECUTIVO
-     */
-    function renderResumenCruceTable() {
-      try {
-        var Dscope = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
-        // Filtrar solo equipos críticos (≥4 días offline) y ordenar por días descendente
-        var criticos = Dscope.filter(function(d) { return isCritical(d); })
-          .sort(function(a, b) { return b.days_ago - a.days_ago; })
-          .slice(0, 15); // Mostrar máximo 15 para mantener compacto
-
-        var html = '';
-        if (criticos.length === 0) {
-          html = '<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-light);">✓ No hay equipos críticos. ¡Excelente!</td></tr>';
-        } else {
-          criticos.forEach(function(d, idx) {
-            var st = statusOf(d);
-            var dias = Number(d.days_ago) || 0;
-            // Color de severidad según días offline
-            var diasColor = dias > 20 ? '#B3261E' : dias > 10 ? '#F5A623' : '#1F7A4E';
-            var rowBg = idx % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.02)';
-
-            html += '<tr style="border-bottom: 1px solid var(--border); background: ' + rowBg + ';">';
-            html += '<td style="padding: 10px 12px;">' + (d['Last Seen'] || '—') + '</td>';
-            html += '<td style="padding: 10px 12px; text-align: center; font-weight: 600; color: ' + diasColor + ';">' + dias + '</td>';
-            html += '<td style="padding: 10px 12px;">' + getEquipmentLabel(d.equipo_type) + '</td>';
-            html += '<td style="padding: 10px 12px; font-weight: 600;">' + (d.CR || '—') + '</td>';
-            html += '<td style="padding: 10px 12px;">' + (d.TIENDA || '—') + '</td>';
-            html += '<td style="padding: 10px 12px;">' + (d.ASESOR || '—') + '</td>';
-            html += '<td style="padding: 10px 12px;"><span style="display: inline-block; padding: 3px 8px; background: ' + st.bg + '; color: ' + st.fg + '; border-radius: 4px; font-size: 11px; font-weight: 600;">' + st.txt + '</span></td>';
-            html += '</tr>';
-          });
-        }
-        document.getElementById('resumen-cruce-tbody').innerHTML = html;
-
-        // Actualizar contador
-        var countEl = document.getElementById('resumen-cruce-count');
-        if (countEl) {
-          countEl.textContent = criticos.length;
-        }
-      } catch (e) {
-        console.warn('Error renderizando tabla cruce en resumen:', e);
-      }
+      // renderResumenCruceTable eliminado — reemplazado por círculos KPI
     }
 
     /**
@@ -17207,45 +17161,65 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
      * Genera un archivo PDF en memoria (sin descargar)
      * @returns {Promise<Uint8Array>} Buffer del PDF
      */
+    /**
+     * Renderiza un nodo al PDF usando html2canvas.
+     * Nodo debe estar visible (fuera de pantalla pero no display:none).
+     */
+    function _pdfAddNode(pdf, node, isFirst) {
+      return html2canvas(node, {
+        scale: 1.2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        width: 794,
+        windowWidth: 794
+      }).then(function(canvas) {
+        if (!canvas || canvas.width === 0 || canvas.height === 0) return; // skip vacíos
+        var imgData   = canvas.toDataURL('image/jpeg', 0.85);
+        var pageW     = 210; // mm A4
+        var pageH     = 297;
+        var imgH      = Math.round((canvas.height * pageW) / canvas.width);
+        if (!isFirst) pdf.addPage();
+        if (imgH <= pageH) {
+          pdf.addImage(imgData, 'JPEG', 0, 0, pageW, imgH);
+        } else {
+          // Imagen más alta que una página: dividir en páginas
+          var yOffset = 0;
+          pdf.addImage(imgData, 'JPEG', 0, 0, pageW, imgH);
+          while (yOffset + pageH < imgH) {
+            yOffset += pageH;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, -yOffset, pageW, imgH);
+          }
+        }
+      });
+    }
+
     async function generatePDFBuffer() {
       return new Promise(function(resolve, reject) {
         if (!window.jspdf || !window.html2canvas) {
-          reject(new Error('Librerías PDF no disponibles'));
+          reject(new Error('Librerías PDF no disponibles. Verifica conexión a internet.'));
           return;
         }
+        // Stage visible pero fuera de la ventana para que html2canvas pueda medir
+        var stage = document.createElement('div');
+        stage.style.cssText = 'position:fixed; left:-9999px; top:0; width:794px; background:#fff; z-index:-1;';
+        document.body.appendChild(stage);
 
         try {
           var jsPDFCtor = window.jspdf.jsPDF;
-          var pdf = new jsPDFCtor({ unit:'mm', format:'a4', orientation:'portrait' });
-          var stage = document.createElement('div');
-          stage.style.display = 'none';
-          document.body.appendChild(stage);
+          var pdf = new jsPDFCtor({ unit: 'mm', format: 'a4', orientation: 'portrait' });
 
           var fecha = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
           var stats = getResumenStats();
+
+          // Portada
           var cover = buildPDFCoverNode(stats, fecha);
+          stage.innerHTML = '';
           stage.appendChild(cover);
 
-          // Capturar portada
-          html2canvas(cover, { scale: 1.2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas) {
-            var imgData = canvas.toDataURL('image/jpeg', 0.85);
-            var imgWidth = 210;
-            var imgHeight = (canvas.height * imgWidth) / canvas.width;
-            var yPos = 0;
-
-            if (imgHeight <= 297) {
-              pdf.addImage(imgData, 'JPEG', 0, yPos, imgWidth, imgHeight);
-            } else {
-              pdf.addImage(imgData, 'JPEG', 0, yPos, imgWidth, imgHeight);
-              while (imgHeight > yPos + 297) {
-                yPos += 297;
-                pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', 0, -yPos, imgWidth, imgHeight);
-              }
-            }
-
-            // Agregar resumen ejecutivo
-            pdf.addPage();
+          _pdfAddNode(pdf, cover, true).then(function() {
+            // Resumen ejecutivo
             var Dscope = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
             var topAsesoresMap = {};
             Dscope.filter(function(d) { return isCritical(d); }).forEach(function(d) {
@@ -17253,45 +17227,32 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               topAsesoresMap[a] = (topAsesoresMap[a] || 0) + 1;
             });
             var topAsesores = Object.keys(topAsesoresMap)
-              .map(function(k) { return { asesor:k, count: topAsesoresMap[k] }; })
-              .sort(function(a,b) { return b.count - a.count; }).slice(0, 10);
+              .map(function(k) { return { asesor: k, count: topAsesoresMap[k] }; })
+              .sort(function(a, b) { return b.count - a.count; }).slice(0, 10);
 
             var resumenHTML = buildResumenSectionHTML(stats);
             if (topAsesores.length) {
-              resumenHTML += '<h3 style="font-size:13px; margin:14px 0 6px 0;">Top asesores con equipos críticos</h3>';
+              resumenHTML += '<h3 style="font-size:13px;margin:14px 0 6px 0;">Top asesores con equipos críticos</h3>';
               resumenHTML += buildTableSectionHTML(topAsesores, [
-                { label:'Asesor', value:function(r) { return r.asesor; } },
-                { label:'Equipos ≥4D', value:function(r) { return r.count; } }
+                { label: 'Asesor',      value: function(r) { return r.asesor; } },
+                { label: 'Equipos ≥4D', value: function(r) { return r.count;  } }
               ]);
             }
             var nodeResumen = buildPDFSectionNode('Resumen ejecutivo', resumenHTML);
             stage.innerHTML = '';
             stage.appendChild(nodeResumen);
 
-            html2canvas(nodeResumen, { scale: 1.2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas2) {
-              var imgData2 = canvas2.toDataURL('image/jpeg', 0.85);
-              var imgWidth2 = 210;
-              var imgHeight2 = (canvas2.height * imgWidth2) / canvas2.width;
-              var yPos2 = 0;
-
-              if (imgHeight2 <= 297) {
-                pdf.addImage(imgData2, 'JPEG', 0, yPos2, imgWidth2, imgHeight2);
-              } else {
-                pdf.addImage(imgData2, 'JPEG', 0, yPos2, imgWidth2, imgHeight2);
-                while (imgHeight2 > yPos2 + 297) {
-                  yPos2 += 297;
-                  pdf.addPage();
-                  pdf.addImage(imgData2, 'JPEG', 0, -yPos2, imgWidth2, imgHeight2);
-                }
-              }
-
-              // Obtener el buffer del PDF
-              var pdfBuffer = pdf.output('arraybuffer');
-              document.body.removeChild(stage);
-              resolve(new Uint8Array(pdfBuffer));
-            }).catch(reject);
-          }).catch(reject);
+            return _pdfAddNode(pdf, nodeResumen, false);
+          }).then(function() {
+            document.body.removeChild(stage);
+            var buf = pdf.output('arraybuffer');
+            resolve(new Uint8Array(buf));
+          }).catch(function(err) {
+            try { document.body.removeChild(stage); } catch(_) {}
+            reject(err);
+          });
         } catch (err) {
+          try { document.body.removeChild(stage); } catch(_) {}
           reject(err);
         }
       });
@@ -17359,12 +17320,23 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             emlContent += 'Content-Disposition: attachment; filename="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.xlsx"\r\n';
             emlContent += 'Content-Transfer-Encoding: base64\r\n\r\n';
 
-            // Convertir Excel a base64
-            var excelBase64 = btoa(String.fromCharCode.apply(null, excelBuffer));
-            // Agregar líneas de 76 caracteres (estándar MIME)
-            for (var i = 0; i < excelBase64.length; i += 76) {
-              emlContent += excelBase64.substr(i, 76) + '\r\n';
+            // Convertir buffer a base64 de forma segura (evita stack overflow en buffers grandes)
+            function uint8ToBase64(buf) {
+              var CHUNK = 8192;
+              var binary = '';
+              for (var b = 0; b < buf.length; b += CHUNK) {
+                binary += String.fromCharCode.apply(null, buf.subarray(b, b + CHUNK));
+              }
+              return btoa(binary);
             }
+            function base64Lines(b64) {
+              var out = '';
+              for (var i = 0; i < b64.length; i += 76) out += b64.substr(i, 76) + '\r\n';
+              return out;
+            }
+
+            // Convertir Excel a base64
+            emlContent += base64Lines(uint8ToBase64(excelBuffer));
             emlContent += '\r\n';
 
             // Parte 3: PDF attachment
@@ -17373,12 +17345,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             emlContent += 'Content-Disposition: attachment; filename="Reporte_Movilidad_' + (plazaActiva || 'Region') + '_' + new Date().toISOString().split('T')[0] + '.pdf"\r\n';
             emlContent += 'Content-Transfer-Encoding: base64\r\n\r\n';
 
-            // Convertir PDF a base64
-            var pdfBase64 = btoa(String.fromCharCode.apply(null, pdfBuffer));
-            // Agregar líneas de 76 caracteres
-            for (var i = 0; i < pdfBase64.length; i += 76) {
-              emlContent += pdfBase64.substr(i, 76) + '\r\n';
-            }
+            // Convertir PDF a base64 (seguro)
+            emlContent += base64Lines(uint8ToBase64(pdfBuffer));
             emlContent += '\r\n';
 
             // Cierre del multipart
