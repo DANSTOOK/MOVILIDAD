@@ -17211,7 +17211,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       }
 
       // === STOCK DE EQUIPO ===
-      var stockArr = (garData && Array.isArray(garData.stock)) ? garData.stock : [];
+      // Preferir stock en vivo (stockPlazas); fallback al guardado.
+      var stockArr = (typeof stockPlazas !== 'undefined' && stockPlazas.length) ? stockPlazas
+                   : ((garData && Array.isArray(garData.stock)) ? garData.stock : []);
       if (stockArr.length) {
         html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
         html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
@@ -18073,7 +18075,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           }
         }
         var hayEstatus=['garantia','robo','danada','apagada'].some(function(k){var v=estatusCounts[k]||{};return (v.hh||0)+(v.tt||0)+(v.imp||0)>0;});
-        var stockArr=(garData&&Array.isArray(garData.stock))?garData.stock:[];
+        // Preferir el stock en vivo (stockPlazas) aunque aún no se haya pulsado
+        // "Guardar todo"; fallback al guardado en localStorage.
+        var stockArr=(typeof stockPlazas!=='undefined' && stockPlazas.length)?stockPlazas
+                    :((garData&&Array.isArray(garData.stock))?garData.stock:[]);
 
         if(hayEstatus){
           T('STOCK & ESTATUS DE EQUIPOS', M, y, 11, 'bold', GREEN); y+=7;
