@@ -11279,7 +11279,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         if (ap === 'AM' && hr === 12) hr = 0;
         return new Date(yr, mon, day, hr, mn, sc);
       }
-      return new Date(s);
+      // Fallback: Date nativo. Devolver null si la cadena no es parseable,
+      // porque un "Invalid Date" es truthy y provocaría days_ago = NaN
+      // (un equipo con fecha corrupta quedaría oculto como si estuviera en línea).
+      var fallback = new Date(s);
+      return isNaN(fallback.getTime()) ? null : fallback;
     }
 
     function processmastersRows(rows) {
