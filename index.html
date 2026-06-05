@@ -9166,6 +9166,85 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .days-cell.sev-critical .days-badge { background: rgba(229,57,53,0.16); color: #C62828; }
     [data-theme="dark"] tbody#cruce-table tr.sev-warning { background: rgba(245,166,35,0.10); }
     [data-theme="dark"] tbody#cruce-table tr.sev-critical { background: rgba(229,57,53,0.12); }
+
+    /* ════════════════════════════════════════════════════════════════
+       MOBILE / TABLET POLISH — pulido responsive sin quitar funciones
+       ════════════════════════════════════════════════════════════════ */
+
+    /* Scroll suave con momentum en iOS/Android para todo lo desplazable */
+    .table-wrapper, .tabs, .dashboards-grid, .modal-body, [class*="scroll"] {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Indicador visual de que una tabla se puede desplazar de lado.
+       Sombra a la derecha que desaparece al llegar al final (scroll-driven). */
+    .table-wrapper {
+      position: relative;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,1) 30%, rgba(255,255,255,0)) left center / 24px 100% no-repeat,
+        linear-gradient(-90deg, rgba(255,255,255,1) 30%, rgba(255,255,255,0)) right center / 24px 100% no-repeat,
+        radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.12), transparent) left center / 12px 100% no-repeat,
+        radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.12), transparent) right center / 12px 100% no-repeat;
+      background-attachment: local, local, scroll, scroll;
+    }
+    [data-theme="dark"] .table-wrapper {
+      background:
+        linear-gradient(90deg, var(--surface,#1e1e1e) 30%, transparent) left center / 24px 100% no-repeat,
+        linear-gradient(-90deg, var(--surface,#1e1e1e) 30%, transparent) right center / 24px 100% no-repeat,
+        radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.4), transparent) left center / 12px 100% no-repeat,
+        radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.4), transparent) right center / 12px 100% no-repeat;
+      background-attachment: local, local, scroll, scroll;
+    }
+
+    @media (max-width: 768px) {
+      /* Tabs deslizables sin barra fea + snap para que encajen */
+      .tabs {
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: 4px;
+      }
+      .tabs::-webkit-scrollbar { display: none; }
+      .tabs .tab { scroll-snap-align: start; flex: 0 0 auto; }
+
+      /* Objetivos táctiles cómodos (Apple/Google recomiendan >=44px) */
+      .btn, button.tab, .export-btn, select, .comment-select,
+      .plaza-dropdown, .toggle-btn {
+        min-height: 40px;
+      }
+
+      /* Inputs de filtro por columna: legibles y tocables en el móvil */
+      .table-wrapper thead input,
+      .table-wrapper thead select {
+        min-height: 32px;
+        font-size: 13px;
+        padding: 4px 6px;
+      }
+
+      /* Inputs de comentario/nota más grandes para el dedo */
+      .comment-select, .note-input { min-height: 38px; font-size: 13px; }
+
+      /* Evitar zoom automático de iOS al enfocar inputs (<16px lo dispara) */
+      input, select, textarea { font-size: 16px; }
+    }
+
+    @media (max-width: 480px) {
+      /* Compactar paddings de secciones para ganar ancho útil */
+      .section { padding-left: 8px; padding-right: 8px; }
+      .container { padding-left: 6px; padding-right: 6px; }
+
+      /* KPIs y grids de estado a una columna para no encimar */
+      .estado-grid, .garantia-estado-grid { grid-template-columns: 1fr !important; }
+
+      /* Header de filtros y barra superior: permitir que envuelvan */
+      .filters-row, .toolbar, .controls-row { flex-wrap: wrap; gap: 8px; }
+
+      /* Modales casi a pantalla completa en móvil */
+      .modal-content, .email-modal-content {
+        width: 96vw !important; max-width: 96vw !important;
+        max-height: 92vh !important; border-radius: 14px !important;
+      }
+    }
 </style>
 
         <div id="kpi-detail-panel" class="kpi-detail-panel" style="display:none;"></div>
@@ -11102,6 +11181,18 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       return m;
     }
 
+    // Debounce: agrupa llamadas rápidas en una sola tras 'wait' ms de inactividad.
+    // Se usa para que al escribir en los filtros no se re-renderice la tabla
+    // completa en cada tecla (con 1900+ filas eso lacañea el móvil).
+    function debounce(fn, wait) {
+      var t;
+      return function() {
+        var ctx = this, args = arguments;
+        clearTimeout(t);
+        t = setTimeout(function(){ fn.apply(ctx, args); }, wait || 160);
+      };
+    }
+
     // Parsea una sola línea CSV respetando comillas dobles (RFC 4180).
     // Maneja campos entrecomillados con comas internas y comillas escapadas ("").
     function parseCSVLine(line) {
@@ -12482,14 +12573,28 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         return;
       }
 
+      // Render inmediato SOLO de lo visible (pestaña activa por defecto: CRUCE)
+      // y los banners. Así la UI pinta al instante en vez de esperar ~1s a que
+      // se rendericen todas las pestañas ocultas.
       renderCruce();
-      renderResumen();
-      renderDetalle();
-      renderAsesor();
-      renderPlazaIssues();
       updateStateBanner();
       updateNotifications();
-      updateMapPlazas();
+
+      // El resto (pestañas no visibles + mapa) se difiere a tiempo ocioso.
+      // switchTab() re-renderiza resumen/detalle/garantía al abrirlas, por lo
+      // que esto es solo un "precalentado" en segundo plano y es seguro.
+      var _deferRest = function() {
+        try { renderResumen(); } catch(e){}
+        try { renderDetalle(); } catch(e){}
+        try { renderAsesor(); } catch(e){}
+        try { renderPlazaIssues(); } catch(e){}
+        try { updateMapPlazas(); } catch(e){}
+      };
+      if (window.requestIdleCallback) {
+        requestIdleCallback(_deferRest, { timeout: 1000 });
+      } else {
+        setTimeout(_deferRest, 32);
+      }
     }
 
     // Estado de filtros de la tabla CRUCE (no afecta KPIs)
@@ -12648,6 +12753,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       syncCruceSelection(sorted);
     }
 
+    var _debouncedRenderCruce = debounce(function(){ renderCruceTable(); }, 160);
     function onCruceFilterChange() {
       var only3d = document.getElementById('cruce-only3d');
       var hideAtt = document.getElementById('cruce-hide-attended');
@@ -12655,7 +12761,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       cruceState.only3Days = only3d ? !!only3d.checked : true;
       cruceState.hideAttended = hideAtt ? !!hideAtt.checked : true;
       cruceState.globalSearch = search ? search.value : '';
-      renderCruceTable();
+      // Render con debounce: al teclear en la búsqueda no re-renderiza por tecla.
+      _debouncedRenderCruce();
     }
 
     function animatePlazaSelector() {
@@ -15443,6 +15550,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       return rows;
     }
 
+    var _debouncedRenderDetalle = debounce(function(){ renderDetalle(); }, 160);
     function onDetalleFilterChange() {
       var only3d = document.getElementById('detalle-only3d');
       var hideAtt = document.getElementById('detalle-hide-attended');
@@ -15450,14 +15558,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       detalleState.only3Days = only3d ? !!only3d.checked : false;
       detalleState.hideAttended = hideAtt ? !!hideAtt.checked : true;
       detalleState.globalSearch = search ? search.value : '';
-      renderDetalle();
+      _debouncedRenderDetalle();
     }
 
     function onDetalleColFilterChange(input) {
       var key = input.dataset.dcol;
       if (!key) return;
       detalleState.colFilters[key] = input.value;
-      renderDetalle();
+      _debouncedRenderDetalle();
     }
 
     function onDetalleSortChange(field) {
@@ -15619,10 +15727,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       return asesorData;
     }
 
+    var _debouncedRenderAsesor = debounce(function(){ renderAsesor(); }, 160);
     function onAsesorFilterChange() {
       var search = document.getElementById('asesor-search');
       asesorState.globalSearch = search ? search.value : '';
-      renderAsesor();
+      _debouncedRenderAsesor();
     }
 
     function onAsesorSortChange(field) {
@@ -17915,16 +18024,24 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             var tableRows = pageRows.map(function(d,idx){
               var dias = Number(d.days_ago)||0;
               var dc   = dias>20?'#B3261E':dias>9?'#E8A800':'#1F7A4E';
-              var cmt  = getComment(d)||'';
-              var bgRow = idx%2?'white':'#f9f9f9';
-              return '<tr style="border-bottom:1px solid #f0f0f0;background:'+bgRow+';transition:background .15s;">'
-                + '<td style="padding:8px 10px;font-size:9px;color:#777;font-family:monospace;">'+(d['Last Seen']||'—')+'</td>'
-                + '<td style="padding:8px 10px;font-size:11px;font-weight:800;color:'+dc+';text-align:center;border-left:4px solid '+dc+';">'+dias+'</td>'
-                + '<td style="padding:8px 10px;font-size:10px;font-weight:600;color:#333;">'+(getEquipmentLabel(d.equipo_type)||'—')+'</td>'
-                + '<td style="padding:8px 10px;font-size:10px;font-weight:700;color:#E2001A;">'+(d.CR||'—')+'</td>'
-                + '<td style="padding:8px 10px;font-size:10px;">'+(d.TIENDA||'—')+'</td>'
-                + '<td style="padding:8px 10px;font-size:10px;">'+(d.ASESOR||'—')+'</td>'
-                + '<td style="padding:8px 10px;font-size:9px;color:#888;">'+cmt+'</td>'
+              // Fecha formateada (formatDateDayjs entiende D/M/Y y evita "Invalid Date").
+              var fechaTxt = (typeof formatDateDayjs === 'function')
+                ? formatDateDayjs(d['Last Seen'], 'DD/MM/YYYY HH:mm')
+                : (d['Last Seen']||'—');
+              // Truncar textos largos para que no desborden la fila/columna.
+              function trunc(t, n){ t = String(t||''); return t.length>n ? t.slice(0,n-1)+'…' : t; }
+              var cmt    = trunc(getComment(d)||'—', 38);
+              var tienda = trunc(d.TIENDA||'—', 26);
+              var asesor = trunc(d.ASESOR||'—', 24);
+              var bgRow = idx%2?'#ffffff':'#f9f9f9';
+              return '<tr style="border-bottom:1px solid #f0f0f0;background:'+bgRow+';">'
+                + '<td style="padding:7px 8px;font-size:8.5px;color:#777;white-space:nowrap;">'+fechaTxt+'</td>'
+                + '<td style="padding:7px 8px;font-size:11px;font-weight:800;color:'+dc+';text-align:center;border-left:4px solid '+dc+';">'+dias+'</td>'
+                + '<td style="padding:7px 8px;font-size:9.5px;font-weight:600;color:#333;white-space:nowrap;">'+(getEquipmentLabel(d.equipo_type)||'—')+'</td>'
+                + '<td style="padding:7px 8px;font-size:9.5px;font-weight:700;color:#E2001A;white-space:nowrap;">'+(d.CR||'—')+'</td>'
+                + '<td style="padding:7px 8px;font-size:9.5px;">'+tienda+'</td>'
+                + '<td style="padding:7px 8px;font-size:9.5px;">'+asesor+'</td>'
+                + '<td style="padding:7px 8px;font-size:9px;color:#888;">'+cmt+'</td>'
                 + '</tr>';
             }).join('');
             await pdfPage(`
@@ -17960,6 +18077,97 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               </div>
             `, false);
           }
+        }
+
+        // ══════════════════════════════════════════════
+        // PÁG — STOCK & ESTATUS DE EQUIPOS
+        // ══════════════════════════════════════════════
+        var garData = (typeof loadGarantiaData === 'function') ? loadGarantiaData() : null;
+        var estatusCounts = (garData && garData.estatus) ? garData.estatus : null;
+        if (!estatusCounts) {
+          // Recalcular desde comentarios si no hay datos guardados
+          estatusCounts = { garantia:{hh:0,tt:0,imp:0}, robo:{hh:0,tt:0,imp:0}, danada:{hh:0,tt:0,imp:0}, apagada:{hh:0,tt:0,imp:0} };
+          if (typeof mapCommentToEstado === 'function') {
+            Dscope.forEach(function(d){
+              var estado = mapCommentToEstado(getComment(d));
+              if (!estado) return;
+              var tipo = (d.equipo_type === 'HH') ? 'hh' : (d.equipo_type === 'TABLET') ? 'tt' : 'imp';
+              if (estado === 'GARANTÍA') estatusCounts.garantia[tipo]++;
+              else if (estado === 'ROBO') estatusCounts.robo[tipo]++;
+              else if (estado === 'DAÑADA') estatusCounts.danada[tipo]++;
+              else if (estado === 'APAGADA') estatusCounts.apagada[tipo]++;
+            });
+          }
+        }
+        var hayEstatus = ['garantia','robo','danada','apagada'].some(function(k){
+          var v = estatusCounts[k] || {}; return (v.hh||0)+(v.tt||0)+(v.imp||0) > 0;
+        });
+        var stockArr = (garData && Array.isArray(garData.stock)) ? garData.stock : [];
+
+        if (hayEstatus || stockArr.length) {
+          var estLabels = { garantia:'En garantía', robo:'Robo', danada:'Dañada', apagada:'Apagada' };
+          var estColor  = { garantia:'#1976D2', robo:'#B3261E', danada:'#E8A800', apagada:'#B80018' };
+          var estatusRows = ['garantia','robo','danada','apagada'].map(function(k){
+            var v = estatusCounts[k] || {hh:0,tt:0,imp:0};
+            var total = (v.hh||0)+(v.tt||0)+(v.imp||0);
+            return '<tr style="border-bottom:1px solid #f0f0f0;background:'+ (estColor[k]+'10') +';border-left:4px solid '+estColor[k]+';">'
+              + '<td style="padding:9px 12px;font-size:11px;font-weight:700;color:#333;">'+estLabels[k]+'</td>'
+              + '<td style="padding:9px 12px;font-size:11px;text-align:center;font-weight:600;">'+(v.hh||0)+'</td>'
+              + '<td style="padding:9px 12px;font-size:11px;text-align:center;font-weight:600;">'+(v.tt||0)+'</td>'
+              + '<td style="padding:9px 12px;font-size:11px;text-align:center;font-weight:600;">'+(v.imp||0)+'</td>'
+              + '<td style="padding:9px 12px;font-size:12px;text-align:center;font-weight:800;color:'+estColor[k]+';">'+total+'</td>'
+              + '</tr>';
+          }).join('');
+
+          var stockRowsHTML = '';
+          if (stockArr.length) {
+            stockRowsHTML = stockArr.map(function(st, si){
+              var bg = si%2?'#ffffff':'#f9f9f9';
+              return '<tr style="border-bottom:1px solid #f0f0f0;background:'+bg+';">'
+                + '<td style="padding:9px 12px;font-size:11px;font-weight:600;">'+ (st.plaza||'—') +'</td>'
+                + '<td style="padding:9px 12px;font-size:11px;text-align:center;">'+(st.hh||0)+'</td>'
+                + '<td style="padding:9px 12px;font-size:11px;text-align:center;">'+(st.tt||0)+'</td>'
+                + '<td style="padding:9px 12px;font-size:11px;text-align:center;">'+(st.imp||0)+'</td>'
+                + '</tr>';
+            }).join('');
+          }
+
+          await pdfPage(`
+            <div style="padding:32px 36px;font-family:'Segoe UI',Arial,sans-serif;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:3px solid #1F7A4E;">
+                <div>
+                  <div style="font-size:17px;font-weight:900;color:#1F7A4E;text-transform:uppercase;letter-spacing:.5px;">📦 Stock & Estatus de Equipos</div>
+                  <div style="font-size:11px;color:#999;margin-top:3px;">${plaza}</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#1F7A4E,#0E5C36);color:white;border-radius:10px;padding:8px 16px;font-size:11px;font-weight:700;">${fecha}</div>
+              </div>
+
+              ${hayEstatus ? `
+              <div style="font-size:12px;font-weight:800;color:#333;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">Estatus por tipo</div>
+              <table style="width:100%;border-collapse:collapse;margin-bottom:26px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-radius:8px;overflow:hidden;">
+                <thead><tr style="background:linear-gradient(135deg,#37474F,#263238);color:white;">
+                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:left;text-transform:uppercase;letter-spacing:.5px;">Estatus</th>
+                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Hand Held</th>
+                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Tablet</th>
+                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Impresoras</th>
+                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Total</th>
+                </tr></thead>
+                <tbody>${estatusRows}</tbody>
+              </table>` : ''}
+
+              ${stockArr.length ? `
+              <div style="font-size:12px;font-weight:800;color:#333;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">Stock de equipo</div>
+              <table style="width:100%;border-collapse:collapse;box-shadow:0 2px 8px rgba(0,0,0,.06);border-radius:8px;overflow:hidden;">
+                <thead><tr style="background:linear-gradient(135deg,#1F7A4E,#0E5C36);color:white;">
+                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:left;text-transform:uppercase;letter-spacing:.5px;">Plaza</th>
+                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">HH</th>
+                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">TT</th>
+                  <th style="padding:10px 12px;font-size:9px;font-weight:800;text-align:center;text-transform:uppercase;">Impresoras</th>
+                </tr></thead>
+                <tbody>${stockRowsHTML}</tbody>
+              </table>` : ''}
+            </div>
+          `, false);
         }
 
         // ══════════════════════════════════════════════
