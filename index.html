@@ -5099,48 +5099,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       opacity: 0;
     }
 
-    /* ============ RESUMEN POR TIPO — v13 mejorado ============ */
-    .summary-by-type-section {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      margin-bottom: 14px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .summary-by-type-header {
-      background: linear-gradient(135deg, rgba(226,0,26,0.08), rgba(226,0,26,0.04));
-      border-bottom: 2px solid var(--primary);
-      padding: 12px 14px;
-    }
-    .summary-by-type-title {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .summary-by-type-title .material-symbols-outlined {
-      font-size: 20px;
-      color: var(--primary);
-      margin-top: 0px;
-    }
-    .summary-by-type-title h2 {
-      margin: 0;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .summary-by-type-title p {
-      margin: 2px 0 0 0;
-      font-size: 9px;
-      color: var(--text-light);
-    }
+    /* ============ RESUMEN POR TIPO — v14 unificado ============ */
+    /* El .summary-by-type-section ya no se usa como wrapper; las cards viven
+       dentro del bloque unificado, así que solo mantenemos el grid */
+    .summary-by-type-section { display: contents; } /* transparente, sin caja propia */
+    .summary-by-type-header  { display: none; }     /* título reemplazado por divisor */
     .summary-by-type-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      padding: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      padding: 16px 20px 20px 20px;
       align-items: stretch;
     }
 
@@ -9279,13 +9247,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">picture_as_pdf</span> Descargar PDF
           </button>
         </div>
-        <!-- DASHBOARD EJECUTIVO - KPIs CIRCULARES (misma lógica que CRUCE) -->
-        <div style="padding: 8px 14px 18px 14px;">
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
-            <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">compare_arrows</span>
-            <span style="font-size:13px; font-weight:700; color:var(--text);">Cruce de Datos</span>
-          </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:16px;">
+        <!-- DASHBOARD EJECUTIVO UNIFICADO: KPIs + Resumen por Tipo en un solo bloque -->
+        <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+
+          <!-- ZONA SUPERIOR: Círculos KPI -->
+          <div style="padding: 16px 20px 14px 20px; background: linear-gradient(135deg, rgba(226,0,26,0.04) 0%, transparent 60%);">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">compare_arrows</span>
+              <span style="font-size:12px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.4px;">Cruce de Datos</span>
+            </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:12px;">
 
             <!-- KPI 1: Total BD -->
             <div class="kpi-circular-widget" style="cursor:default;">
@@ -9384,21 +9355,25 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
 
           </div>
-        </div>
+          </div><!-- /zona círculos -->
+
+          <!-- DIVISOR con etiqueta -->
+          <div style="display:flex; align-items:center; gap:10px; padding:0 20px; margin: 0;">
+            <div style="flex:1; height:1px; background:var(--border);"></div>
+            <div style="display:flex; align-items:center; gap:6px; padding:6px 12px; background:var(--surface); border:1px solid var(--border); border-radius:20px; white-space:nowrap;">
+              <span class="material-symbols-outlined" style="font-size:14px; color:var(--primary);">summarize</span>
+              <span style="font-size:10px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.4px;">Resumen por Tipo</span>
+            </div>
+            <div style="flex:1; height:1px; background:var(--border);"></div>
+          </div>
+
+          <!-- ZONA INFERIOR: Cards HH / Tablet -->
+          <div id="resumen-table-container" class="summary-by-type-grid"></div>
+
+        </div><!-- /bloque unificado -->
+
         <div id="hhcount" style="display:none;"></div>
         <div id="ttcount" style="display:none;"></div>
-
-        <div class="summary-by-type-section">
-          <div class="summary-by-type-header">
-            <div class="summary-by-type-title">
-              <span class="material-symbols-outlined">summarize</span>
-              <div>
-                <h2>Resumen por Tipo</h2>
-                <p>Equipos offline agrupados por HH, Tablet e Impresora</p>
-              </div>
-            </div>
-          </div>
-          <div id="resumen-table-container" class="summary-by-type-grid"></div></div>
 
         <!-- DASHBOARD EJECUTIVO - TODOS LOS GRÁFICOS (Grid automático) -->
         <div class="dashboards-grid">
