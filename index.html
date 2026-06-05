@@ -7107,6 +7107,43 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <input type="file" id="file-input-1" accept=".csv,.xlsx">
         </div>
 
+        <!-- ============ DESCARGAR DESDE AIRWATCH ============ -->
+        <div style="margin:10px 0 12px; padding:12px 14px; border:1px solid #ececec; border-radius:12px;
+                    background:linear-gradient(135deg,#fff 0%,#fafafa 100%);">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <span style="display:inline-flex; width:26px; height:26px; border-radius:7px;
+                         background:linear-gradient(135deg,#E2001A,#B80018); align-items:center; justify-content:center;">
+              <span class="material-symbols-outlined" style="font-size:16px; color:#fff;">cloud_download</span>
+            </span>
+            <div style="font-size:12px; font-weight:700; color:#333;">¿No tienes el archivo aún?</div>
+          </div>
+          <p style="margin:0 0 10px; font-size:10.5px; color:#777; line-height:1.5;">
+            Descárgalo de <strong>AirWatch</strong>. Si ya iniciaste sesión, solo da clic en
+            <strong>Exportar</strong> dentro del portal y luego arrastra el archivo aquí.
+          </p>
+          <button type="button" onclick="openAirWatchPortal()"
+            style="width:100%; padding:10px 12px; border:none; border-radius:8px; cursor:pointer;
+                   background:linear-gradient(135deg,#E2001A,#B80018); color:#fff; font-weight:700; font-size:12px;
+                   display:flex; align-items:center; justify-content:center; gap:8px;
+                   box-shadow:0 3px 10px rgba(226,0,26,.28); transition:all .2s;"
+            onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 5px 14px rgba(226,0,26,.4)';"
+            onmouseout="this.style.transform='';this.style.boxShadow='0 3px 10px rgba(226,0,26,.28)';">
+            <span class="material-symbols-outlined" style="font-size:16px;">open_in_new</span>
+            Abrir AirWatch y descargar
+          </button>
+          <div style="display:flex; gap:6px; margin-top:9px;">
+            <div style="flex:1; text-align:center; font-size:9px; color:#999;">
+              <div style="font-weight:800; color:#E2001A; font-size:11px;">1</div>Abre el portal
+            </div>
+            <div style="flex:1; text-align:center; font-size:9px; color:#999;">
+              <div style="font-weight:800; color:#E2001A; font-size:11px;">2</div>Clic en Exportar
+            </div>
+            <div style="flex:1; text-align:center; font-size:9px; color:#999;">
+              <div style="font-weight:800; color:#E2001A; font-size:11px;">3</div>Arrastra aquí
+            </div>
+          </div>
+        </div>
+
         <!-- STATUS INLINE -->
         <div id="report-status" class="file-status-pill" style="margin-bottom: 8px;">
           <span class="file-status-check">
@@ -11609,6 +11646,23 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     function continueToResults() {
       if (!reportReady) return;
       proceedToResults();
+    }
+
+    // Portal AirWatch / Workspace ONE UEM (Vista de lista de dispositivos).
+    // Se abre en pestaña nueva: el usuario suele tener sesión SSO activa, así
+    // que solo da clic en "Exportar" y luego arrastra el archivo al dropzone.
+    // No se puede embeber en iframe (AirWatch envía X-Frame-Options).
+    var AIRWATCH_PORTAL_URL = 'https://cn1863.awmdm.com/AirWatch/#/Device/List';
+    function openAirWatchPortal() {
+      try {
+        window.open(AIRWATCH_PORTAL_URL, '_blank', 'noopener,noreferrer');
+        if (typeof showEmailToast === 'function') {
+          showEmailToast('Abriendo AirWatch… Da clic en "Exportar" y luego arrastra el archivo aquí.', 'success');
+        }
+      } catch (e) {
+        // Fallback: si el navegador bloquea la apertura, navegar en la misma pestaña
+        window.location.href = AIRWATCH_PORTAL_URL;
+      }
     }
 
     function proceedToResults() {
