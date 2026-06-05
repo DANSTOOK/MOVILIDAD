@@ -17995,14 +17995,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         // ══ KPI CARDS (3 x 2) ══
         var kpis=[
-          {label:'TOTAL BD',     val:fmt(s.totalBD),       sub:'equipos',     color:'#424242'},
-          {label:'EN REPORTE',   val:fmt(s.totalReport),   sub:'sincronizados',color:GREEN},
-          {label:'CRÍTICOS ≥4D', val:fmt(criticos.length), sub:'offline',     color:CRIT},
-          {label:'DISP. HH',     val:s.dispHH+'%',         sub:'handhelds',   color:dispColor(s.dispHH)},
-          {label:'DISP. TT',     val:s.dispTT+'%',         sub:'tablets',     color:dispColor(s.dispTT)},
-          {label:'USABILIDAD',   val:usabPct+'%',          sub:'general',     color:dispColor(usabPct)}
+          {label:'TOTAL BD',   val:fmt(s.totalBD),     sub:'equipos',      color:'#424242'},
+          {label:'EN REPORTE', val:fmt(s.totalReport), sub:'sincronizados',color:GREEN},
+          {label:'DISP. HH',   val:s.dispHH+'%',       sub:'handhelds',    color:dispColor(s.dispHH)},
+          {label:'DISP. TT',   val:s.dispTT+'%',       sub:'tablets',      color:dispColor(s.dispTT)}
         ];
-        var gap=5, cols=3, cardW=(CW-(cols-1)*gap)/cols, cardH=23;
+        var gap=6, cols=2, cardW=(CW-(cols-1)*gap)/cols, cardH=24;
         kpis.forEach(function(k,i){
           var x=M+(i%cols)*(cardW+gap), cy=y+Math.floor(i/cols)*(cardH+gap);
           fill(WHITE); strokeC('#ECECEC'); pdf.setLineWidth(0.3); pdf.roundedRect(x,cy,cardW,cardH,2,2,'FD');
