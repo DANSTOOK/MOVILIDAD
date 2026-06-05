@@ -7142,6 +7142,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <div style="font-weight:800; color:#E2001A; font-size:11px;">3</div>Arrastra aquí
             </div>
           </div>
+          <div style="margin-top:9px; padding-top:8px; border-top:1px dashed #e8e8e8; text-align:center;">
+            <a href="#" onclick="openAirWatchExports(); return false;"
+               style="font-size:10px; color:#777; text-decoration:none; font-weight:600;">
+              También: <span style="color:#E2001A;">Reportes programados / Exports →</span>
+            </a>
+          </div>
         </div>
 
         <!-- STATUS INLINE -->
@@ -11653,6 +11659,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     // que solo da clic en "Exportar" y luego arrastra el archivo al dropzone.
     // No se puede embeber en iframe (AirWatch envía X-Frame-Options).
     var AIRWATCH_PORTAL_URL = 'https://cn1863.awmdm.com/AirWatch/#/Device/List';
+    var AIRWATCH_EXPORTS_URL = 'https://cn1863.awmdm.com/AirWatch/aa/#/monitor/report-analytics/exports';
     function openAirWatchPortal() {
       try {
         window.open(AIRWATCH_PORTAL_URL, '_blank', 'noopener,noreferrer');
@@ -11662,6 +11669,15 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       } catch (e) {
         // Fallback: si el navegador bloquea la apertura, navegar en la misma pestaña
         window.location.href = AIRWATCH_PORTAL_URL;
+      }
+    }
+    // Sección de Reportes / Exports programados de AirWatch (donde caen los
+    // reportes generados/programados listos para descargar).
+    function openAirWatchExports() {
+      try {
+        window.open(AIRWATCH_EXPORTS_URL, '_blank', 'noopener,noreferrer');
+      } catch (e) {
+        window.location.href = AIRWATCH_EXPORTS_URL;
       }
     }
 
