@@ -21600,8 +21600,69 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
   }, false);
 })();
+</script>
 
+<!-- ============ ATAJOS DE TECLADO + VOLVER ARRIBA ============ -->
+<button id="back-to-top" title="Volver arriba"
+  onclick="window.scrollTo({top:0,behavior:'smooth'}); var rs=document.getElementById('results-screen'); if(rs) rs.scrollTo&&rs.scrollTo({top:0,behavior:'smooth'});"
+  style="position:fixed; right:18px; bottom:18px; z-index:900; width:44px; height:44px; border:none;
+         border-radius:50%; background:linear-gradient(135deg,#E2001A,#B80018); color:#fff; cursor:pointer;
+         box-shadow:0 4px 14px rgba(226,0,26,.4); opacity:0; pointer-events:none;
+         align-items:center; justify-content:center; display:flex; transition:opacity .25s, transform .2s;"
+  onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='';">
+  <span class="material-symbols-outlined" style="font-size:24px;">keyboard_arrow_up</span>
+</button>
+<script>
+(function(){
+  // --- Botón "volver arriba": aparece al bajar ---
+  var btt = document.getElementById('back-to-top');
+  function scrollY(){
+    var rs = document.getElementById('results-screen');
+    return Math.max(
+      window.scrollY || document.documentElement.scrollTop || 0,
+      (rs && rs.scrollTop) || 0
+    );
+  }
+  function toggleBtt(){
+    if(!btt) return;
+    var show = scrollY() > 400;
+    btt.style.opacity = show ? '1' : '0';
+    btt.style.pointerEvents = show ? 'auto' : 'none';
+  }
+  window.addEventListener('scroll', toggleBtt, { passive:true });
+  var rs0 = document.getElementById('results-screen');
+  if (rs0) rs0.addEventListener('scroll', toggleBtt, { passive:true });
+  toggleBtt();
 
+  // --- Atajos de teclado ---
+  function isTyping(el){
+    if(!el) return false;
+    var t = el.tagName;
+    return t==='INPUT' || t==='TEXTAREA' || t==='SELECT' || el.isContentEditable;
+  }
+  function activeSearchInput(){
+    var sec = document.querySelector('#results-screen .section.active');
+    if(!sec) return null;
+    return sec.querySelector('.filter-search-input');
+  }
+  document.addEventListener('keydown', function(e){
+    // "/" → enfoca la búsqueda de la pestaña activa (si no estás escribiendo)
+    if(e.key === '/' && !isTyping(document.activeElement)){
+      var inp = activeSearchInput();
+      if(inp){ e.preventDefault(); inp.focus(); if(inp.select) inp.select(); }
+      return;
+    }
+    // "Esc" → limpia la búsqueda enfocada
+    if(e.key === 'Escape'){
+      var el = document.activeElement;
+      if(el && el.classList && el.classList.contains('filter-search-input') && el.value){
+        el.value = '';
+        el.dispatchEvent(new Event('input', { bubbles:true })); // dispara onCruce/Detalle FilterChange
+        el.blur();
+      }
+    }
+  });
+})();
 </script>
 </body>
 </html>
