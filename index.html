@@ -15567,18 +15567,27 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       }
     }
 
+    // Caché del HTML de <option> por valor seleccionado. En DETALLE se generan
+    // miles de <select> y casi todos comparten el mismo set de opciones; cachear
+    // por "current" evita reconstruir el markup en cada fila (render más rápido).
+    var _commentOptsCache = {};
+    function commentOptionsHtml(current) {
+      if (_commentOptsCache[current] !== undefined) return _commentOptsCache[current];
+      var html = COMMENT_OPTIONS.map(function(opt) {
+        var label = opt === '' ? '— (sin comentario)' : opt;
+        return '<option value="' + opt + '"' + (opt === current ? ' selected' : '') + '>' + label + '</option>';
+      }).join('');
+      _commentOptsCache[current] = html;
+      return html;
+    }
+
     function buildCommentSelect(d) {
       var key = getCommentKey(d);
       var current = getComment(d);
       var hasValue = !!current;
-      var opts = COMMENT_OPTIONS.map(function(opt) {
-        var label = opt === '' ? '— (sin comentario)' : opt;
-        var selected = (opt === current) ? ' selected' : '';
-        return '<option value="' + opt + '"' + selected + '>' + label + '</option>';
-      }).join('');
       return '<select class="comment-select' + (hasValue?' cm-set':'') + '" data-key="' +
              String(key).replace(/"/g,'&quot;') + '" onchange="updateComment(this.dataset.key, this.value)">' +
-             opts + '</select>';
+             commentOptionsHtml(current) + '</select>';
     }
 
     /* === DETALLE STATE & FILTERS (homologado con CRUCE) === */
@@ -21671,16 +21680,20 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       (rs && rs.scrollTop) || 0
     );
   }
-  function toggleBtt(){
+  var _bttRaf = false;
+  function applyBtt(){
+    _bttRaf = false;
     if(!btt) return;
     var show = scrollY() > 400;
     btt.style.opacity = show ? '1' : '0';
     btt.style.pointerEvents = show ? 'auto' : 'none';
   }
+  // Throttle con rAF: como mucho una lectura de layout por frame al hacer scroll.
+  function toggleBtt(){ if(!_bttRaf){ _bttRaf = true; requestAnimationFrame(applyBtt); } }
   window.addEventListener('scroll', toggleBtt, { passive:true });
   var rs0 = document.getElementById('results-screen');
   if (rs0) rs0.addEventListener('scroll', toggleBtt, { passive:true });
-  toggleBtt();
+  applyBtt();
 
   // --- Atajos de teclado ---
   function isTyping(el){
