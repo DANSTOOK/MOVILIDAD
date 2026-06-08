@@ -11,3 +11,17 @@ movilidad-updates.bundle
 
 # Entorno de preview local
 .claude/launch.json
+
+# Backend & Node
+backend/node_modules/
+backend/data/
+backend/.env
+backend/.env.local
+backend/npm-debug.log
+backend/package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
