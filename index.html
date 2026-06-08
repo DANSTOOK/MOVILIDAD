@@ -6753,6 +6753,52 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .kpi-circle-container { width: 84px !important; height: 84px !important; }
     .kpi-number { font-size: 15px !important; }
   }
+
+  /* ════════════════════════════════════════════════════════════════
+     DASHBOARDS: botones siempre visibles en táctil + fondo que resalta
+     ════════════════════════════════════════════════════════════════ */
+
+  /* En dispositivos táctiles NO hay :hover, así que los botones de descargar
+     y expandir quedaban invisibles. Mostrarlos siempre ahí. */
+  @media (hover: none), (pointer: coarse), (max-width: 768px) {
+    .dashboard-card .chart-download-btn,
+    .dashboard-card .chart-expand-btn {
+      opacity: 1 !important;
+      visibility: visible !important;
+      background: rgba(226,0,26,0.08);
+      border-color: rgba(226,0,26,0.25);
+      color: #E2001A;
+    }
+  }
+
+  /* Que el título no quede tapado por los 2 botones de la esquina */
+  .dashboard-card h3 { padding-right: 78px; }
+
+  /* Fondo que hace RESALTAR cada dashboard (sin tocar la gráfica):
+     leve degradado + borde y sombra más marcados, y un panel interior
+     claro detrás de la gráfica para que el chart "flote". */
+  .dashboard-card {
+    background: linear-gradient(160deg, var(--card-bg) 0%, rgba(226,0,26,0.025) 100%);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+  .dashboard-card:hover {
+    box-shadow: 0 10px 26px rgba(226,0,26,0.14);
+    border-color: rgba(226,0,26,0.30);
+  }
+  .dashboard-card .chart-wrap {
+    background: rgba(0,0,0,0.015);
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 10px;
+    padding: 6px;
+  }
+  [data-theme="dark"] .dashboard-card {
+    background: linear-gradient(160deg, var(--card-bg) 0%, rgba(226,0,26,0.06) 100%);
+  }
+  [data-theme="dark"] .dashboard-card .chart-wrap {
+    background: rgba(255,255,255,0.02);
+    border-color: rgba(255,255,255,0.06);
+  }
 </style>
 </head>
 <body>
