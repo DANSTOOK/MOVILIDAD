@@ -21972,33 +21972,40 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   *::-webkit-scrollbar-track { background: transparent; }
 
   /* ════════════════════════════════════════════════════════════════
-     HERO OSCURO ARGON para el bloque de dashboards (cambio radical):
-     panel navy con degradado y las cards BLANCAS flotando encima.
-     Las gráficas siguen en card blanca → renderizan perfecto.
+     PANEL DE DASHBOARDS — ARGON LIMPIO (blanco/gris, elegante y profesional)
      ════════════════════════════════════════════════════════════════ */
   .dash-hero-wrap {
-    background: linear-gradient(135deg, #1b2440 0%, #0e1626 100%) !important;
-    border: 0 !important;
+    background: #ffffff !important;
+    border: 1px solid #eef0f4 !important;
     border-radius: 18px !important;
-    box-shadow: 0 16px 40px rgba(14,22,38,0.35) !important;
-    padding-top: 6px;
+    box-shadow: 0 0 2rem 0 rgba(136,152,170,0.16) !important;
   }
-  /* Header del hero en blanco */
-  .dash-hero-wrap > div:first-child { padding: 18px 22px 4px !important; }
-  .dash-hero-wrap > div:first-child span { color: #ffffff !important; }
+  /* Header del panel: barra superior con título + línea divisoria sutil */
+  .dash-hero-wrap > div:first-child {
+    padding: 18px 22px !important;
+    border-bottom: 1px solid #eef0f4;
+    margin-bottom: 4px;
+  }
+  .dash-hero-wrap > div:first-child span { color: #32325d !important; }
   .dash-hero-wrap > div:first-child .material-symbols-outlined {
-    background: rgba(255,255,255,0.12) !important; color: #fff !important;
-    border-radius: 8px; padding: 6px; font-size: 18px !important;
+    background: linear-gradient(135deg,#E2001A,#B80018) !important; color: #fff !important;
+    border-radius: 9px; padding: 7px; font-size: 18px !important;
+    box-shadow: 0 4px 10px rgba(226,0,26,0.28);
   }
-  /* El grid dentro del hero: transparente para que se vea el navy */
+  /* Grid sobre lienzo gris claro Argon → las cards blancas se distinguen sin dureza */
   .dash-hero-wrap .dashboards-grid {
-    background: transparent !important;
+    background: #f6f7fb !important;
     border: 0 !important;
+    border-radius: 14px !important;
     padding: 18px !important;
   }
-  /* Cards blancas con sombra fuerte → flotan sobre el navy */
+  [data-theme="dark"] .dash-hero-wrap { background: var(--card-bg) !important; border-color: rgba(255,255,255,0.06) !important; }
+  [data-theme="dark"] .dash-hero-wrap > div:first-child span { color: var(--text) !important; }
+  [data-theme="dark"] .dash-hero-wrap .dashboards-grid { background: rgba(255,255,255,0.02) !important; }
+
+  /* Cards: sombra Argon suave, no dura */
   .dash-hero-wrap .dashboard-card {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.28) !important;
+    box-shadow: 0 0 1.5rem 0 rgba(136,152,170,0.22) !important;
   }
 </style>
 </body>
