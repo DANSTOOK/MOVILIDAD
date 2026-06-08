@@ -6758,21 +6758,39 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
      DASHBOARDS: botones siempre visibles en táctil + fondo que resalta
      ════════════════════════════════════════════════════════════════ */
 
-  /* En dispositivos táctiles NO hay :hover, así que los botones de descargar
-     y expandir quedaban invisibles. Mostrarlos siempre ahí. */
+  /* FIX DEFINITIVO de los botones de cada dashboard (móvil Y escritorio):
+     algo los dejaba como position:relative, por lo que "caían" sobre el título
+     (descargar) y al fondo del card (expandir). Forzamos posición absoluta en
+     la esquina superior derecha, separados y SIEMPRE visibles. */
+  .dashboard-card { position: relative; }
+  .dashboard-card .chart-download-btn,
+  .dashboard-card .chart-expand-btn {
+    position: absolute !important;
+    top: 12px !important;
+    left: auto !important;
+    bottom: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 12 !important;
+    width: 30px !important; height: 30px !important;
+  }
+  .dashboard-card .chart-download-btn { right: 12px !important; }
+  .dashboard-card .chart-expand-btn  { right: 50px !important; }  /* a la izquierda del de descarga */
+  /* el menú de descarga debe abrir bajo su botón, no en flujo */
+  .dashboard-card .chart-download-menu { position: absolute; top: 46px; right: 12px; left: auto; }
+
+  /* En táctil, tinte rojo para que se note que son accionables */
   @media (hover: none), (pointer: coarse), (max-width: 768px) {
     .dashboard-card .chart-download-btn,
     .dashboard-card .chart-expand-btn {
-      opacity: 1 !important;
-      visibility: visible !important;
-      background: rgba(226,0,26,0.08);
-      border-color: rgba(226,0,26,0.25);
-      color: #E2001A;
+      background: rgba(226,0,26,0.08) !important;
+      border-color: rgba(226,0,26,0.25) !important;
+      color: #E2001A !important;
     }
   }
 
   /* Que el título no quede tapado por los 2 botones de la esquina */
-  .dashboard-card h3 { padding-right: 78px; }
+  .dashboard-card h3 { padding-right: 88px; }
 
   /* Fondo que hace RESALTAR cada dashboard (sin tocar la gráfica):
      leve degradado + borde y sombra más marcados, y un panel interior
