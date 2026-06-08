@@ -21943,6 +21943,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   /* ---------- BADGES pill Argon ---------- */
   .badge { border-radius: 9999px !important; font-weight: 600; }
 
+  /* ---------- FIX: encabezado sticky tapaba los selects de "Asignar plaza" ----------
+     En Inconsistencias el thead sticky (z-index:10) flotaba sobre los <select>
+     y no dejaba ver/usar la plaza. En estas tablas cortas el header NO necesita
+     ser fijo. Además, los selects se elevan por encima por si acaso. */
+  .incon-card thead { position: static !important; z-index: auto !important; }
+  #plaza-issues-table select { position: relative; z-index: 20; }
+  #plaza-issues-table td { overflow: visible !important; }
+
   /* ---------- ICONOS DE ENCABEZADO como chips rojos (toque premium) ---------- */
   /* Cada icono que precede a un <h2> (títulos de sección) → chip con degradado */
   .material-symbols-outlined:has(+ h2) {
