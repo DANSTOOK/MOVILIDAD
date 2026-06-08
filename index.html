@@ -6792,74 +6792,64 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   /* Que el título no quede tapado por los 2 botones de la esquina */
   .dashboard-card h3 { padding-right: 88px; }
 
-  /* Fondo que hace RESALTAR cada dashboard (sin tocar la gráfica):
-     leve degradado + borde y sombra más marcados, y un panel interior
-     claro detrás de la gráfica para que el chart "flote". */
-  .dashboard-card {
-    background: linear-gradient(160deg, var(--card-bg) 0%, rgba(226,0,26,0.025) 100%);
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  }
-  .dashboard-card:hover {
-    box-shadow: 0 10px 26px rgba(226,0,26,0.14);
-    border-color: rgba(226,0,26,0.30);
-  }
-  .dashboard-card .chart-wrap {
-    background: rgba(0,0,0,0.015);
-    border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 10px;
-    padding: 6px;
-  }
-  [data-theme="dark"] .dashboard-card {
-    background: linear-gradient(160deg, var(--card-bg) 0%, rgba(226,0,26,0.06) 100%);
-  }
-  [data-theme="dark"] .dashboard-card .chart-wrap {
-    background: rgba(255,255,255,0.02);
-    border-color: rgba(255,255,255,0.06);
-  }
-
   /* ════════════════════════════════════════════════════════════════
-     DASHBOARDS QUE RESALTAN DE VERDAD (estado permanente, no solo hover)
+     DASHBOARDS — ESTILO ARGON (Creative Tim): card blanca limpia,
+     esquinas redondeadas, sombra suave difusa gris-azulada, sobre un
+     fondo gris claro. Limpio y elegante, no recargado.
      ════════════════════════════════════════════════════════════════ */
 
-  /* Panel contenedor con leve tinte → las tarjetas blancas "flotan" sobre él */
+  /* Lienzo gris claro estilo Argon (#f8f9fe) para que las cards blancas resalten */
   .dashboards-grid {
-    background: linear-gradient(180deg, rgba(226,0,26,0.035), rgba(226,0,26,0.015));
-    border: 1px solid rgba(226,0,26,0.10);
+    background: #f7f8fc;
+    border: 0;
     border-radius: 16px;
-    padding: 14px !important;
-    gap: 16px !important;
+    padding: 16px !important;
+    gap: 18px !important;
   }
+  [data-theme="dark"] .dashboards-grid { background: rgba(255,255,255,0.02); }
 
-  /* Tarjeta: blanca y nítida, con barra roja superior SIEMPRE visible,
-     borde definido y sombra marcada para que cada dashboard destaque. */
+  /* Card Argon: blanca, borde 0, radio 0.75rem, sombra suave y difusa */
   .dashboard-card {
-    background: var(--card-bg) !important;
-    border: 1px solid rgba(0,0,0,0.08) !important;
-    border-top: 3px solid #E2001A !important;
-    border-radius: 12px !important;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.10), 0 2px 4px rgba(226,0,26,0.06) !important;
+    background: #ffffff !important;
+    border: 0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 0 2rem 0 rgba(136,152,170,0.18) !important;
     overflow: hidden;
+    transition: transform .25s ease, box-shadow .25s ease;
   }
   .dashboard-card:hover {
-    box-shadow: 0 14px 32px rgba(226,0,26,0.18) !important;
-    border-color: rgba(226,0,26,0.35) !important;
     transform: translateY(-4px);
+    box-shadow: 0 .75rem 2.5rem rgba(136,152,170,0.32) !important;
   }
-  /* La barra superior decorativa (::before) ahora permanente y más visible */
-  .dashboard-card::before {
-    opacity: 1 !important;
-    transform: scaleX(1) !important;
-    height: 0 !important;  /* el border-top rojo ya hace de barra; evitamos doble línea */
+  /* Sin barra/halo decorativo: Argon es limpio */
+  .dashboard-card::before, .dashboard-card::after { display: none !important; }
+
+  /* Título estilo Argon: subtítulo como "overline" gris en mayúsculas + título */
+  .dashboard-card h3 {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #32325d !important;
+    margin: 4px 0 2px 0 !important;
   }
-  [data-theme="dark"] .dashboards-grid {
-    background: linear-gradient(180deg, rgba(226,0,26,0.10), rgba(226,0,26,0.04));
-    border-color: rgba(226,0,26,0.18);
+  .dashboard-card .dash-sub {
+    color: #8898aa !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .6px !important;
+  }
+  /* Gráfica limpia, sin panel/borde interno (Argon va al ras) */
+  .dashboard-card .chart-wrap {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
   }
   [data-theme="dark"] .dashboard-card {
-    border-color: rgba(255,255,255,0.08) !important;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
+    background: var(--card-bg) !important;
+    box-shadow: 0 0 2rem 0 rgba(0,0,0,0.35) !important;
   }
+  [data-theme="dark"] .dashboard-card h3 { color: var(--text) !important; }
 </style>
 </head>
 <body>
