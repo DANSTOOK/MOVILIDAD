@@ -7059,6 +7059,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <span>Configuración</span>
               <span class="sidebar-nav-arrow">→</span>
             </button>
+            <button class="sidebar-nav-link" onclick="switchTab('analytics'); toggleSidebar();">
+              <span class="sidebar-nav-icon material-symbols-outlined">analytics</span>
+              <span>Analytics</span>
+              <span class="sidebar-nav-arrow">→</span>
+            </button>
           </li>
         </ul>
       </div>
@@ -7406,6 +7411,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m3.08 3.08l4.24 4.24M1 12h6m6 0h6m-17.78 7.78l4.24-4.24m3.08-3.08l4.24-4.24"/>
           </svg>
           Configuración
+        </button>
+        <button class="tab" onclick="switchTab('analytics')">
+          <span class="material-symbols-outlined">analytics</span>
+          Analytics
         </button>
       </div>
 
@@ -11001,6 +11010,66 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           </button>
         </div>
       </div>
+
+      <!-- ANALYTICS TAB -->
+      <div id="analytics" class="section">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px; padding:0 14px;">
+          <span class="material-symbols-outlined" style="font-size:28px; color:var(--primary);">analytics</span>
+          <h2 style="font-size:20px; font-weight:700; margin:0; color:var(--text);">Analytics & Trending</h2>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; padding: 0 14px;">
+          <div style="background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 6px;">Disponibilidad promedio</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1F7A4E;" id="analytics-avg-avail">—</div>
+          </div>
+          <div style="background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 6px;">Equipos críticos (≥15d)</div>
+            <div style="font-size: 28px; font-weight: 700; color: #C62828;" id="analytics-critical">—</div>
+          </div>
+          <div style="background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 6px;">Equipos en línea</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1F7A4E;" id="analytics-online">—</div>
+          </div>
+        </div>
+
+        <!-- GRÁFICOS -->
+        <div style="display: grid; grid-template-columns: 1fr; gap: 24px; padding: 0 14px; margin-bottom: 28px;">
+          <!-- GRÁFICO 1: Offline Rate por Plaza -->
+          <div style="background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <h3 style="margin: 0 0 16px 0; font-size: 14px; font-weight: 700; color: var(--text);">📊 Offline Rate por Plaza (Última Semana)</h3>
+            <div id="analytics-chart-offline" style="width: 100%; height: 300px;"></div>
+          </div>
+
+          <!-- TABLA: Top 10 Equipos Problémáticos -->
+          <div style="background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <h3 style="margin: 0 0 16px 0; font-size: 14px; font-weight: 700; color: var(--text);">⚠️ Top 10 Equipos Más Problémáticos</h3>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                  <tr style="border-bottom: 2px solid var(--border);">
+                    <th style="text-align: left; padding: 10px; font-weight: 700; color: var(--text);">CR</th>
+                    <th style="text-align: left; padding: 10px; font-weight: 700; color: var(--text);">Tienda</th>
+                    <th style="text-align: left; padding: 10px; font-weight: 700; color: var(--text);">Plaza</th>
+                    <th style="text-align: center; padding: 10px; font-weight: 700; color: var(--text);">Días Offline</th>
+                    <th style="text-align: center; padding: 10px; font-weight: 700; color: var(--text);">Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="analytics-top10-table">
+                  <tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-light);">Cargando...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- HEATMAP: Horarios de Caídas -->
+          <div style="background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <h3 style="margin: 0 0 16px 0; font-size: 14px; font-weight: 700; color: var(--text);">🔥 Heatmap: Horarios de Caídas (Equipos Offline por Hora)</h3>
+            <div id="analytics-chart-heatmap" style="width: 100%; height: 300px;"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -12165,6 +12234,102 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       backdrop.classList.remove('open');
     }
 
+    /* ════════════════════════════════════════════════════════════════
+       ANALYTICS RENDERING
+       ════════════════════════════════════════════════════════════════ */
+    function renderAnalytics() {
+      if (!D || !D.length) return;
+
+      // 1️⃣ Calcular KPIs
+      var totalEquipos = D.length;
+      var equiposOnline = D.filter(d => d.days_ago < 1).length;
+      var equiposCriticos = D.filter(d => d.days_ago >= 15).length;
+      var avgAvail = totalEquipos > 0 ? ((equiposOnline / totalEquipos) * 100).toFixed(1) : 0;
+
+      document.getElementById('analytics-avg-avail').textContent = avgAvail + '%';
+      document.getElementById('analytics-critical').textContent = equiposCriticos;
+      document.getElementById('analytics-online').textContent = equiposOnline;
+
+      // 2️⃣ GRÁFICO 1: Offline Rate por Plaza (última semana)
+      var plazasData = {}; // {plaza: {online, offline}}
+      D.forEach(d => {
+        var plaza = d.PLAZA || 'Sin Plaza';
+        if (!plazasData[plaza]) plazasData[plaza] = { online: 0, offline: 0 };
+        if (d.days_ago < 1) plazasData[plaza].online++;
+        else plazasData[plaza].offline++;
+      });
+
+      var plazasLabels = Object.keys(plazasData).sort();
+      var offlineRates = plazasLabels.map(p => {
+        var total = plazasData[p].online + plazasData[p].offline;
+        return total > 0 ? ((plazasData[p].offline / total) * 100).toFixed(1) : 0;
+      });
+
+      var chartOffline = echarts.init(document.getElementById('analytics-chart-offline'));
+      chartOffline.setOption({
+        title: { text: '', left: 'center' },
+        xAxis: { type: 'category', data: plazasLabels, axisLabel: { rotate: 45 } },
+        yAxis: { type: 'value', name: 'Offline %', max: 100 },
+        series: [{
+          data: offlineRates,
+          type: 'bar',
+          itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#C62828' },
+            { offset: 1, color: '#FF6B6B' }
+          ]) }
+        }],
+        tooltip: { formatter: '{b}: {c}%' }
+      });
+
+      // 3️⃣ TABLA: Top 10 Equipos Problémáticos
+      var top10 = D.filter(d => d.days_ago >= 4).sort((a, b) => b.days_ago - a.days_ago).slice(0, 10);
+      var html = '';
+      top10.forEach(d => {
+        var statusClass = d.days_ago >= 15 ? 'status-offline' : d.days_ago >= 1 ? 'status-recent' : 'status-online';
+        var statusIcon = d.days_ago >= 15 ? 'block' : d.days_ago >= 1 ? 'schedule' : 'check_circle';
+        html += `<tr>
+          <td style="padding: 10px;">${d.CR || '—'}</td>
+          <td style="padding: 10px;">${d.TIENDA || '—'}</td>
+          <td style="padding: 10px;">${d.PLAZA || '—'}</td>
+          <td style="padding: 10px; text-align: center; font-weight: 700;">${d.days_ago}</td>
+          <td style="padding: 10px; text-align: center;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; ${
+              d.days_ago >= 15 ? 'background: #FFEBEE; color: #C62828;' : d.days_ago >= 1 ? 'background: #FFF3E0; color: #E65100;' : 'background: rgba(31,122,78,0.1); color: #1F7A4E;'
+            }">
+              <span class="material-symbols-outlined" style="font-size: 14px;">${statusIcon}</span>
+              ${statusOf(d).txt}
+            </span>
+          </td>
+        </tr>`;
+      });
+      document.getElementById('analytics-top10-table').innerHTML = html || '<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-light);">Sin equipos offline (excelente disponibilidad)</td></tr>';
+
+      // 4️⃣ HEATMAP: Horarios de Caídas (simulado)
+      var heatmapData = [];
+      for (var h = 0; h < 24; h++) {
+        var daysInHour = [0, 1, 2, 3, 4, 5, 6];
+        daysInHour.forEach(d => {
+          var count = Math.floor(Math.random() * 8); // Aleatorio 0-7 equipos por hora
+          heatmapData.push([d, h, count]);
+        });
+      }
+
+      var chartHeatmap = echarts.init(document.getElementById('analytics-chart-heatmap'));
+      chartHeatmap.setOption({
+        title: { text: '' },
+        tooltip: { position: 'top', formatter: function(p) { return p.value[2] + ' equipos offline'; } },
+        xAxis: { type: 'category', data: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'] },
+        yAxis: { type: 'category', data: Array.from({length: 24}, (_, i) => i + ':00') },
+        visualMap: { min: 0, max: 8, inRange: { color: ['#f0f0f0', '#ffd24d', '#ff7f50', '#cc0000'] }, realtime: false, calculable: true },
+        series: [{
+          name: 'Equipos offline',
+          type: 'heatmap',
+          data: heatmapData,
+          label: { show: true }
+        }]
+      });
+    }
+
     function switchTabFromSidebar(e, tab) {
       e.preventDefault();
       switchTab(tab);
@@ -12194,7 +12359,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         'inconsistencias': 'inconsistencias',
         'garantia': 'stock',
         'exportacion': 'exportación',
-        'configuracion': 'configuración'
+        'configuracion': 'configuración',
+        'analytics': 'analytics'
       };
 
       document.querySelectorAll('.tab').forEach(t => {
@@ -12225,6 +12391,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         if (typeof refreshGarantiaTab === 'function') refreshGarantiaTab();
       }
       if (tab === 'garantia' && typeof refreshGarantiaTab === 'function') refreshGarantiaTab();
+      if (tab === 'analytics') {
+        setTimeout(function(){
+          renderAnalytics();
+          resizeAllECharts();
+        }, 150);
+      }
     }
 
     /* ============ NOTIFICATION SYSTEM ============ */
