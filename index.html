@@ -6817,6 +6817,49 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     background: rgba(255,255,255,0.02);
     border-color: rgba(255,255,255,0.06);
   }
+
+  /* ════════════════════════════════════════════════════════════════
+     DASHBOARDS QUE RESALTAN DE VERDAD (estado permanente, no solo hover)
+     ════════════════════════════════════════════════════════════════ */
+
+  /* Panel contenedor con leve tinte → las tarjetas blancas "flotan" sobre él */
+  .dashboards-grid {
+    background: linear-gradient(180deg, rgba(226,0,26,0.035), rgba(226,0,26,0.015));
+    border: 1px solid rgba(226,0,26,0.10);
+    border-radius: 16px;
+    padding: 14px !important;
+    gap: 16px !important;
+  }
+
+  /* Tarjeta: blanca y nítida, con barra roja superior SIEMPRE visible,
+     borde definido y sombra marcada para que cada dashboard destaque. */
+  .dashboard-card {
+    background: var(--card-bg) !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    border-top: 3px solid #E2001A !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.10), 0 2px 4px rgba(226,0,26,0.06) !important;
+    overflow: hidden;
+  }
+  .dashboard-card:hover {
+    box-shadow: 0 14px 32px rgba(226,0,26,0.18) !important;
+    border-color: rgba(226,0,26,0.35) !important;
+    transform: translateY(-4px);
+  }
+  /* La barra superior decorativa (::before) ahora permanente y más visible */
+  .dashboard-card::before {
+    opacity: 1 !important;
+    transform: scaleX(1) !important;
+    height: 0 !important;  /* el border-top rojo ya hace de barra; evitamos doble línea */
+  }
+  [data-theme="dark"] .dashboards-grid {
+    background: linear-gradient(180deg, rgba(226,0,26,0.10), rgba(226,0,26,0.04));
+    border-color: rgba(226,0,26,0.18);
+  }
+  [data-theme="dark"] .dashboard-card {
+    border-color: rgba(255,255,255,0.08) !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
+  }
 </style>
 </head>
 <body>
