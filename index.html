@@ -22495,6 +22495,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
   /* Animación de nota deslizando desde la izquierda */
   @keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+  /* Animación de alert deslizando hacia arriba */
+  @keyframes slideInAlertUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   @media (prefers-reduced-motion: reduce) {
     #results-screen .section.active { animation: none; }
     .metric-card:hover, .estado-card:hover, .export-card:hover { transform: none; }
@@ -22503,6 +22506,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
 <!-- QR Code Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+
+<!-- Real-time Alerts Container -->
+<div id="alerts-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; max-width:350px;"></div>
 
 <!-- Follow-up Notes Timeline Modal -->
 <div id="notes-timeline-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
@@ -22935,6 +22941,74 @@ document.addEventListener('keydown', function(e) {
     closeNotesTimeline();
   }
 });
+
+// Real-time Alerts System
+var _previousEquiposState = null;
+var _alertsShown = {};
+
+function showAlert(message, type, duration) {
+  type = type || 'info'; // info, success, warning, error/critical
+  duration = duration || 5000;
+
+  var container = document.getElementById('alerts-container');
+  if (!container) return;
+
+  var id = 'alert-' + Date.now();
+  var bgColor = type === 'critical' ? '#B3261E' : type === 'warning' ? '#F5A623' : type === 'success' ? '#1F7A4E' : '#1976D2';
+  var icon = type === 'critical' ? 'error' : type === 'warning' ? 'warning' : type === 'success' ? 'check_circle' : 'info';
+
+  var alertDiv = document.createElement('div');
+  alertDiv.id = id;
+  alertDiv.style.cssText = 'animation:slideInAlertUp 0.3s ease; margin-bottom:12px; padding:12px 16px; background:' + bgColor + '; color:white; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); display:flex; align-items:center; gap:10px; font-size:12px; line-height:1.4;';
+  alertDiv.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px; flex-shrink:0;">' + icon + '</span>' +
+                       '<span style="flex:1;">' + message + '</span>' +
+                       '<button onclick="document.getElementById(\'' + id + '\').remove();" style="background:none; border:none; color:white; cursor:pointer; padding:0; font-size:18px; line-height:1;">×</button>';
+
+  container.appendChild(alertDiv);
+
+  if (duration > 0) {
+    setTimeout(function() {
+      if (document.getElementById(id)) document.getElementById(id).remove();
+    }, duration);
+  }
+}
+
+function checkEquiposStatusChanges() {
+  if (!D || !D.length) return;
+
+  if (!_previousEquiposState) {
+    _previousEquiposState = D.map(d => ({ cr: d.CR, daysAgo: d.days_ago }));
+    return;
+  }
+
+  // Detectar cambios
+  D.forEach(function(equipo) {
+    var previous = _previousEquiposState.find(p => p.cr === equipo.CR);
+    if (!previous) return;
+
+    var wasOnline = previous.daysAgo < 1;
+    var isNowOnline = equipo.days_ago < 1;
+    var justWentCritical = equipo.days_ago >= 15 && previous.daysAgo < 15;
+    var justCameBack = isNowOnline && !wasOnline;
+
+    // Evitar mostrar múltiples veces el mismo alerta
+    var alertKey = equipo.CR + '|' + equipo.days_ago;
+
+    if (justWentCritical && !_alertsShown[alertKey]) {
+      showAlert('🔴 ' + (equipo.CR || 'Equipo') + ' CRÍTICO (' + equipo.days_ago + ' días offline)', 'critical');
+      _alertsShown[alertKey] = true;
+    } else if (justCameBack && !_alertsShown[alertKey]) {
+      showAlert('✅ ' + (equipo.CR || 'Equipo') + ' reconectado', 'success');
+      _alertsShown[alertKey] = true;
+    }
+  });
+
+  // Actualizar estado previo
+  _previousEquiposState = D.map(d => ({ cr: d.CR, daysAgo: d.days_ago }));
+}
+
+// Ejecutar verificación de cambios cada 30 segundos
+setInterval(checkEquiposStatusChanges, 30000);
 </script>
 
 </body>
