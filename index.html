@@ -9487,10 +9487,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </span>
             <select id="plaza-dropdown" onchange="onPlazaFilterChange(); animatePlazaSelector();">
               <option value="">Todas las plazas</option>
-              <option value="Tijuana Este">Tijuana Este</option>
-              <option value="Ensenada">Ensenada</option>
-              <option value="Playas">Playas</option>
-              <option value="Tijuana Centro">Tijuana Centro</option>
+              <option value="Tijuana Este">TIJUANA ESTE</option>
+              <option value="Ensenada">TIJUANA ENSENADA</option>
+              <option value="Playas">TIJUANA PLAYAS</option>
+              <option value="Tijuana Centro">TIJUANA CENTRO</option>
             </select>
           </label>
 
@@ -9535,9 +9535,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <th style="width:44px; text-align:center;" title="Seleccionar todos los visibles">
                   <input type="checkbox" id="cruce-select-all" onchange="toggleCruceSelectAll(this.checked)" aria-label="Seleccionar todos los equipos visibles" style="cursor:pointer; accent-color: var(--primary);">
                 </th>
-                <th title="Marcar equipo como atendido / archivar" style="width:50px; text-align:center;">
-                  <span class="material-symbols-outlined" style="font-size:18px;">done_all</span>
-                </th>
                 <th style="cursor:pointer" onclick="onSortChange('Last Seen')">Última Conexión <span id="sort-icon-lastSeen"></span></th>
                 <th style="cursor:pointer" onclick="onSortChange('days_ago')">Días Offline <span id="sort-icon-days_ago"></span></th>
                 <th style="cursor:pointer" onclick="onSortChange('equipo_type')">Equipo <span id="sort-icon-equipo"></span></th>
@@ -9559,21 +9556,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           </table>
         </div>
 
-        <!-- BARRA DE ACCIONES MASIVAS (aparece al seleccionar equipos) -->
-        <div id="bulk-action-bar" class="bulk-action-bar" role="region" aria-label="Acciones masivas">
-          <span class="bulk-count" id="bulk-count-label">0 equipos seleccionados</span>
-          <div class="bulk-actions">
-            <button class="bulk-btn bulk-btn-primary" onclick="bulkSetAttended(true)">
-              <span class="material-symbols-outlined" style="font-size:18px">done_all</span>Marcar atendido
-            </button>
-            <button class="bulk-btn" onclick="bulkSetAttended(false)">
-              <span class="material-symbols-outlined" style="font-size:18px">remove_done</span>Quitar atendido
-            </button>
-            <button class="bulk-btn bulk-btn-ghost" onclick="clearCruceSelection()">
-              <span class="material-symbols-outlined" style="font-size:18px">close</span>Cancelar
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- RESUMEN TAB -->
@@ -9917,10 +9899,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </span>
             <select id="plaza-dropdown-detalle" disabled>
               <option value="">Todas las plazas</option>
-              <option value="Tijuana Este">Tijuana Este</option>
-              <option value="Ensenada">Ensenada</option>
-              <option value="Playas">Playas</option>
-              <option value="Tijuana Centro">Tijuana Centro</option>
+              <option value="Tijuana Este">TIJUANA ESTE</option>
+              <option value="Ensenada">TIJUANA ENSENADA</option>
+              <option value="Playas">TIJUANA PLAYAS</option>
+              <option value="Tijuana Centro">TIJUANA CENTRO</option>
             </select>
           </label>
 
@@ -10055,10 +10037,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </span>
             <select id="plaza-dropdown-asesor" disabled>
               <option value="">Todas las plazas</option>
-              <option value="Tijuana Este">Tijuana Este</option>
-              <option value="Ensenada">Ensenada</option>
-              <option value="Playas">Playas</option>
-              <option value="Tijuana Centro">Tijuana Centro</option>
+              <option value="Tijuana Este">TIJUANA ESTE</option>
+              <option value="Ensenada">TIJUANA ENSENADA</option>
+              <option value="Playas">TIJUANA PLAYAS</option>
+              <option value="Tijuana Centro">TIJUANA CENTRO</option>
             </select>
           </label>
 
@@ -11622,13 +11604,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         }
       }
 
-      // Validar que la tienda termine con TIJ (o tenga TIJ en algún lugar)
-      var hasLocationCode = /\bTIJ\b/i.test(tiendaPart);
-
+      // Si se detectó una plaza (p.ej., "Playas", "Ensenada"), es suficiente.
+      // No requiere que la tienda tenga "TIJ" para considerarla válida.
       return {
         tienda: tiendaPart || withoutOxxo,
         plaza: plaza,
-        parseOk: plaza !== '' && hasLocationCode
+        parseOk: plaza !== ''  // Solo necesita plaza; TIJ ya no es obligatorio
       };
     }
 
@@ -12968,7 +12949,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var selChecked = cruceSelection.has(getCommentKey(d)) ? ' checked' : '';
         html += `<tr${rowCls}>
           <td style="text-align:center"><input type="checkbox" class="cruce-sel-cb" data-key="${selKey}"${selChecked} onchange="toggleCruceSelect(this.dataset.key, this.checked)" aria-label="Seleccionar equipo" style="cursor:pointer; accent-color: var(--primary);"></td>
-          <td style="text-align:center">${buildAttendedCheckbox(d)}</td>
           <td>${d['Last Seen'] || '—'}</td>
           <td class="days-cell ${sev}"><span class="days-badge">${d.days_ago}</span></td>
           <td>${getEquipmentLabel(d.equipo_type)}</td>
@@ -15872,6 +15852,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var pdd = document.getElementById('plaza-dropdown-detalle'); if (pdd) pdd.value = '';
       var filterInputs = document.querySelectorAll('#detalle tr.filter-row input[data-dcol]');  // Cachear una sola vez
       for (var i = 0; i < filterInputs.length; i++) { filterInputs[i].value = ''; }  // for loop más rápido
+      // Limpiar comentarios también
+      commentStore = {};
+      try { localStorage.removeItem(COMMENT_STORE_KEY); } catch (e) {}
       renderDetalle();
     }
 
