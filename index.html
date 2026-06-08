@@ -12824,26 +12824,29 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function statusOf(d) {
       // REGLA EXACTA basada en "Días Offline" columna de la tabla:
-      // - >= 4 días → OFFLINE
-      // - >= 1 y < 4 días → RECIENTE
-      // - < 1 día → EN LÍNEA
+      // - >= 4 días → OFFLINE (rojo, ícono X, parpadeo)
+      // - >= 1 y < 4 días → RECIENTE (naranja/amarillo, ícono alerta)
+      // - < 1 día → EN LÍNEA (verde, ícono checkmark, pulso)
 
-      if (!d) return { cls: 'unknown', txt: '?', bg: 'rgba(0,0,0,0.06)', fg: '#666' };
+      if (!d) return { cls: 'unknown', txt: '?', icon: 'help', bg: 'rgba(0,0,0,0.06)', fg: '#666' };
 
       var days = d.days_ago || 0;
-      var cls, txt, bg, fg;
+      var cls, txt, icon, bg, fg;
       if (days >= 4) {
-        cls = 'offline'; txt = 'Offline';
-        bg  = 'rgba(179,38,30,0.12)'; fg = '#B3261E';
+        cls = 'status-offline'; txt = 'Offline';
+        icon = 'block';  // Icono de bloque (equipos bloqueados/desconectados)
+        bg  = '#FFEBEE'; fg = '#C62828';  // Rojo más vibrante
       } else if (days >= 1) {
-        cls = 'recent'; txt = 'Reciente';
-        bg  = 'rgba(245,166,35,0.12)'; fg = '#D4850A';
+        cls = 'status-recent'; txt = 'Reciente';
+        icon = 'schedule';  // Reloj (esperando reconexión)
+        bg  = '#FFF3E0'; fg = '#E65100';  // Naranja más vibrante
       } else {
-        cls = 'online'; txt = 'En línea';
-        bg  = 'rgba(31,122,78,0.12)'; fg = '#1F7A4E';
+        cls = 'status-online'; txt = 'En línea';
+        icon = 'check_circle';  // Checkmark en círculo (activo)
+        bg  = 'rgba(31,122,78,0.08)'; fg = '#1F7A4E';
       }
 
-      return { cls: cls, txt: txt, bg: bg, fg: fg };
+      return { cls: cls, txt: txt, icon: icon, bg: bg, fg: fg };
     }
 
     // Estado vacío reutilizable: ícono + mensaje + acción (en vez de tabla en blanco)
@@ -12956,7 +12959,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <td>${d.PLAZA || '<span style="color:var(--error)">Sin plaza</span>'}</td>
           <td>${d.TIENDA || '—'}</td>
           <td>${d.ASESOR || '—'}</td>
-          <td><span class="badge ${st.cls}"><span class="material-symbols-outlined" style="font-size: 14px;">radio_button_checked</span>${st.txt}</span></td>
+          <td><span class="badge status-badge ${st.cls}" style="background: ${st.bg}; color: ${st.fg};"><span class="material-symbols-outlined status-icon">${st.icon}</span><span class="status-text">${st.txt}</span></span></td>
         </tr>`;
       });
       document.getElementById('cruce-table').innerHTML = html || emptyStateRow(10, { msg: 'Ningún equipo cumple los filtros activos. Prueba ajustar la plaza, la búsqueda o el filtro de offline.', clearFn: 'clearCruceFilters()' });
@@ -21925,6 +21928,70 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
   /* ---------- BADGES pill Argon ---------- */
   .badge { border-radius: 9999px !important; font-weight: 600; }
+
+  /* ════════════════════════════════════════════════════════════════
+     ESTADO BADGES — Mejorados con iconos, colores vibrantes, animaciones
+     ════════════════════════════════════════════════════════════════ */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px !important;
+    font-weight: 700 !important;
+    font-size: 13px;
+    border-radius: 12px !important;
+    border: 1px solid currentColor;
+    border-opacity: 0.2;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all .3s ease;
+  }
+
+  .status-icon {
+    font-size: 18px !important;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .status-text {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  /* EN LÍNEA: pulso suave (activo) */
+  .status-badge.status-online {
+    animation: statusPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes statusPulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(31,122,78,0.3), inset 0 0 0 0 rgba(31,122,78,0); }
+    50% { box-shadow: 0 2px 8px rgba(31,122,78,0.5), inset 0 0 0 8px rgba(31,122,78,0.1); }
+  }
+
+  /* RECIENTE: pulsación con color */
+  .status-badge.status-recent {
+    animation: statusWarn 2s ease-in-out infinite;
+  }
+
+  @keyframes statusWarn {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.9; }
+  }
+
+  /* OFFLINE: parpadeo subtil (alerta) */
+  .status-badge.status-offline {
+    animation: statusBlink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes statusBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Hover: feedback interactivo */
+  .status-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+  }
 
   /* ---------- FIX: encabezado sticky tapaba los selects de "Asignar plaza" ----------
      En Inconsistencias el thead sticky (z-index:10) flotaba sobre los <select>
