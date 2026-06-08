@@ -12294,6 +12294,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       var chartOffline = echarts.init(containerOffline);
       containerOffline._echarts = chartOffline;
+      dashboardCharts['analytics-chart-offline'] = chartOffline;
       chartOffline.setOption({
         title: { text: '', left: 'center' },
         xAxis: {
@@ -12394,6 +12395,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       var chartHeatmap = echarts.init(containerHeatmap);
       containerHeatmap._echarts = chartHeatmap;
+      dashboardCharts['analytics-chart-heatmap'] = chartHeatmap;
       chartHeatmap.setOption({
         title: { text: '' },
         tooltip: {
