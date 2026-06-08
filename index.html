@@ -9726,7 +9726,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         <!-- DASHBOARD EJECUTIVO - TODOS LOS GRÁFICOS (Grid automático) -->
         <!-- Wrapper con header de sección y fondo sutil para que el bloque resalte -->
-        <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:8px;">
+        <div class="dash-hero-wrap" style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:8px;">
           <!-- Header del bloque de gráficas -->
           <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px 0 20px;">
             <div style="display:flex; align-items:center; gap:8px;">
@@ -21970,6 +21970,36 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   *::-webkit-scrollbar-thumb { background: #c8cfda; border-radius: 6px; }
   *::-webkit-scrollbar-thumb:hover { background: #aab3c4; }
   *::-webkit-scrollbar-track { background: transparent; }
+
+  /* ════════════════════════════════════════════════════════════════
+     HERO OSCURO ARGON para el bloque de dashboards (cambio radical):
+     panel navy con degradado y las cards BLANCAS flotando encima.
+     Las gráficas siguen en card blanca → renderizan perfecto.
+     ════════════════════════════════════════════════════════════════ */
+  .dash-hero-wrap {
+    background: linear-gradient(135deg, #1b2440 0%, #0e1626 100%) !important;
+    border: 0 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 16px 40px rgba(14,22,38,0.35) !important;
+    padding-top: 6px;
+  }
+  /* Header del hero en blanco */
+  .dash-hero-wrap > div:first-child { padding: 18px 22px 4px !important; }
+  .dash-hero-wrap > div:first-child span { color: #ffffff !important; }
+  .dash-hero-wrap > div:first-child .material-symbols-outlined {
+    background: rgba(255,255,255,0.12) !important; color: #fff !important;
+    border-radius: 8px; padding: 6px; font-size: 18px !important;
+  }
+  /* El grid dentro del hero: transparente para que se vea el navy */
+  .dash-hero-wrap .dashboards-grid {
+    background: transparent !important;
+    border: 0 !important;
+    padding: 18px !important;
+  }
+  /* Cards blancas con sombra fuerte → flotan sobre el navy */
+  .dash-hero-wrap .dashboard-card {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.28) !important;
+  }
 </style>
 </body>
 </html>
