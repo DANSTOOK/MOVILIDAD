@@ -10050,6 +10050,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <th>Modelo</th>
                 <th>Comentario</th>
                 <th>Nota</th>
+                <th title="Historial de seguimiento">Historial</th>
               </tr>
               <tr class="filter-row">
                 <th></th>
@@ -10064,15 +10065,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <th><input type="text" data-dcol="modelo" placeholder="filtro" oninput="onDetalleColFilterChange(this)"></th>
                 <th><input type="text" data-dcol="comentario" placeholder="ROBO/DAÑADA..." oninput="onDetalleColFilterChange(this)"></th>
                 <th><input type="text" data-dcol="nota" placeholder="filtro" oninput="onDetalleColFilterChange(this)"></th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="detalle-table">
-              <tr aria-hidden="true"><td colspan="12" class="skeleton-cell"><div class="skeleton-bar" style="width:92%"></div></td></tr>
-              <tr aria-hidden="true"><td colspan="12" class="skeleton-cell"><div class="skeleton-bar" style="width:78%"></div></td></tr>
-              <tr aria-hidden="true"><td colspan="12" class="skeleton-cell"><div class="skeleton-bar" style="width:85%"></div></td></tr>
-              <tr aria-hidden="true"><td colspan="12" class="skeleton-cell"><div class="skeleton-bar" style="width:70%"></div></td></tr>
-              <tr aria-hidden="true"><td colspan="12" class="skeleton-cell"><div class="skeleton-bar" style="width:82%"></div></td></tr>
-              <tr class="sr-only"><td colspan="12">Cargando datos…</td></tr>
+              <tr aria-hidden="true"><td colspan="13" class="skeleton-cell"><div class="skeleton-bar" style="width:92%"></div></td></tr>
+              <tr aria-hidden="true"><td colspan="13" class="skeleton-cell"><div class="skeleton-bar" style="width:78%"></div></td></tr>
+              <tr aria-hidden="true"><td colspan="13" class="skeleton-cell"><div class="skeleton-bar" style="width:85%"></div></td></tr>
+              <tr aria-hidden="true"><td colspan="13" class="skeleton-cell"><div class="skeleton-bar" style="width:70%"></div></td></tr>
+              <tr aria-hidden="true"><td colspan="13" class="skeleton-cell"><div class="skeleton-bar" style="width:82%"></div></td></tr>
+              <tr class="sr-only"><td colspan="13">Cargando datos…</td></tr>
             </tbody>
           </table>
         </div>
@@ -16441,6 +16443,15 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           + '<td>' + (d.Model || '—') + '</td>'
           + '<td>' + buildCommentSelect(d) + '</td>'
           + '<td>' + buildNoteInput(d) + '</td>'
+          + '<td style="text-align:center;">' +
+            '<button onclick="openNotesTimeline(' + JSON.stringify(d).replace(/"/g, '&quot;') + ')" ' +
+              'style="background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:4px; color:#E2001A; font-weight:600; transition:all 0.2s;" ' +
+              'onmouseover="this.style.background=\'rgba(226,0,26,0.1)\';" ' +
+              'onmouseout="this.style.background=\'transparent\';" ' +
+              'title="Ver historial de seguimiento">' +
+              '<span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle;">history</span>' +
+            '</button>' +
+          '</td>'
         + '</tr>';
       });
       document.getElementById('detalle-table').innerHTML = html || emptyStateRow(12, { msg: 'Ningún equipo cumple los filtros activos. Prueba limpiar los filtros de columna o la búsqueda.', clearFn: 'clearDetalleFilters()' });
@@ -22481,6 +22492,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   /* Entrada suave de la sección activa (fade-up) */
   @keyframes argonSectionIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   #results-screen .section.active { animation: argonSectionIn .35s ease both; }
+
+  /* Animación de nota deslizando desde la izquierda */
+  @keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
   @media (prefers-reduced-motion: reduce) {
     #results-screen .section.active { animation: none; }
     .metric-card:hover, .estado-card:hover, .export-card:hover { transform: none; }
@@ -22489,6 +22503,44 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
 <!-- QR Code Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+
+<!-- Follow-up Notes Timeline Modal -->
+<div id="notes-timeline-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:12px; width:90%; max-width:500px; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.3); overflow:hidden;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e0e0e0;">
+      <div>
+        <h3 style="margin:0 0 4px 0; color:#1C1B1F; font-size:18px; font-weight:700;">Historial de Seguimiento</h3>
+        <p style="margin:0; font-size:11px; color:#999;" id="notes-equipo-info">Equipo</p>
+      </div>
+      <button onclick="closeNotesTimeline()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">×</button>
+    </div>
+
+    <!-- Add Note Section -->
+    <div style="padding:16px 20px; border-bottom:1px solid #e0e0e0; background:#f9f9f9;">
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <input type="text" id="new-note-input" placeholder="Agregar nota de seguimiento..."
+               style="flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:6px; font-size:12px;"
+               onkeydown="if(event.key==='Enter') addFollowupNote()">
+        <button onclick="addFollowupNote()"
+                style="background:#E2001A; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:600; font-size:12px;">
+          Agregar
+        </button>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div style="flex:1; overflow-y:auto; padding:16px 20px;" id="notes-timeline-container">
+      <div style="text-align:center; padding:40px 20px; color:#999;">
+        <span class="material-symbols-outlined" style="font-size:48px; display:block; margin-bottom:8px; opacity:0.3;">note</span>
+        Sin notas de seguimiento aún
+      </div>
+    </div>
+
+    <div style="padding:12px 20px; border-top:1px solid #e0e0e0; text-align:right;">
+      <button onclick="closeNotesTimeline()" style="background:#e0e0e0; color:#333; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:600; font-size:12px;">Cerrar</button>
+    </div>
+  </div>
+</div>
 
 <!-- PDF Preview Modal -->
 <div id="pdf-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
@@ -22726,6 +22778,161 @@ function closePDFPreview() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && document.getElementById('pdf-preview-modal').style.display !== 'none') {
     closePDFPreview();
+  }
+});
+
+// Follow-up Notes Timeline Management
+var _currentEquipoForNotes = null;
+var NOTES_STORE_KEY = 'oxxoFollowupNotes'; // {[equipoKey]: [{timestamp, user, text, status}]}
+var notesStore = {};
+
+function loadNotesStore() {
+  try {
+    var raw = localStorage.getItem(NOTES_STORE_KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') notesStore = parsed;
+    }
+  } catch (e) { notesStore = {}; }
+}
+
+function saveNotesStore() {
+  try {
+    localStorage.setItem(NOTES_STORE_KEY, JSON.stringify(notesStore));
+  } catch (e) { /* quota exceeded */ }
+}
+
+function getEquipoKey(equipo) {
+  return (equipo.CR || '?') + '|' + (equipo['Serial Number'] || '?');
+}
+
+function openNotesTimeline(equipo) {
+  _currentEquipoForNotes = equipo;
+  var key = getEquipoKey(equipo);
+
+  // Mostrar información del equipo
+  document.getElementById('notes-equipo-info').textContent = (equipo.CR || '—') + ' • ' + (equipo.TIENDA || '—');
+
+  // Limpiar input
+  document.getElementById('new-note-input').value = '';
+  document.getElementById('new-note-input').focus();
+
+  // Renderizar timeline
+  renderNotesTimeline(key);
+
+  // Mostrar modal
+  document.getElementById('notes-timeline-modal').style.display = 'flex';
+}
+
+function closeNotesTimeline() {
+  document.getElementById('notes-timeline-modal').style.display = 'none';
+  _currentEquipoForNotes = null;
+}
+
+function addFollowupNote() {
+  if (!_currentEquipoForNotes) return;
+
+  var input = document.getElementById('new-note-input');
+  var text = input.value.trim();
+  if (!text) {
+    input.focus();
+    return;
+  }
+
+  var key = getEquipoKey(_currentEquipoForNotes);
+  if (!notesStore[key]) notesStore[key] = [];
+
+  // Obtener estado actual del equipo
+  var status = _currentEquipoForNotes.days_ago >= 15 ? 'CRÍTICO' : _currentEquipoForNotes.days_ago >= 4 ? 'RECIENTE' : 'OPERATIVO';
+
+  notesStore[key].push({
+    timestamp: new Date().toISOString(),
+    user: 'Admin',
+    text: text,
+    status: status
+  });
+
+  saveNotesStore();
+  input.value = '';
+
+  renderNotesTimeline(key);
+  input.focus();
+}
+
+function renderNotesTimeline(equipoKey) {
+  var notes = notesStore[equipoKey] || [];
+  var container = document.getElementById('notes-timeline-container');
+
+  if (notes.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:#999;">' +
+      '<span class="material-symbols-outlined" style="font-size:48px; display:block; margin-bottom:8px; opacity:0.3;">note</span>' +
+      'Sin notas de seguimiento aún' +
+      '</div>';
+    return;
+  }
+
+  // Ordenar por timestamp descendente (más reciente primero)
+  var sorted = notes.slice().sort(function(a, b) {
+    return new Date(b.timestamp) - new Date(a.timestamp);
+  });
+
+  var html = '<div style="position:relative; padding:0;">';
+
+  sorted.forEach(function(note, idx) {
+    var date = new Date(note.timestamp);
+    var dateStr = date.toLocaleDateString('es-MX');
+    var timeStr = date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+
+    var statusColor = note.status === 'CRÍTICO' ? '#B3261E' : note.status === 'RECIENTE' ? '#F5A623' : '#1F7A4E';
+    var statusBg = note.status === 'CRÍTICO' ? '#FFEBEE' : note.status === 'RECIENTE' ? '#FFF3E0' : '#F1F8F4';
+
+    html += '<div style="position:relative; padding:16px; border-left:3px solid ' + statusColor + '; background:' + statusBg + '; margin-bottom:12px; border-radius:6px; animation:slideInLeft 0.3s ease;">' +
+      '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">' +
+        '<div>' +
+          '<div style="font-weight:600; color:#1C1B1F; font-size:12px;">' + note.user + '</div>' +
+          '<div style="font-size:10px; color:#999; margin-top:2px;">' + dateStr + ' • ' + timeStr + '</div>' +
+        '</div>' +
+        '<span style="background:' + statusColor + '; color:white; padding:2px 8px; border-radius:4px; font-size:9px; font-weight:700;">' + note.status + '</span>' +
+      '</div>' +
+      '<div style="color:#333; font-size:12px; line-height:1.5;">' + String(note.text).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>' +
+      '<button onclick="deleteFollowupNote(\'' + equipoKey.replace(/'/g, "\\'") + '\', ' + idx + ')" ' +
+        'style="margin-top:8px; background:none; border:none; color:#999; font-size:11px; cursor:pointer; text-decoration:underline;">Eliminar</button>' +
+    '</div>';
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function deleteFollowupNote(equipoKey, noteIndex) {
+  if (!confirm('¿Eliminar esta nota?')) return;
+
+  var notes = notesStore[equipoKey] || [];
+  // Buscar el índice en el array original (no ordenado)
+  var sorted = notes.slice().sort(function(a, b) {
+    return new Date(b.timestamp) - new Date(a.timestamp);
+  });
+
+  var noteToDelete = sorted[noteIndex];
+  var originalIndex = notes.findIndex(function(n) {
+    return n.timestamp === noteToDelete.timestamp && n.text === noteToDelete.text;
+  });
+
+  if (originalIndex >= 0) {
+    notes.splice(originalIndex, 1);
+    notesStore[equipoKey] = notes;
+    saveNotesStore();
+    renderNotesTimeline(equipoKey);
+  }
+}
+
+// Load notes on startup
+loadNotesStore();
+
+// Cerrar timeline modal con ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('notes-timeline-modal').style.display !== 'none') {
+    closeNotesTimeline();
   }
 });
 </script>
