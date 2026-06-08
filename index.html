@@ -21859,6 +21859,78 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   });
 })();
 </script>
+
+<!-- ════════════════════════════════════════════════════════════════
+     TEMA ARGON (Creative Tim) — capa visual CSS, sin tocar la lógica.
+     Mantiene el rojo OXXO como acento. Último bloque = gana en cascada.
+     ════════════════════════════════════════════════════════════════ -->
+<style id="argon-theme">
+  /* Paleta global estilo Argon (solo tema claro; el modo oscuro se respeta) */
+  :root:not([data-theme="dark"]) {
+    --bg: #f8f9fe;          /* lienzo gris claro Argon */
+    --surface: #ffffff;
+    --border: #e9ecef;
+    --text: #32325d;        /* slate Argon */
+    --text-light: #8898aa;  /* muted Argon */
+  }
+  body:not([data-theme="dark"]) { background: #f8f9fe; }
+  #results-screen { background: #f8f9fe; }
+
+  /* Sombra suave difusa Argon en los contenedores principales */
+  .metric-card, .table-wrapper, .estado-card, .export-card, .config-section,
+  .saved-views-bar, .kpi-detail-panel {
+    box-shadow: 0 0 2rem 0 rgba(136,152,170,0.16) !important;
+    border-radius: 12px;
+  }
+
+  /* ---------- TABLAS estilo Argon ---------- */
+  .table-wrapper table th {
+    background: #f6f9fc !important;
+    color: #8898aa !important;
+    text-transform: uppercase;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: .4px;
+    border-bottom: 1px solid #e9ecef !important;
+  }
+  .table-wrapper table td { color: #525f7f !important; border-top: 1px solid #f0f2f5; }
+  .table-wrapper table tbody tr:hover { background: #f6f9fc !important; }
+  [data-theme="dark"] .table-wrapper table th { background: rgba(255,255,255,0.04) !important; color: var(--text-light) !important; }
+  [data-theme="dark"] .table-wrapper table tbody tr:hover { background: rgba(255,255,255,0.03) !important; }
+
+  /* ---------- INPUTS / SELECTS estilo Argon ---------- */
+  input[type="text"], input[type="search"], input[type="number"],
+  select, textarea, .comment-select {
+    border: 1px solid #cad1d7 !important;
+    border-radius: .5rem !important;
+    transition: box-shadow .15s ease, border-color .15s ease !important;
+  }
+  input[type="text"]:focus, input[type="search"]:focus, input[type="number"]:focus,
+  select:focus, textarea:focus, .comment-select:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(226,0,26,0.12) !important;
+    outline: none !important;
+  }
+  [data-theme="dark"] input[type="text"], [data-theme="dark"] select,
+  [data-theme="dark"] textarea, [data-theme="dark"] .comment-select {
+    border-color: rgba(255,255,255,0.14) !important;
+  }
+
+  /* ---------- BOTONES estilo Argon ---------- */
+  .btn, .bulk-btn {
+    border-radius: .5rem !important;
+    box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+    transition: transform .15s ease, box-shadow .15s ease !important;
+  }
+  .btn:hover, .bulk-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 7px 14px rgba(50,50,93,.10), 0 3px 6px rgba(0,0,0,.08);
+  }
+  .btn:active, .bulk-btn:active { transform: translateY(0); }
+
+  /* ---------- BADGES pill Argon ---------- */
+  .badge { border-radius: 9999px !important; font-weight: 600; }
+</style>
 </body>
 </html>
 <!-- end -->
