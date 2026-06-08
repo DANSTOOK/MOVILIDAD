@@ -7133,7 +7133,20 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
           </div>
         </div>
-        <div class="app-bar-avatar" id="hdr-avatar" title="Usuario">JM</div>
+        <div style="position:relative;">
+          <button class="app-bar-avatar" id="hdr-avatar" title="Usuario" onclick="toggleUserMenu()" style="background:none; border:none; cursor:pointer; padding:0;">JM</button>
+          <div id="user-menu" style="display:none; position:absolute; top:48px; right:0; background:white; border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:9999; min-width:180px; overflow:hidden;">
+            <div style="padding:12px 16px; border-bottom:1px solid var(--border);">
+              <div style="font-size:11px; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Usuario</div>
+              <div style="font-size:13px; font-weight:600; color:#1C1B1F;" id="user-menu-name">Admin</div>
+            </div>
+            <div style="padding:4px;">
+              <button onclick="handleLogout()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; color:#E2001A; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s;" onmouseover="this.style.background='rgba(226,0,26,0.05)'" onmouseout="this.style.background='transparent'">
+                <span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:6px;">logout</span>Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -22507,6 +22520,48 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 <!-- QR Code Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
 
+<!-- Login Modal -->
+<div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:11000; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:12px; width:90%; max-width:400px; padding:32px; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:48px; margin-bottom:12px;">📱</div>
+      <h2 style="margin:0; font-size:24px; font-weight:700; color:#1C1B1F;">OXXO Movilidad</h2>
+      <p style="margin:4px 0 0 0; font-size:12px; color:#999;">API Backend Connection</p>
+    </div>
+
+    <form onsubmit="handleLogin(event)" style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:#333; margin-bottom:6px;">Usuario</label>
+        <input type="text" id="login-username" placeholder="admin" value="admin"
+               style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; box-sizing:border-box;">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:#333; margin-bottom:6px;">Contraseña</label>
+        <input type="password" id="login-password" placeholder="••••••••"
+               style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; box-sizing:border-box;">
+      </div>
+
+      <div style="margin-top:4px;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#666; cursor:pointer;">
+          <input type="checkbox" id="login-local-mode">
+          Usar modo local (sin API)
+        </label>
+      </div>
+
+      <div id="login-error" style="display:none; padding:10px; background:#FFEBEE; border:1px solid #FFCDD2; border-radius:6px; font-size:12px; color:#C62828;"></div>
+
+      <button type="submit" style="background:#E2001A; color:white; border:none; padding:12px; border-radius:6px; font-weight:600; cursor:pointer; font-size:14px; transition:background 0.2s;" onmouseover="this.style.background='#B8001A'" onmouseout="this.style.background='#E2001A'">
+        Conectar
+      </button>
+
+      <div style="text-align:center; font-size:11px; color:#999; margin-top:8px;">
+        Demo: usuario: <strong>admin</strong> / contraseña: <strong>admin123</strong>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Real-time Alerts Container -->
 <div id="alerts-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; max-width:350px;"></div>
 
@@ -23009,6 +23064,255 @@ function checkEquiposStatusChanges() {
 
 // Ejecutar verificación de cambios cada 30 segundos
 setInterval(checkEquiposStatusChanges, 30000);
+
+// ════════════════════════════════════════════════════════════════
+// API INTEGRATION & AUTHENTICATION
+// ════════════════════════════════════════════════════════════════
+
+var API_BASE_URL = 'http://localhost:3001';
+var AUTH_TOKEN_KEY = 'oxxoAuthToken';
+var USER_INFO_KEY = 'oxxoUserInfo';
+var _useLocalMode = false;
+
+function setAuthToken(token) {
+  try {
+    localStorage.setItem(AUTH_TOKEN_KEY, token);
+  } catch (e) { console.error('Error saving token', e); }
+}
+
+function getAuthToken() {
+  try {
+    return localStorage.getItem(AUTH_TOKEN_KEY);
+  } catch (e) { return null; }
+}
+
+function clearAuth() {
+  try {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(USER_INFO_KEY);
+  } catch (e) {}
+}
+
+function showLoginModal() {
+  document.getElementById('login-modal').style.display = 'flex';
+  document.getElementById('login-username').focus();
+}
+
+function hideLoginModal() {
+  document.getElementById('login-modal').style.display = 'none';
+}
+
+function handleLogin(event) {
+  event.preventDefault();
+
+  var useLocal = document.getElementById('login-local-mode').checked;
+  var username = document.getElementById('login-username').value.trim();
+  var password = document.getElementById('login-password').value.trim();
+
+  if (!username || !password) {
+    showLoginError('Por favor completa todos los campos');
+    return;
+  }
+
+  if (useLocal) {
+    _useLocalMode = true;
+    hideLoginModal();
+    loadLocalData();
+  } else {
+    loginWithAPI(username, password);
+  }
+}
+
+function showLoginError(message) {
+  var errorDiv = document.getElementById('login-error');
+  errorDiv.textContent = message;
+  errorDiv.style.display = 'block';
+}
+
+function clearLoginError() {
+  document.getElementById('login-error').style.display = 'none';
+}
+
+async function loginWithAPI(username, password) {
+  try {
+    showAlert('Conectando a API...', 'info', 3000);
+
+    var response = await fetch(API_BASE_URL + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username, password: password })
+    });
+
+    if (!response.ok) {
+      var error = await response.json();
+      showLoginError(error.error || 'Error de autenticación');
+      return;
+    }
+
+    var data = await response.json();
+    setAuthToken(data.token);
+    localStorage.setItem(USER_INFO_KEY, JSON.stringify(data.user));
+
+    hideLoginModal();
+    clearLoginError();
+    _useLocalMode = false;
+
+    updateUserInfo();
+
+    showAlert('✓ Conectado como ' + data.user.username, 'success');
+    fetchEquiposFromAPI();
+  } catch (error) {
+    showLoginError('Error al conectar: ' + error.message);
+    console.error('Login error:', error);
+  }
+}
+
+async function fetchEquiposFromAPI(plaza) {
+  var token = getAuthToken();
+  if (!token) {
+    showLoginModal();
+    return;
+  }
+
+  try {
+    var url = API_BASE_URL + '/api/equipos';
+    if (plaza) url += '?plaza=' + encodeURIComponent(plaza);
+
+    var response = await fetch(url, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    if (response.status === 401) {
+      clearAuth();
+      showLoginModal();
+      showAlert('Token expirado. Por favor, inicia sesión nuevamente.', 'warning');
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error('Error ' + response.status);
+    }
+
+    var equipos = await response.json();
+
+    // Convertir datos del API al formato esperado por la aplicación
+    D = equipos.map(function(e) {
+      return {
+        CR: e.cr,
+        'Friendly Name': e.friendly_name || e.cr,
+        TIENDA: e.tienda,
+        PLAZA: e.plaza,
+        ASESOR: e.asesor,
+        Modelo: e.model,
+        'Serial Number': e.serial_number,
+        'Last Seen': e.last_seen,
+        days_ago: e.days_ago,
+        estado: e.estado,
+        equipo_type: e.equipo_type,
+        latitude: e.latitude,
+        longitude: e.longitude
+      };
+    });
+
+    // Procesar plaza
+    processData();
+    renderAll();
+
+    showAlert('✓ ' + D.length + ' equipos cargados del API', 'success', 2000);
+  } catch (error) {
+    showAlert('Error al cargar equipos: ' + error.message, 'warning');
+    console.error('Fetch equipos error:', error);
+  }
+}
+
+function loadLocalData() {
+  // Fallback al modo local si no hay API
+  showAlert('Modo local activado (sin API)', 'info');
+  // Los datos se cargan desde CSV como antes
+}
+
+// Verificar autenticación al cargar la página
+function checkAuthOnLoad() {
+  var token = getAuthToken();
+  if (!token) {
+    showLoginModal();
+  } else {
+    // Intentar verificar token con el API
+    verifyTokenWithAPI();
+  }
+}
+
+async function verifyTokenWithAPI() {
+  var token = getAuthToken();
+  if (!token) return;
+
+  try {
+    var response = await fetch(API_BASE_URL + '/api/auth/verify', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    if (!response.ok) {
+      clearAuth();
+      showLoginModal();
+      return;
+    }
+
+    // Token válido, cargar datos
+    _useLocalMode = false;
+    fetchEquiposFromAPI();
+  } catch (error) {
+    // Si el API no está disponible, usar modo local
+    console.warn('API no disponible, usando modo local:', error.message);
+    _useLocalMode = true;
+    loadLocalData();
+  }
+}
+
+// Verificar autenticación cuando la página está lista
+window.addEventListener('load', function() {
+  // Pequeño delay para asegurar que todo esté listo
+  setTimeout(checkAuthOnLoad, 100);
+});
+
+function toggleUserMenu() {
+  var menu = document.getElementById('user-menu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function handleLogout() {
+  if (!confirm('¿Cerrar sesión?')) return;
+
+  clearAuth();
+  toggleUserMenu();
+
+  // Limpiar datos
+  D = [];
+
+  showAlert('Sesión cerrada', 'info');
+  showLoginModal();
+}
+
+// Cerrar user menu cuando hago clic afuera
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('user-menu');
+  var avatar = document.getElementById('hdr-avatar');
+  if (menu && avatar && !menu.contains(e.target) && !avatar.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+// Actualizar nombre de usuario en el menú cuando se hace login
+function updateUserInfo() {
+  try {
+    var userInfo = JSON.parse(localStorage.getItem(USER_INFO_KEY));
+    if (userInfo) {
+      document.getElementById('user-menu-name').textContent = userInfo.username || 'Admin';
+      // Actualizar avatar con iniciales
+      var initials = (userInfo.username || 'A').substring(0, 2).toUpperCase();
+      document.getElementById('hdr-avatar').textContent = initials;
+    }
+  } catch (e) {}
+}
 </script>
 
 </body>
