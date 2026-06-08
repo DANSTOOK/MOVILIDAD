@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: oxxo-movilidad-api
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=development
+      - JWT_SECRET=oxxo-development-secret-change-in-production
+      - DB_PATH=./data/oxxo_movilidad.db
+      - GOOGLE_MAPS_API_KEY=your-google-maps-key-here
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Optional: PostgreSQL para production (comentado)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: oxxo-movilidad-db
+  #   environment:
+  #     POSTGRES_USER: oxxo
+  #     POSTGRES_PASSWORD: secure-password-change-this
+  #     POSTGRES_DB: oxxo_movilidad
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+
+# volumes:
+#   postgres_data:
