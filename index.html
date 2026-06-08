@@ -22007,6 +22007,65 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   .dash-hero-wrap .dashboard-card {
     box-shadow: 0 0 1.5rem 0 rgba(136,152,170,0.22) !important;
   }
+
+  /* ════════════════════════════════════════════════════════════════
+     HERO ROJO ARGON detrás de las pestañas + tabs como pills blancos
+     (look de cabecera con barra de navegación flotante)
+     ════════════════════════════════════════════════════════════════ */
+  #results-screen { position: relative; }
+  #results-screen::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 74px;
+    background: linear-gradient(135deg, #E2001A 0%, #9B000F 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
+  /* La barra de pestañas flota como card blanca sobre el hero rojo */
+  .tabs {
+    position: relative !important;
+    z-index: 3 !important;
+    background: #ffffff !important;
+    border: 0 !important;
+    box-shadow: 0 8px 24px rgba(155,0,15,0.28) !important;
+    margin-top: 22px !important;
+    padding: 8px !important;
+  }
+  /* Tab activa = pill rojo relleno (look Argon) */
+  .tabs .tab.active {
+    background: linear-gradient(135deg, #E2001A, #B80018) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(226,0,26,0.35) !important;
+    border-radius: 14px !important;
+  }
+  .tabs .tab.active .material-symbols-outlined,
+  .tabs .tab.active .tab-icon-svg { color: #ffffff !important; stroke: #ffffff !important; }
+  /* El contenido de la sección por encima del hero */
+  #results-screen .section { position: relative; z-index: 1; }
+  [data-theme="dark"] #results-screen::before { background: linear-gradient(135deg, #7a0010, #4a000a); }
+  [data-theme="dark"] .tabs { background: var(--card-bg) !important; }
+
+  /* ════════════════════════════════════════════════════════════════
+     REACTIVIDAD / ANIMACIONES ARGON — hover lifts y transiciones suaves
+     ════════════════════════════════════════════════════════════════ */
+  .metric-card, .estado-card, .export-card, .config-section, .saved-views-bar {
+    transition: transform .22s ease, box-shadow .22s ease !important;
+  }
+  .metric-card:hover, .estado-card:hover, .export-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 .75rem 2rem 0 rgba(136,152,170,0.30) !important;
+  }
+  /* Botones e inputs: micro-feedback */
+  .btn, .bulk-btn, button { transition: transform .12s ease, box-shadow .15s ease, background .15s ease; }
+  .tab { transition: all .2s cubic-bezier(.34,1.56,.64,1) !important; }
+  .tab:not(.active):hover { background: rgba(226,0,26,0.06) !important; color: #E2001A !important; transform: translateY(-1px); }
+
+  /* Entrada suave de la sección activa (fade-up) */
+  @keyframes argonSectionIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  #results-screen .section.active { animation: argonSectionIn .35s ease both; }
+  @media (prefers-reduced-motion: reduce) {
+    #results-screen .section.active { animation: none; }
+    .metric-card:hover, .estado-card:hover, .export-card:hover { transform: none; }
+  }
 </style>
 </body>
 </html>
