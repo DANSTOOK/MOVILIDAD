@@ -21942,6 +21942,34 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
   /* ---------- BADGES pill Argon ---------- */
   .badge { border-radius: 9999px !important; font-weight: 600; }
+
+  /* ---------- ICONOS DE ENCABEZADO como chips rojos (toque premium) ---------- */
+  /* Cada icono que precede a un <h2> (títulos de sección) → chip con degradado */
+  .material-symbols-outlined:has(+ h2) {
+    background: linear-gradient(135deg, #E2001A, #B80018) !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 9px !important;
+    font-size: 22px !important;
+    box-shadow: 0 6px 14px rgba(226,0,26,0.30) !important;
+    line-height: 1 !important;
+  }
+  /* Título de sección en slate, bien marcado */
+  div:has(> .material-symbols-outlined + h2) > h2 { color: var(--text) !important; font-weight: 700 !important; }
+
+  /* ---------- TAB activa estilo Argon (pill rojo) ---------- */
+  .tab.active {
+    color: #E2001A !important;
+    font-weight: 700 !important;
+  }
+  .tab .material-symbols-outlined, .tab .tab-icon-svg { transition: transform .2s ease; }
+  .tab:hover .material-symbols-outlined, .tab:hover .tab-icon-svg { transform: translateY(-1px); }
+
+  /* ---------- Scrollbars finas estilo Argon ---------- */
+  *::-webkit-scrollbar { width: 9px; height: 9px; }
+  *::-webkit-scrollbar-thumb { background: #c8cfda; border-radius: 6px; }
+  *::-webkit-scrollbar-thumb:hover { background: #aab3c4; }
+  *::-webkit-scrollbar-track { background: transparent; }
 </style>
 </body>
 </html>
