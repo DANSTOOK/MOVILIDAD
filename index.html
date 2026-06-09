@@ -10009,91 +10009,54 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
           </div>
 
-          <!-- 📊 PANEL DE DETALLES PREMIUM -->
-          <div id="oxxo-details-panel" style="display:none; margin-bottom:28px; background:linear-gradient(135deg, #FFFFFF 0%, rgba(25,118,210,0.02) 100%);
-                                               border:1px solid rgba(0,0,0,0.08); border-radius:20px; padding:32px;
-                                               box-shadow: 0 12px 40px rgba(0,0,0,0.12);">
+          <!-- 📊 PANEL DE DETALLES COMPACTO -->
+          <div id="oxxo-details-panel" style="display:none; margin-bottom:12px; background:linear-gradient(135deg, #FFFFFF 0%, rgba(25,118,210,0.02) 100%);
+                                               border:1px solid rgba(0,0,0,0.08); border-radius:14px; padding:12px;
+                                               box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
 
-            <!-- HEADER PREMIUM -->
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px;">
+            <!-- HEADER COMPACTO -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
               <div style="flex:1;">
-                <div style="font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Información de Tienda</div>
-                <h2 id="oxxo-details-name" style="margin:0; font-size:28px; font-weight:700; color:var(--text); letter-spacing:-0.5px;">Oxxo Seleccionado</h2>
-                <div id="oxxo-location-label" style="font-size:13px; color:var(--text-light); margin-top:8px; display:flex; align-items:center; gap:6px;">
-                  <span class="material-symbols-outlined" style="font-size:18px;">location_on</span>
-                  📍 Ubicación geográfica
-                </div>
+                <h3 id="oxxo-details-name" style="margin:0; font-size:14px; font-weight:700; color:var(--primary);">Oxxo</h3>
+                <div id="oxxo-location-label" style="font-size:10px; color:var(--text-light); margin-top:2px;">📍 Ubicación</div>
               </div>
-              <button onclick="closeOxxoDetails()" style="background:none; border:none; color:var(--text-light); cursor:pointer; font-size:28px;
-                                                          width:48px; height:48px; border-radius:50%; transition:all 0.2s;
+              <button onclick="closeOxxoDetails()" style="background:none; border:none; color:var(--text-light); cursor:pointer; font-size:18px;
+                                                          width:28px; height:28px; border-radius:50%; transition:all 0.2s;
                                                           display:flex; align-items:center; justify-content:center;"
                 onmouseover="this.style.background='rgba(0,0,0,0.05)'; this.style.color='var(--text)';" onmouseout="this.style.background='none'; this.style.color='var(--text-light)';">✕</button>
             </div>
 
-            <!-- COORDENADAS DESTACADAS -->
-            <div style="background:linear-gradient(135deg, rgba(25,118,210,0.08) 0%, rgba(25,118,210,0.03) 100%); padding:20px; border-radius:16px; margin-bottom:28px;
-                        border-left:5px solid var(--primary);">
-              <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:12px; letter-spacing:0.5px;">
-                <span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:6px;">location_on</span>
-                Coordenadas Exactas
-              </div>
-              <div id="oxxo-coords" style="font-size:18px; font-weight:600; color:var(--primary); font-family:'Courier New', monospace; line-height:1.8; letter-spacing:0.5px;">—</div>
+            <!-- COORDENADAS COMPACTAS -->
+            <div style="background:linear-gradient(135deg, rgba(25,118,210,0.08) 0%, rgba(25,118,210,0.03) 100%); padding:8px 10px; border-radius:8px; margin-bottom:10px;
+                        border-left:3px solid var(--primary);">
+              <div style="font-size:8px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:2px; letter-spacing:0.5px;">📍 Coord</div>
+              <div id="oxxo-coords" style="font-size:10px; font-weight:600; color:var(--primary); font-family:'Courier New', monospace;">—</div>
             </div>
 
-            <!-- ESTADÍSTICAS EN GRID 2x2 CON ESTILO PREMIUM -->
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px;">
-
-              <!-- Total Equipos - Card Principal -->
-              <div style="grid-column:1/3; background:linear-gradient(135deg, var(--primary) 0%, #1565C0 100%);
-                          color:white; padding:28px; border-radius:16px;
-                          box-shadow: 0 8px 24px rgba(25,118,210,0.3);">
-                <div style="font-size:12px; font-weight:700; text-transform:uppercase; opacity:0.9; letter-spacing:0.5px; margin-bottom:12px;">
-                  <span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle; margin-right:6px;">devices</span>
-                  Total de Equipos
-                </div>
-                <div id="oxxo-total-count" style="font-size:48px; font-weight:700; line-height:1;">—</div>
-                <div style="font-size:13px; margin-top:12px; opacity:0.85;">Dispositivos activos y monitoreados</div>
+            <!-- ESTADÍSTICAS EN GRID COMPACTO 1x4 -->
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px; margin-bottom:10px;">
+              <div style="background:linear-gradient(135deg, var(--primary) 0%, #1565C0 100%); color:white; padding:8px 6px; border-radius:8px; text-align:center;">
+                <div style="font-size:7px; font-weight:700; text-transform:uppercase; opacity:0.85; margin-bottom:2px;">Total</div>
+                <div id="oxxo-total-count" style="font-size:14px; font-weight:700;">—</div>
               </div>
-
-              <!-- Online -->
-              <div style="background:linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
-                          padding:24px; border-radius:16px; border:1px solid rgba(31,122,78,0.2);
-                          position:relative; overflow:hidden;">
-                <div style="position:absolute; top:16px; right:16px; font-size:32px; opacity:0.1;">🟢</div>
-                <div style="font-size:11px; font-weight:700; color:#1F7A4E; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">Equipos Online</div>
-                <div id="oxxo-online-count" style="font-size:36px; font-weight:700; color:#1F7A4E;">—</div>
-                <div style="font-size:12px; color:rgba(31,122,78,0.7); margin-top:8px;">En funcionamiento</div>
+              <div style="background:rgba(31,122,78,0.1); padding:8px 6px; border-radius:8px; border:1px solid rgba(31,122,78,0.2); text-align:center;">
+                <div style="font-size:7px; font-weight:700; color:#1F7A4E; text-transform:uppercase; margin-bottom:2px;">On</div>
+                <div id="oxxo-online-count" style="font-size:14px; font-weight:700; color:#1F7A4E;">—</div>
               </div>
-
-              <!-- Offline 1-3d -->
-              <div style="background:linear-gradient(135deg, #FFF3E0 0%, #FFF8E1 100%);
-                          padding:24px; border-radius:16px; border:1px solid rgba(226,0,26,0.15);
-                          position:relative; overflow:hidden;">
-                <div style="position:absolute; top:16px; right:16px; font-size:32px; opacity:0.1;">🟠</div>
-                <div style="font-size:11px; font-weight:700; color:#E2001A; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">Offline 1-3 Días</div>
-                <div id="oxxo-offline-count" style="font-size:36px; font-weight:700; color:#E2001A;">—</div>
-                <div style="font-size:12px; color:rgba(226,0,26,0.7); margin-top:8px;">Requiere atención</div>
+              <div style="background:rgba(226,0,26,0.1); padding:8px 6px; border-radius:8px; border:1px solid rgba(226,0,26,0.15); text-align:center;">
+                <div style="font-size:7px; font-weight:700; color:#E2001A; text-transform:uppercase; margin-bottom:2px;">1-3d</div>
+                <div id="oxxo-offline-count" style="font-size:14px; font-weight:700; color:#E2001A;">—</div>
               </div>
-
-              <!-- Crítico 4+d -->
-              <div style="background:linear-gradient(135deg, #FFEBEE 0%, #FFF1F1 100%);
-                          padding:24px; border-radius:16px; border:1px solid rgba(139,0,0,0.2);
-                          position:relative; overflow:hidden;">
-                <div style="position:absolute; top:16px; right:16px; font-size:32px; opacity:0.1;">🔴</div>
-                <div style="font-size:11px; font-weight:700; color:#8B0000; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">Crítico 4+ Días</div>
-                <div id="oxxo-critical-count" style="font-size:36px; font-weight:700; color:#8B0000;">—</div>
-                <div style="font-size:12px; color:rgba(139,0,0,0.7); margin-top:8px;">Acción urgente</div>
+              <div style="background:rgba(139,0,0,0.1); padding:8px 6px; border-radius:8px; border:1px solid rgba(139,0,0,0.2); text-align:center;">
+                <div style="font-size:7px; font-weight:700; color:#8B0000; text-transform:uppercase; margin-bottom:2px;">4+d</div>
+                <div id="oxxo-critical-count" style="font-size:14px; font-weight:700; color:#8B0000;">—</div>
               </div>
             </div>
 
-            <!-- LISTADO DE EQUIPOS PREMIUM -->
-            <div style="background:linear-gradient(135deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.005) 100%); padding:24px; border-radius:16px;
-                        border:1px solid rgba(0,0,0,0.06);">
-              <div style="font-size:12px; font-weight:700; color:var(--text); text-transform:uppercase; margin-bottom:18px; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
-                <span class="material-symbols-outlined" style="font-size:20px;">list_alt</span>
-                Desglose Detallado de Equipos
-              </div>
-              <div id="oxxo-equipment-list" style="font-size:13px; max-height:240px; overflow-y:auto; line-height:1.8;">—</div>
+            <!-- LISTADO DE EQUIPOS COMPACTO -->
+            <div style="background:rgba(0,0,0,0.02); padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06);">
+              <div style="font-size:9px; font-weight:700; color:var(--text); text-transform:uppercase; margin-bottom:4px; letter-spacing:0.5px;">📋 Equipos</div>
+              <div id="oxxo-equipment-list" style="font-size:10px; max-height:100px; overflow-y:auto; line-height:1.3;">—</div>
             </div>
           </div>
 
@@ -13066,8 +13029,29 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
 
     function closeOxxoDetails() {
-      document.getElementById('oxxo-details-panel').style.display = 'none';
-      document.getElementById('oxxo-search-input').value = '';
+      // Cerrar panel de detalles
+      var panel = document.getElementById('oxxo-details-panel');
+      if (panel) {
+        panel.style.display = 'none';
+      }
+
+      // Limpiar búsqueda
+      var searchInput = document.getElementById('oxxo-search-input');
+      if (searchInput) {
+        searchInput.value = '';
+      }
+
+      // Cerrar resultados
+      var resultsContainer = document.getElementById('search-results-container');
+      if (resultsContainer) {
+        resultsContainer.style.display = 'none';
+      }
+
+      // Limpiar botón de limpiar
+      var clearBtn = document.getElementById('search-clear-btn');
+      if (clearBtn) {
+        clearBtn.style.display = 'none';
+      }
     }
 
     function switchTabFromSidebar(e, tab) {
