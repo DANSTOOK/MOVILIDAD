@@ -9965,54 +9965,89 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         <!-- 13. MAPA INTERACTIVO DE PLAZAS (BAJA CALIFORNIA) -->
         <div class="mexico-map-wrap">
-          <!-- 🔍 BUSCADOR DE OXXO -->
-          <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-            <div>
-              <label style="font-size:11px; font-weight:600; color:var(--text-light); display:block; margin-bottom:6px;">🔍 Buscar Oxxo</label>
-              <input type="text" id="oxxo-search-input" placeholder="Ej: Maples, Centro, Playas..."
-                style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px;
-                       background:var(--card-bg); color:var(--text); font-size:13px;"
-                oninput="searchOxxoByName(this.value)">
+          <!-- 🔍 BUSCADOR MODERNO DE OXXO -->
+          <div style="margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+              <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px;">search</span>
+              <label style="font-size:12px; font-weight:700; color:var(--text); margin:0;">BUSCAR OXXO</label>
             </div>
-            <div id="search-results-box" style="display:none; background:var(--surface); border:1px solid var(--border);
-                                                 border-radius:8px; overflow:hidden; max-height:200px; overflow-y:auto;">
+            <input type="text" id="oxxo-search-input" placeholder="Escribe el nombre de la tienda... (Ej: Maples, Centro, Playas)"
+              style="width:100%; padding:14px 16px; border:2px solid var(--border); border-radius:10px;
+                     background:var(--card-bg); color:var(--text); font-size:14px; font-weight:500;
+                     transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05);"
+              onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 2px 12px rgba(25,118,210,0.15)';"
+              onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.05)';"
+              oninput="searchOxxoByName(this.value)">
+
+            <!-- GRID DE RESULTADOS -->
+            <div id="search-results-container" style="display:none; margin-top:16px;">
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;" id="search-results-grid">
+              </div>
             </div>
           </div>
 
-          <!-- 📊 PANEL DE DETALLES DEL OXXO SELECCIONADO -->
-          <div id="oxxo-details-panel" style="display:none; margin-bottom:16px; background:var(--card-bg);
-                                               border:2px solid var(--primary); border-radius:12px; padding:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <h4 id="oxxo-details-name" style="margin:0; font-size:16px; font-weight:700; color:var(--text);">Oxxo Seleccionado</h4>
-              <button onclick="closeOxxoDetails()" style="background:none; border:none; color:var(--text-light); cursor:pointer; font-size:20px;">✕</button>
+          <!-- 📊 PANEL DE DETALLES DEL OXXO SELECCIONADO (MEJORADO) -->
+          <div id="oxxo-details-panel" style="display:none; margin-bottom:20px; background:linear-gradient(135deg, var(--card-bg) 0%, rgba(25,118,210,0.03) 100%);
+                                               border:2px solid var(--primary); border-radius:16px; padding:24px;
+                                               box-shadow: 0 8px 24px rgba(25,118,210,0.1);">
+            <!-- HEADER CON NOMBRE Y BOTÓN CERRAR -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid var(--border);">
+              <div>
+                <h4 id="oxxo-details-name" style="margin:0; font-size:20px; font-weight:700; color:var(--primary);">Oxxo Seleccionado</h4>
+                <div id="oxxo-location-label" style="font-size:11px; color:var(--text-light); margin-top:4px;">📍 Ubicación geográfica</div>
+              </div>
+              <button onclick="closeOxxoDetails()" style="background:rgba(255,0,0,0.1); border:none; color:#E2001A; cursor:pointer; font-size:24px;
+                                                          width:44px; height:44px; border-radius:50%; transition:all 0.2s;
+                                                          display:flex; align-items:center; justify-content:center;"
+                onmouseover="this.style.background='rgba(255,0,0,0.2)'" onmouseout="this.style.background='rgba(255,0,0,0.1)'">✕</button>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
-              <div style="background:var(--surface); padding:12px; border-radius:8px;">
-                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">📍 COORDENADAS</div>
-                <div id="oxxo-coords" style="font-size:12px; font-weight:600; color:var(--text); font-family:monospace;">—</div>
+
+            <!-- COORDENADAS EN DESTAQUE -->
+            <div style="background:var(--surface); padding:16px; border-radius:12px; margin-bottom:20px; border-left:4px solid var(--primary);">
+              <div style="font-size:11px; font-weight:700; color:var(--text-light); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">📍 Coordenadas Exactas</div>
+              <div id="oxxo-coords" style="font-size:14px; font-weight:600; color:var(--primary); font-family:'Courier New', monospace; line-height:1.6;">—</div>
+            </div>
+
+            <!-- ESTADÍSTICAS EN GRID 2x2 -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+              <!-- Total Equipos -->
+              <div style="background:linear-gradient(135deg, rgba(25,118,210,0.1) 0%, rgba(25,118,210,0.05) 100%);
+                          padding:16px; border-radius:12px; border:2px solid rgba(25,118,210,0.2);">
+                <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">📊 Total de Equipos</div>
+                <div id="oxxo-total-count" style="font-size:28px; font-weight:700; color:var(--primary);">—</div>
               </div>
-              <div style="background:var(--surface); padding:12px; border-radius:8px;">
-                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">📊 EQUIPOS TOTALES</div>
-                <div id="oxxo-total-count" style="font-size:16px; font-weight:700; color:var(--primary);">—</div>
+
+              <!-- Online -->
+              <div style="background:linear-gradient(135deg, rgba(31,122,78,0.15) 0%, rgba(31,122,78,0.05) 100%);
+                          padding:16px; border-radius:12px; border:2px solid rgba(31,122,78,0.3); position:relative;">
+                <div style="position:absolute; top:-12px; right:16px; background:#1F7A4E; color:white; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:700;">EN LÍNEA</div>
+                <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">🟢 Equipos Online</div>
+                <div id="oxxo-online-count" style="font-size:24px; font-weight:700; color:#1F7A4E;">—</div>
+              </div>
+
+              <!-- Offline 1-3d -->
+              <div style="background:linear-gradient(135deg, rgba(226,0,26,0.15) 0%, rgba(226,0,26,0.05) 100%);
+                          padding:16px; border-radius:12px; border:2px solid rgba(226,0,26,0.3);">
+                <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">🟠 Offline 1-3 Días</div>
+                <div id="oxxo-offline-count" style="font-size:24px; font-weight:700; color:#E2001A;">—</div>
+              </div>
+
+              <!-- Crítico 4+d -->
+              <div style="background:linear-gradient(135deg, rgba(139,0,0,0.15) 0%, rgba(139,0,0,0.05) 100%);
+                          padding:16px; border-radius:12px; border:2px solid rgba(139,0,0,0.3); position:relative;">
+                <div style="position:absolute; top:-12px; right:16px; background:#8B0000; color:white; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:700;">CRÍTICO</div>
+                <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">🔴 Crítico 4+ Días</div>
+                <div id="oxxo-critical-count" style="font-size:24px; font-weight:700; color:#8B0000;">—</div>
               </div>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
-              <div style="background:rgba(31,122,78,0.1); padding:12px; border-radius:8px; border-left:3px solid #1F7A4E;">
-                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">🟢 ONLINE</div>
-                <div id="oxxo-online-count" style="font-size:14px; font-weight:700; color:#1F7A4E;">—</div>
+
+            <!-- LISTADO DE EQUIPOS -->
+            <div style="background:var(--surface); padding:16px; border-radius:12px; border:2px solid var(--border);">
+              <div style="font-size:11px; font-weight:700; color:var(--text); text-transform:uppercase; margin-bottom:12px; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
+                <span class="material-symbols-outlined" style="font-size:16px;">list</span>
+                Desglose de Equipos
               </div>
-              <div style="background:rgba(226,0,26,0.1); padding:12px; border-radius:8px; border-left:3px solid #E2001A;">
-                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">🟠 OFFLINE 1-3d</div>
-                <div id="oxxo-offline-count" style="font-size:14px; font-weight:700; color:#E2001A;">—</div>
-              </div>
-              <div style="background:rgba(139,0,0,0.1); padding:12px; border-radius:8px; border-left:3px solid #8B0000;">
-                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">🔴 CRÍTICO 4+d</div>
-                <div id="oxxo-critical-count" style="font-size:14px; font-weight:700; color:#8B0000;">—</div>
-              </div>
-            </div>
-            <div style="background:var(--surface); padding:12px; border-radius:8px;">
-              <div style="font-size:11px; font-weight:600; color:var(--text); margin-bottom:8px;">📋 EQUIPOS (HH/TT):</div>
-              <div id="oxxo-equipment-list" style="font-size:11px; max-height:150px; overflow-y:auto;">—</div>
+              <div id="oxxo-equipment-list" style="font-size:12px; max-height:200px; overflow-y:auto; line-height:1.6;">—</div>
             </div>
           </div>
 
@@ -12668,20 +12703,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       _tiendaMarkers[tienda] = marker;
     }
 
-    function searchOxxoByName(query) {
-      var resultsBox = document.getElementById('search-results-box');
-      if (!query || query.length < 1) {
-        resultsBox.style.display = 'none';
-        return;
-      }
-
+    function getAllUniqueTiendas() {
       var data = getPlazaScopedData();
-      if (!data || !data.length) return;
+      if (!data || !data.length) return {};
 
-      // Group by TIENDA and search
       var tiendas = {};
-      var found = [];
-
       data.forEach(function(d) {
         var tienda = d.TIENDA || 'Desconocida';
         if (!tiendas[tienda]) {
@@ -12693,53 +12719,100 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         else if (d.days_ago < 4) tiendas[tienda].offline++;
         else tiendas[tienda].critical++;
       });
+      return tiendas;
+    }
+
+    function searchOxxoByName(query) {
+      var resultsContainer = document.getElementById('search-results-container');
+      var resultsGrid = document.getElementById('search-results-grid');
+
+      if (!query || query.length < 1) {
+        resultsContainer.style.display = 'none';
+        return;
+      }
+
+      var allTiendas = getAllUniqueTiendas();
+      var found = [];
 
       // Filter by query (case-insensitive)
-      Object.keys(tiendas).forEach(function(tienda) {
+      Object.keys(allTiendas).forEach(function(tienda) {
         if (tienda.toLowerCase().includes(query.toLowerCase())) {
-          found.push({ name: tienda, stats: tiendas[tienda] });
+          found.push({ name: tienda, stats: allTiendas[tienda] });
         }
+      });
+
+      // Sort by online count (desc) to show healthiest stores first
+      found.sort(function(a, b) {
+        return b.stats.online - a.stats.online;
       });
 
       // Display results
       if (found.length === 0) {
-        resultsBox.innerHTML = '<div style="padding:12px; color:var(--text-light); font-size:12px;">Sin resultados</div>';
+        resultsGrid.innerHTML = '<div style="grid-column: 1/-1; padding:40px; text-align:center; color:var(--text-light);">' +
+          '<span class="material-symbols-outlined" style="font-size:48px; opacity:0.3;">location_off</span>' +
+          '<div style="margin-top:12px; font-size:14px;">No hay resultados para "' + query + '"</div></div>';
       } else {
         var html = '';
         found.forEach(function(item) {
-          html += '<div style="padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.2s;"' +
-            'onmouseover="this.style.background=\'var(--card-bg)\'" onmouseout="this.style.background=\'\'"' +
-            'onclick="selectOxxoFromSearch(\'' + item.name + '\')">' +
-            '<div style="font-weight:600; color:var(--primary); font-size:12px;">' + item.name + '</div>' +
-            '<div style="font-size:10px; color:var(--text-light); margin-top:4px;">' +
-            '📊 ' + item.stats.count + ' equipos | ' +
-            '🟢 ' + item.stats.online + ' | ' +
-            '🟠 ' + item.stats.offline + ' | ' +
-            '🔴 ' + item.stats.critical +
-            '</div></div>';
+          var healthColor = item.stats.critical > 0 ? '#8B0000' : item.stats.offline > 0 ? '#E2001A' : '#1F7A4E';
+          var healthStatus = item.stats.critical > 0 ? 'Crítico' : item.stats.offline > 0 ? 'Problemas' : 'Saludable';
+          var healthIcon = item.stats.critical > 0 ? '⚠️' : item.stats.offline > 0 ? '⚡' : '✅';
+
+          html += '<div style="background:var(--card-bg); border:2px solid var(--border); border-radius:12px; padding:16px; cursor:pointer;' +
+            'transition: all 0.3s ease; position:relative; overflow:hidden;"' +
+            'onmouseover="this.style.transform=\'translateY(-4px)\'; this.style.boxShadow=\'0 12px 24px rgba(0,0,0,0.1)\';"' +
+            'onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.05)\';"' +
+            'onclick="selectOxxoFromSearch(\'' + item.name.replace(/'/g, "\\'") + '\')">' +
+
+            // Barra de estado
+            '<div style="position:absolute; top:0; left:0; right:0; height:4px; background:' + healthColor + ';"></div>' +
+
+            // Header con nombre y status
+            '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">' +
+            '<div style="flex:1;">' +
+            '<h3 style="margin:0; font-size:14px; font-weight:700; color:var(--text); word-break:break-word;">' + item.name + '</h3>' +
+            '<div style="font-size:11px; color:' + healthColor + '; font-weight:600; margin-top:4px;">' + healthIcon + ' ' + healthStatus + '</div>' +
+            '</div>' +
+            '<div style="background:' + healthColor + '; color:white; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:700; white-space:nowrap;">' +
+            item.stats.count + ' equipos' +
+            '</div></div>' +
+
+            // Grid de stats
+            '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px;">' +
+            '<div style="background:rgba(31,122,78,0.1); padding:8px; border-radius:6px; text-align:center;">' +
+            '<div style="font-size:13px; font-weight:700; color:#1F7A4E;">' + item.stats.online + '</div>' +
+            '<div style="font-size:9px; color:var(--text-light);">Online</div>' +
+            '</div>' +
+            '<div style="background:rgba(226,0,26,0.1); padding:8px; border-radius:6px; text-align:center;">' +
+            '<div style="font-size:13px; font-weight:700; color:#E2001A;">' + item.stats.offline + '</div>' +
+            '<div style="font-size:9px; color:var(--text-light);">1-3d</div>' +
+            '</div>' +
+            '<div style="background:rgba(139,0,0,0.1); padding:8px; border-radius:6px; text-align:center;">' +
+            '<div style="font-size:13px; font-weight:700; color:#8B0000;">' + item.stats.critical + '</div>' +
+            '<div style="font-size:9px; color:var(--text-light);">4+d</div>' +
+            '</div>' +
+            '</div>' +
+
+            // Progress bar de salud
+            '<div style="background:var(--surface); height:6px; border-radius:3px; overflow:hidden;">' +
+            '<div style="height:100%; background:linear-gradient(90deg, #1F7A4E 0%, #FFB800 50%, #8B0000 100%);' +
+            'width:' + (item.stats.count > 0 ? ((item.stats.online / item.stats.count) * 100) : 0) + '%;' +
+            'transition: width 0.5s ease;"></div>' +
+            '</div>' +
+            '</div>';
         });
-        resultsBox.innerHTML = html;
+        resultsGrid.innerHTML = html;
       }
 
-      resultsBox.style.display = found.length > 0 ? 'block' : 'none';
+      resultsContainer.style.display = 'block';
     }
 
     function selectOxxoFromSearch(tienda) {
       var input = document.getElementById('oxxo-search-input');
       input.value = tienda;
 
-      var data = getPlazaScopedData();
-      var stats = { count: 0, online: 0, offline: 0, critical: 0, equipment: [] };
-
-      data.forEach(function(d) {
-        if ((d.TIENDA || 'Desconocida') === tienda) {
-          stats.count++;
-          stats.equipment.push(d);
-          if (d.days_ago < 1) stats.online++;
-          else if (d.days_ago < 4) stats.offline++;
-          else stats.critical++;
-        }
-      });
+      var allTiendas = getAllUniqueTiendas();
+      var stats = allTiendas[tienda] || { count: 0, online: 0, offline: 0, critical: 0, equipment: [] };
 
       // Get coordinates from cache or show default
       var coords = _tiendaCoordinates[tienda] || { lat: 23.6345, lon: -102.5528 };
@@ -12752,21 +12825,21 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         _tiendaMarkers[tienda].openPopup();
       }
 
-      document.getElementById('search-results-box').style.display = 'none';
+      document.getElementById('search-results-container').style.display = 'none';
     }
 
     function displayOxxoDetails(tienda, coords, stats) {
       var panel = document.getElementById('oxxo-details-panel');
 
       document.getElementById('oxxo-details-name').textContent = tienda;
-      document.getElementById('oxxo-coords').textContent = coords.lat.toFixed(4) + ', ' + coords.lon.toFixed(4);
+      document.getElementById('oxxo-location-label').textContent = '📍 ' + coords.lat.toFixed(4) + ', ' + coords.lon.toFixed(4);
+      document.getElementById('oxxo-coords').textContent = coords.lat.toFixed(6) + '°N, ' + coords.lon.toFixed(6) + '°W';
       document.getElementById('oxxo-total-count').textContent = stats.count;
       document.getElementById('oxxo-online-count').textContent = stats.online;
       document.getElementById('oxxo-offline-count').textContent = stats.offline;
       document.getElementById('oxxo-critical-count').textContent = stats.critical;
 
       // List equipos by type (HH/TT) and status
-      var equipmentHtml = '';
       var hh = { online: [], offline: [], critical: [] };
       var tt = { online: [], offline: [], critical: [] };
 
@@ -12779,16 +12852,30 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         else tt[status].push(label);
       });
 
-      // Format output
-      if (hh.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; margin:4px 0;">🟢 HH Online: ' + hh.online.join(', ') + '</div>';
-      if (hh.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; margin:4px 0;">🟠 HH Offline: ' + hh.offline.join(', ') + '</div>';
-      if (hh.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; margin:4px 0;">🔴 HH Crítico: ' + hh.critical.join(', ') + '</div>';
+      // Build enhanced HTML for equipment list
+      var equipmentHtml = '';
 
-      if (tt.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; margin:4px 0;">🟢 TT Online: ' + tt.online.join(', ') + '</div>';
-      if (tt.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; margin:4px 0;">🟠 TT Offline: ' + tt.offline.join(', ') + '</div>';
-      if (tt.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; margin:4px 0;">🔴 TT Crítico: ' + tt.critical.join(', ') + '</div>';
+      // HH Section
+      if (hh.online.length > 0 || hh.offline.length > 0 || hh.critical.length > 0) {
+        equipmentHtml += '<div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">' +
+          '<div style="font-weight:700; color:var(--text); margin-bottom:8px;">📱 HANDHELDS (HH):</div>';
+        if (hh.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; font-size:11px; margin-bottom:4px;">🟢 Online: ' + hh.online.join(' • ') + '</div>';
+        if (hh.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; font-size:11px; margin-bottom:4px;">🟠 Offline: ' + hh.offline.join(' • ') + '</div>';
+        if (hh.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; font-size:11px;">🔴 Crítico: ' + hh.critical.join(' • ') + '</div>';
+        equipmentHtml += '</div>';
+      }
 
-      document.getElementById('oxxo-equipment-list').innerHTML = equipmentHtml || '<div style="color:var(--text-light);">Sin equipos</div>';
+      // TT Section
+      if (tt.online.length > 0 || tt.offline.length > 0 || tt.critical.length > 0) {
+        equipmentHtml += '<div>' +
+          '<div style="font-weight:700; color:var(--text); margin-bottom:8px;">💻 TABLETS (TT):</div>';
+        if (tt.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; font-size:11px; margin-bottom:4px;">🟢 Online: ' + tt.online.join(' • ') + '</div>';
+        if (tt.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; font-size:11px; margin-bottom:4px;">🟠 Offline: ' + tt.offline.join(' • ') + '</div>';
+        if (tt.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; font-size:11px;">🔴 Crítico: ' + tt.critical.join(' • ') + '</div>';
+        equipmentHtml += '</div>';
+      }
+
+      document.getElementById('oxxo-equipment-list').innerHTML = equipmentHtml || '<div style="color:var(--text-light); font-style:italic;">Sin equipos registrados</div>';
 
       panel.style.display = 'block';
     }
