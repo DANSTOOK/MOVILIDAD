@@ -24646,21 +24646,41 @@ document.addEventListener('DOMContentLoaded', function() {
 // ════════════════════════════════════════════════════════════════════════════════
 
 function renderOSModelos() {
+  console.log('renderOSModelos() iniciando...');
   var data = getPlazaScopedData();
+  console.log('Data obtenida:', data ? data.length : 0, 'equipos');
+
+  if (!data || data.length === 0) {
+    console.warn('No hay datos para renderizar');
+    document.getElementById('os-version-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos disponibles</td></tr>';
+    document.getElementById('update-required-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos disponibles</td></tr>';
+    document.getElementById('models-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos disponibles</td></tr>';
+    return;
+  }
+
   var plazaDisplay = plazaActiva ? escHTML(plazaActiva) : 'Región';
+  console.log('Plaza:', plazaDisplay);
 
   // Analizar versiones de Android
+  console.log('Renderizando OS Table...');
   renderOSVersionTable(data);
 
   // Mostrar equipos que necesitan actualización
+  console.log('Renderizando Update Required Table...');
   renderUpdateRequiredTable(data);
 
   // Mostrar distribución de modelos
+  console.log('Renderizando Models Table...');
   renderModelsTable(data);
+
+  console.log('renderOSModelos() completado');
 }
 
 function renderOSVersionTable(data) {
+  console.log('renderOSVersionTable() iniciando con', data.length, 'datos');
+
   if (!data || data.length === 0) {
+    console.warn('renderOSVersionTable: Sin datos');
     document.getElementById('os-version-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos disponibles</td></tr>';
     return;
   }
@@ -24671,12 +24691,16 @@ function renderOSVersionTable(data) {
     osStats[os] = (osStats[os] || 0) + 1;
   });
 
+  console.log('OS Statistics:', osStats);
+
   var total = data.length;
   var osArray = Object.keys(osStats)
     .map(function(osKey) {
       return { os: osKey, count: osStats[osKey] };
     })
     .sort(function(a, b) { return b.count - a.count; });
+
+  console.log('OS Array:', osArray);
 
   var html = '';
   osArray.forEach(function(item) {
@@ -24693,7 +24717,12 @@ function renderOSVersionTable(data) {
       '</tr>';
   });
 
-  document.getElementById('os-version-table-body').innerHTML = html || '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos</td></tr>';
+  console.log('HTML generado:', html.length, 'caracteres');
+  var elem = document.getElementById('os-version-table-body');
+  console.log('Elemento encontrado:', elem ? 'sí' : 'no');
+
+  elem.innerHTML = html || '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos</td></tr>';
+  console.log('renderOSVersionTable() completado');
 }
 
 function renderUpdateRequiredTable(data) {
