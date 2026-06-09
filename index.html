@@ -9965,6 +9965,57 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         <!-- 13. MAPA INTERACTIVO DE PLAZAS (BAJA CALIFORNIA) -->
         <div class="mexico-map-wrap">
+          <!-- 🔍 BUSCADOR DE OXXO -->
+          <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div>
+              <label style="font-size:11px; font-weight:600; color:var(--text-light); display:block; margin-bottom:6px;">🔍 Buscar Oxxo</label>
+              <input type="text" id="oxxo-search-input" placeholder="Ej: Maples, Centro, Playas..."
+                style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px;
+                       background:var(--card-bg); color:var(--text); font-size:13px;"
+                oninput="searchOxxoByName(this.value)">
+            </div>
+            <div id="search-results-box" style="display:none; background:var(--surface); border:1px solid var(--border);
+                                                 border-radius:8px; overflow:hidden; max-height:200px; overflow-y:auto;">
+            </div>
+          </div>
+
+          <!-- 📊 PANEL DE DETALLES DEL OXXO SELECCIONADO -->
+          <div id="oxxo-details-panel" style="display:none; margin-bottom:16px; background:var(--card-bg);
+                                               border:2px solid var(--primary); border-radius:12px; padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h4 id="oxxo-details-name" style="margin:0; font-size:16px; font-weight:700; color:var(--text);">Oxxo Seleccionado</h4>
+              <button onclick="closeOxxoDetails()" style="background:none; border:none; color:var(--text-light); cursor:pointer; font-size:20px;">✕</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+              <div style="background:var(--surface); padding:12px; border-radius:8px;">
+                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">📍 COORDENADAS</div>
+                <div id="oxxo-coords" style="font-size:12px; font-weight:600; color:var(--text); font-family:monospace;">—</div>
+              </div>
+              <div style="background:var(--surface); padding:12px; border-radius:8px;">
+                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">📊 EQUIPOS TOTALES</div>
+                <div id="oxxo-total-count" style="font-size:16px; font-weight:700; color:var(--primary);">—</div>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
+              <div style="background:rgba(31,122,78,0.1); padding:12px; border-radius:8px; border-left:3px solid #1F7A4E;">
+                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">🟢 ONLINE</div>
+                <div id="oxxo-online-count" style="font-size:14px; font-weight:700; color:#1F7A4E;">—</div>
+              </div>
+              <div style="background:rgba(226,0,26,0.1); padding:12px; border-radius:8px; border-left:3px solid #E2001A;">
+                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">🟠 OFFLINE 1-3d</div>
+                <div id="oxxo-offline-count" style="font-size:14px; font-weight:700; color:#E2001A;">—</div>
+              </div>
+              <div style="background:rgba(139,0,0,0.1); padding:12px; border-radius:8px; border-left:3px solid #8B0000;">
+                <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">🔴 CRÍTICO 4+d</div>
+                <div id="oxxo-critical-count" style="font-size:14px; font-weight:700; color:#8B0000;">—</div>
+              </div>
+            </div>
+            <div style="background:var(--surface); padding:12px; border-radius:8px;">
+              <div style="font-size:11px; font-weight:600; color:var(--text); margin-bottom:8px;">📋 EQUIPOS (HH/TT):</div>
+              <div id="oxxo-equipment-list" style="font-size:11px; max-height:150px; overflow-y:auto;">—</div>
+            </div>
+          </div>
+
           <h3>
             <span class="material-symbols-outlined" style="color:var(--primary);">map</span>
             Mapa de Plazas — Baja California
@@ -12609,7 +12660,142 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       marker.bindTooltip(tienda);
       marker.addTo(_leafletMap);
 
+      // Click marker to show details
+      marker.on('click', function() {
+        displayOxxoDetails(tienda, coords, stats);
+      });
+
       _tiendaMarkers[tienda] = marker;
+    }
+
+    function searchOxxoByName(query) {
+      var resultsBox = document.getElementById('search-results-box');
+      if (!query || query.length < 1) {
+        resultsBox.style.display = 'none';
+        return;
+      }
+
+      var data = getPlazaScopedData();
+      if (!data || !data.length) return;
+
+      // Group by TIENDA and search
+      var tiendas = {};
+      var found = [];
+
+      data.forEach(function(d) {
+        var tienda = d.TIENDA || 'Desconocida';
+        if (!tiendas[tienda]) {
+          tiendas[tienda] = { count: 0, online: 0, offline: 0, critical: 0, equipment: [] };
+        }
+        tiendas[tienda].count++;
+        tiendas[tienda].equipment.push(d);
+        if (d.days_ago < 1) tiendas[tienda].online++;
+        else if (d.days_ago < 4) tiendas[tienda].offline++;
+        else tiendas[tienda].critical++;
+      });
+
+      // Filter by query (case-insensitive)
+      Object.keys(tiendas).forEach(function(tienda) {
+        if (tienda.toLowerCase().includes(query.toLowerCase())) {
+          found.push({ name: tienda, stats: tiendas[tienda] });
+        }
+      });
+
+      // Display results
+      if (found.length === 0) {
+        resultsBox.innerHTML = '<div style="padding:12px; color:var(--text-light); font-size:12px;">Sin resultados</div>';
+      } else {
+        var html = '';
+        found.forEach(function(item) {
+          html += '<div style="padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.2s;"' +
+            'onmouseover="this.style.background=\'var(--card-bg)\'" onmouseout="this.style.background=\'\'"' +
+            'onclick="selectOxxoFromSearch(\'' + item.name + '\')">' +
+            '<div style="font-weight:600; color:var(--primary); font-size:12px;">' + item.name + '</div>' +
+            '<div style="font-size:10px; color:var(--text-light); margin-top:4px;">' +
+            '📊 ' + item.stats.count + ' equipos | ' +
+            '🟢 ' + item.stats.online + ' | ' +
+            '🟠 ' + item.stats.offline + ' | ' +
+            '🔴 ' + item.stats.critical +
+            '</div></div>';
+        });
+        resultsBox.innerHTML = html;
+      }
+
+      resultsBox.style.display = found.length > 0 ? 'block' : 'none';
+    }
+
+    function selectOxxoFromSearch(tienda) {
+      var input = document.getElementById('oxxo-search-input');
+      input.value = tienda;
+
+      var data = getPlazaScopedData();
+      var stats = { count: 0, online: 0, offline: 0, critical: 0, equipment: [] };
+
+      data.forEach(function(d) {
+        if ((d.TIENDA || 'Desconocida') === tienda) {
+          stats.count++;
+          stats.equipment.push(d);
+          if (d.days_ago < 1) stats.online++;
+          else if (d.days_ago < 4) stats.offline++;
+          else stats.critical++;
+        }
+      });
+
+      // Get coordinates from cache or show default
+      var coords = _tiendaCoordinates[tienda] || { lat: 23.6345, lon: -102.5528 };
+
+      displayOxxoDetails(tienda, coords, stats);
+
+      // Zoom map to tienda
+      if (_leafletMap && _tiendaMarkers[tienda]) {
+        _leafletMap.setView([coords.lat, coords.lon], 12);
+        _tiendaMarkers[tienda].openPopup();
+      }
+
+      document.getElementById('search-results-box').style.display = 'none';
+    }
+
+    function displayOxxoDetails(tienda, coords, stats) {
+      var panel = document.getElementById('oxxo-details-panel');
+
+      document.getElementById('oxxo-details-name').textContent = tienda;
+      document.getElementById('oxxo-coords').textContent = coords.lat.toFixed(4) + ', ' + coords.lon.toFixed(4);
+      document.getElementById('oxxo-total-count').textContent = stats.count;
+      document.getElementById('oxxo-online-count').textContent = stats.online;
+      document.getElementById('oxxo-offline-count').textContent = stats.offline;
+      document.getElementById('oxxo-critical-count').textContent = stats.critical;
+
+      // List equipos by type (HH/TT) and status
+      var equipmentHtml = '';
+      var hh = { online: [], offline: [], critical: [] };
+      var tt = { online: [], offline: [], critical: [] };
+
+      stats.equipment.forEach(function(e) {
+        var type = (e.equipo_type === 'TABLET' || e['Equipo'] === 'TABLET') ? 'TT' : 'HH';
+        var status = e.days_ago < 1 ? 'online' : e.days_ago < 4 ? 'offline' : 'critical';
+        var label = (e['Friendly Name'] || e.CR) + ' (' + e.days_ago + 'd)';
+
+        if (type === 'HH') hh[status].push(label);
+        else tt[status].push(label);
+      });
+
+      // Format output
+      if (hh.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; margin:4px 0;">🟢 HH Online: ' + hh.online.join(', ') + '</div>';
+      if (hh.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; margin:4px 0;">🟠 HH Offline: ' + hh.offline.join(', ') + '</div>';
+      if (hh.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; margin:4px 0;">🔴 HH Crítico: ' + hh.critical.join(', ') + '</div>';
+
+      if (tt.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; margin:4px 0;">🟢 TT Online: ' + tt.online.join(', ') + '</div>';
+      if (tt.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; margin:4px 0;">🟠 TT Offline: ' + tt.offline.join(', ') + '</div>';
+      if (tt.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; margin:4px 0;">🔴 TT Crítico: ' + tt.critical.join(', ') + '</div>';
+
+      document.getElementById('oxxo-equipment-list').innerHTML = equipmentHtml || '<div style="color:var(--text-light);">Sin equipos</div>';
+
+      panel.style.display = 'block';
+    }
+
+    function closeOxxoDetails() {
+      document.getElementById('oxxo-details-panel').style.display = 'none';
+      document.getElementById('oxxo-search-input').value = '';
     }
 
     function switchTabFromSidebar(e, tab) {
