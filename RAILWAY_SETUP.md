@@ -1,138 +1,123 @@
-# 🚀 RAILWAY DEPLOYMENT - GUÍA RÁPIDA
+# 🚂 Railway Setup Guide - OXXO Movilidad Dashboard
 
-## ✅ PRE-REQUISITOS
+## Paso 1: Crear Proyecto en Railway
 
-1. **Cuenta en Railway** (gratis con $5 de crédito)
-   - Va a https://railway.app
-   - Haz click "Start Project"
-   - Usa GitHub para login (recomendado)
+1. Ve a https://railway.com/login
+2. Inicia sesión o crea una cuenta
+3. Crea un nuevo proyecto
 
-2. **Repositorio en GitHub** (ya lo tienes: DANSTOOK/MOVILIDAD)
+## Paso 2: Agregar Base de Datos PostgreSQL
 
----
+1. En tu proyecto Railway, haz click en "New"
+2. Selecciona "PostgreSQL" (la opción de base de datos)
+3. Espera a que se cree la instancia (1-2 minutos)
+4. Haz click en la BD para ver la configuración
+5. Copia la URL de conexión (DATABASE_URL)
 
-## 🎯 PASO 1: CREAR PROYECTO EN RAILWAY
+## Paso 3: Agregar Backend API
 
-1. Va a https://railway.app/dashboard
-2. Click "New Project"
-3. Selecciona "Deploy from GitHub"
-4. Autoriza y selecciona tu repo `DANSTOOK/MOVILIDAD`
+### Opción A: Deploy desde GitHub (Recomendado)
+1. Conecta tu repositorio GitHub a Railway
+2. Selecciona la rama `main`
+3. Railway detectará automáticamente que es Node.js
 
----
+### Opción B: Deploy Manual
+1. En tu proyecto Railway, haz click en "New"
+2. Selecciona "GitHub Repo"
+3. Autoriza a Railway para acceder a tus repositorios
+4. Selecciona tu repositorio
 
-## ⚙️ PASO 2: CONFIGURAR BACKEND
+## Paso 4: Configurar Variables de Entorno
 
-Railway auto-detecta Node.js:
+En Railway (en la pestaña del servicio backend):
 
-1. En el dashboard, ve a "Variables"
-2. Agrega:
-   ```
-   PORT=3001
-   NODE_ENV=production
-   JWT_SECRET=oxxo-production-secret-super-seguro-123456
-   DB_PATH=./data/oxxo_movilidad.db
-   GOOGLE_MAPS_API_KEY=your-key-here
-   ```
+1. Haz click en "Variables"
+2. Agrega las siguientes variables:
 
-3. Click "Deploy"
+```
+DATABASE_URL=<pega la URL que copiaste de PostgreSQL>
+PORT=3001
+NODE_ENV=production
+JWT_SECRET=tu-clave-secreta-super-segura-aqui
+CORS_ORIGIN=https://tu-dominio.railway.app
+```
 
----
+## Paso 5: Configurar el Root Directory
 
-## 📱 PASO 3: OBTENER URL DE RAILWAY
+1. En la pestaña "Settings" del servicio backend
+2. Establece "Root Directory" a `backend`
+3. Establece "Build Command" a `npm install`
+4. Establece "Start Command" a `npm start`
 
-Después del deploy (5-10 minutos):
+## Paso 6: Deploy
 
-1. Railway te da una URL como:
-   ```
-   https://oxxo-movilidad-api-production.up.railway.app
-   ```
+1. Railway debería hacer deploy automáticamente después de la última actualización
+2. Puedes ver los logs en tiempo real en la sección "Logs"
+3. Una vez que veas "listening on port 3001", está listo
 
-2. **COPIA ESTA URL**
+## Paso 7: Conectar Frontend a Railway
 
----
+En el archivo `index.html`, busca la línea:
 
-## 🔗 PASO 4: ACTUALIZAR FRONTEND
-
-En `index.html`, busca línea ~11600:
-
-**Cambiar DE:**
 ```javascript
-var API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:3001';
 ```
 
-**A:**
+Reemplázala con:
+
 ```javascript
-var API_BASE_URL = 'https://oxxo-movilidad-api-production.up.railway.app';
+const API_BASE_URL = 'https://tu-servicio-railway.railway.app';
 ```
 
-(Reemplaza con TU URL de Railway)
+O mejor aún, usa una variable de entorno:
 
----
-
-## 🔄 PASO 5: COMMIT Y PUSH
-
-```bash
-git add index.html
-git commit -m "Update API URL to Railway production"
-git push origin main
+```javascript
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:3001' 
+  : 'https://tu-servicio-railway.railway.app';
 ```
 
-Railway auto-redeploy cuando haces push 🎉
+## Verificación
 
----
+1. Abre Railway y ve a tu servicio backend
+2. Copia la URL pública (ej: `https://movilidad-prod.railway.app`)
+3. Prueba el login:
+   ```
+   POST https://tu-servicio-railway.railway.app/api/auth/login
+   Body: { "username": "admin", "password": "admin123" }
+   ```
 
-## ✅ VERIFICACIÓN
+4. Si ves un token JWT en la respuesta ✅, ¡está funcionando!
 
-1. Abre el frontend (localhost:8080 o tu dominio)
-2. Login:
-   - Usuario: `admin`
-   - Contraseña: `admin123`
-3. Dashboard debe cargar datos del API en Railway ✅
+## Solución de Problemas
 
----
+### "Connection refused" o "Cannot connect to database"
+- Verifica que la DATABASE_URL esté correcta
+- Asegúrate de que PostgreSQL esté corriendo en Railway
+- Revisa los logs del servicio
 
-## 🎊 ¡LISTO!
+### "Port already in use"
+- Railway maneja automáticamente los puertos
+- El servicio debería correr en `0.0.0.0:3001`
 
-Ahora tienes:
-- ✅ Backend corriendo en Railway (24/7)
-- ✅ Frontend en localhost (o tu dominio)
-- ✅ Conectados automáticamente
-- ✅ Auto-deploy en cada push a GitHub
+### Tabla de usuarios vacía
+- Railway ejecuta `npm start` que llama `initDB()` y `initDemoUser()`
+- Verifica en los logs que veas `✓ Demo user created`
 
----
+## Escala Automática
 
-## 📊 MONITOREO
+Railway escalará automáticamente basado en:
+- CPU usage
+- Memory usage
+- Conexiones activas
 
-En Railway dashboard:
-- Ver logs en tiempo real
-- Monitorear CPU y memoria
-- Ver últimos deployments
-- Crear alerts
+No necesitas configurar nada adicional para esto.
 
----
+## Costos
 
-## 💰 COSTOS
+Railway tiene un plan gratuito con:
+- 5GB de almacenamiento de BD
+- Créditos de $5 USD/mes
+- 100 horas de ejecución de aplicación
 
-- Primeros $5/mes gratis
-- Después $0.50/vCPU/hora
-- Típicamente: $5-10/mes para esta app
-
----
-
-## 🆘 SI HAY PROBLEMAS
-
-### Error: "Connection refused"
-- Backend aún está deployando (espera 5-10 min)
-- Verifica Railway logs
-
-### Error: "Invalid JWT"
-- JWT_SECRET debe ser el mismo en Railway y frontend
-- Verifica que esté configurado en Variables
-
-### Error: "Database locked"
-- SQLite tiene límites
-- Usa PostgreSQL en Railway (Phase 2)
-
----
-
-**¿Seguiste estos pasos? ¡Avísame!** 🚀
+Si necesitas más, puedes activar "Pro" mode que es ~$10 USD/mes.

@@ -1,66 +1,86 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const fs = require('fs');
+const { Pool } = require('pg');
 
-// Crear carpeta data si no existe
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-
-const DB_PATH = path.join(dataDir, 'oxxo_movilidad.db');
-const db = new sqlite3.Database(DB_PATH, (err) => {
-  if (err) console.error('Error opening database:', err);
-  else console.log('✓ Database connected:', DB_PATH);
+// PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/oxxo_movilidad',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
-// Promisify database operations
-const dbAll = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
+pool.on('connect', () => {
+  console.log('✓ PostgreSQL connected');
+});
+
+pool.on('error', (err) => {
+  console.error('✗ PostgreSQL pool error:', err);
+});
+
+// Database query wrappers
+const dbAll = async (sql, params = []) => {
+  try {
+    // Convert SQLite style parameters (?) to PostgreSQL style ($1, $2, etc)
+    const { query, values } = convertSqliteToPostgres(sql, params);
+    const result = await pool.query(query, values);
+    return result.rows;
+  } catch (err) {
+    console.error('Query error:', err);
+    throw err;
+  }
 };
 
-const dbRun = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function(err) {
-      if (err) reject(err);
-      else resolve({ lastID: this.lastID, changes: this.changes });
-    });
-  });
+const dbRun = async (sql, params = []) => {
+  try {
+    const { query, values } = convertSqliteToPostgres(sql, params);
+    const result = await pool.query(query, values);
+    return {
+      lastID: result.rows[0]?.id,
+      changes: result.rowCount
+    };
+  } catch (err) {
+    console.error('Query error:', err);
+    throw err;
+  }
 };
 
-const dbGet = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) reject(err);
-      else resolve(row);
-    });
-  });
+const dbGet = async (sql, params = []) => {
+  try {
+    const { query, values } = convertSqliteToPostgres(sql, params);
+    const result = await pool.query(query, values);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Query error:', err);
+    throw err;
+  }
+};
+
+// Convert SQLite style parameter placeholders (?) to PostgreSQL style ($1, $2, etc)
+const convertSqliteToPostgres = (sql, params) => {
+  let paramIndex = 1;
+  const query = sql.replace(/\?/g, () => `$${paramIndex++}`);
+  return { query, values: params };
 };
 
 // Inicializar tablas
 const initDB = async () => {
   try {
     // Tabla usuarios
-    await dbRun(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         username TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
         role TEXT DEFAULT 'supervisor',
         plaza TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
     // Tabla equipos
-    await dbRun(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS equipos (
-        id INTEGER PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         cr TEXT UNIQUE NOT NULL,
         friendly_name TEXT,
         tienda TEXT,
@@ -68,52 +88,52 @@ const initDB = async () => {
         asesor TEXT,
         estado TEXT DEFAULT 'online',
         days_ago INTEGER,
-        last_seen DATETIME,
+        last_seen TIMESTAMP,
         equipo_type TEXT,
         serial_number TEXT,
         model TEXT,
-        latitude REAL,
-        longitude REAL,
-        last_sync DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        latitude DECIMAL(10, 6),
+        longitude DECIMAL(10, 6),
+        last_sync TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
     // Tabla comentarios
-    await dbRun(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS comentarios (
-        id INTEGER PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         equipo_id INTEGER NOT NULL,
         usuario_id INTEGER NOT NULL,
         texto TEXT,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(equipo_id) REFERENCES equipos(id),
         FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
       )
     `);
 
     // Tabla stock
-    await dbRun(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS stock (
-        id INTEGER PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         equipo_id INTEGER NOT NULL,
         plaza TEXT,
         cantidad INTEGER,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(equipo_id) REFERENCES equipos(id)
       )
     `);
 
     // Tabla audit_log
-    await dbRun(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS audit_log (
-        id INTEGER PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         usuario_id INTEGER,
         accion TEXT,
         tabla TEXT,
         registro_id INTEGER,
         detalles TEXT,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
       )
     `);
@@ -124,7 +144,7 @@ const initDB = async () => {
   }
 };
 
-// Crear usuario demo (si no existe)
+// Create demo user if not exists
 const initDemoUser = async () => {
   try {
     const bcrypt = require('bcryptjs');
@@ -144,7 +164,7 @@ const initDemoUser = async () => {
 };
 
 module.exports = {
-  db,
+  pool,
   dbAll,
   dbRun,
   dbGet,
