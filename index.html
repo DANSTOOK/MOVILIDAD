@@ -7427,10 +7427,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           </svg>
           Configuración
         </button>
-        <button class="tab" onclick="switchTab('mapa-geo')">
-          <span class="material-symbols-outlined" style="width:24px; height:24px; font-size:20px; display:flex; align-items:center; justify-content:center;">location_on</span>
-          Mapa Geo
-        </button>
       </div>
 
       <!-- CRUCE TAB -->
@@ -9588,6 +9584,23 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <span class="material-symbols-outlined" style="font-size:24px; color:var(--primary);">summarize</span>
           <h2 style="font-size:17px; font-weight:700; margin:0; color:var(--text);">Resumen Ejecutivo</h2>
         </div>
+
+        <!-- 🗺️ MAPA INTERACTIVO CON HEAT MAP -->
+        <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+          <div style="padding:12px 16px; background:linear-gradient(135deg, rgba(25,118,210,0.04) 0%, transparent 60%); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:18px; color:#1976D2;">location_on</span>
+            <span style="font-size:12px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.4px;">Mapa Geográfico - Desconexiones por Ubicación</span>
+          </div>
+          <div id="resumen-map-container" style="width:100%; height:420px; background:#f0f0f0;"></div>
+          <div style="padding:12px 16px; border-top:1px solid var(--border); font-size:11px; color:var(--text-light);">
+            <strong>Leyenda:</strong>
+            <span style="display:inline-block; width:10px; height:10px; background:#1F7A4E; border-radius:2px; margin:0 4px 0 8px;"></span>Online
+            <span style="display:inline-block; width:10px; height:10px; background:#F5A623; border-radius:2px; margin:0 4px 0 8px;"></span>Offline 1-3d
+            <span style="display:inline-block; width:10px; height:10px; background:#E2001A; border-radius:2px; margin:0 4px 0 8px;"></span>Crítico 4-14d
+            <span style="display:inline-block; width:10px; height:10px; background:#8B0000; border-radius:2px; margin:0 4px 0 8px;"></span>Crítico ≥15d
+          </div>
+        </div>
+
         <!-- Botón flotante compacto en la esquina superior derecha (no estorba) -->
         <button id="export-resumen-btn" onclick="toggleExportMenu()" title="Descargar resumen"
           style="position:absolute; top:0; right:12px; z-index:30; background:var(--primary); color:white; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(226,0,26,.32); transition:all 0.2s;"
@@ -11119,70 +11132,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         </div>
       </div>
 
-      <!-- MAPA GEO TAB -->
-      <div id="mapa-geo" class="section">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:0 12px;">
-          <span class="material-symbols-outlined" style="font-size:24px; color:var(--primary);">location_on</span>
-          <h2 style="font-size:17px; font-weight:700; margin:0; color:var(--text);">Mapeo Geográfico</h2>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 320px; gap:20px; padding:12px;">
-          <!-- MAP CONTAINER -->
-          <div id="mapa-geo-container" style="width:100%; height:600px; border:1px solid var(--border); border-radius:12px; background:var(--card-bg); box-shadow:0 2px 8px rgba(0,0,0,0.08);"></div>
-
-          <!-- CONTROLS PANEL -->
-          <div id="mapa-controls-panel" style="background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:16px; overflow-y:auto; max-height:600px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-            <h3 style="margin:0 0 12px 0; font-size:14px; font-weight:700; color:var(--text);">Filtros & Búsqueda</h3>
-
-            <!-- RADIUS FILTER -->
-            <div style="margin-bottom:16px;">
-              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-light); margin-bottom:6px;">Radio (km)</label>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-                <button class="btn btn-small" onclick="setMapRadius(5)">5 km</button>
-                <button class="btn btn-small" onclick="setMapRadius(10)">10 km</button>
-                <button class="btn btn-small" onclick="setMapRadius(25)">25 km</button>
-                <button class="btn btn-small" onclick="setMapRadius(50)">50 km</button>
-              </div>
-            </div>
-
-            <!-- STATUS FILTER -->
-            <div style="margin-bottom:16px;">
-              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-light); margin-bottom:6px;">Estado</label>
-              <div style="display:flex; flex-direction:column; gap:6px;">
-                <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
-                  <input type="checkbox" id="mapa-filter-online" checked onchange="refreshMapGeo()"> Online
-                </label>
-                <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
-                  <input type="checkbox" id="mapa-filter-offline" checked onchange="refreshMapGeo()"> Offline 1-3d
-                </label>
-                <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
-                  <input type="checkbox" id="mapa-filter-critical" checked onchange="refreshMapGeo()"> Critical 4+d
-                </label>
-              </div>
-            </div>
-
-            <!-- ROUTE OPTIMIZATION -->
-            <div style="margin-bottom:12px;">
-              <button class="btn btn-primary" onclick="optimizeRoute()" style="width:100%;">
-                <span class="material-symbols-outlined" style="font-size:16px;">route</span>
-                Optimizar Ruta
-              </button>
-            </div>
-
-            <!-- CLEAR FILTER -->
-            <div style="margin-bottom:16px;">
-              <button class="btn btn-secondary" onclick="clearRadiusFilter()" style="width:100%; font-size:12px;">
-                <span class="material-symbols-outlined" style="font-size:14px;">clear</span>
-                Limpiar Filtro
-              </button>
-            </div>
-
-            <!-- EQUIPMENT LIST -->
-            <div id="mapa-equipment-list" style="font-size:12px;">
-              <p style="color:var(--text-light); text-align:center; padding:12px; margin:0;">Selecciona filtros...</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -12556,13 +12505,131 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       });
     }
 
-    /* ============ MAP GEOGRAPHIC (FASE 2) ============ */
-    var _geoMap = null;
-    var _geoMarkers = [];
-    var _geoMarkerClusterGroup = null;
-    var _geoRadiusFilter = null;    // { centerLat, centerLon, radiusKm }
-    var _geoRadiusCircle = null;    // Leaflet circle for visualization
-    var _geoCurrentRoute = [];       // Last calculated route
+    /* ============ GEOGRAPHIC MAP IN RESUMEN (GOOGLE MAPS GEOCODING) ============ */
+    var _resumenMap = null;
+    var _resumenMapMarkers = {};  // { tienda: marker }
+    var _tiendaCoordinates = {};  // { tienda: {lat, lon} } - cache
+
+    function initResumenMap() {
+      var container = document.getElementById('resumen-map-container');
+      if (!container || _resumenMap) return;
+
+      _resumenMap = L.map('resumen-map-container', {
+        center: [23.6345, -102.5528],  // Centro de México (default)
+        zoom: 6,
+        scrollWheelZoom: false,
+        zoomControl: true
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+        maxZoom: 18
+      }).addTo(_resumenMap);
+
+      // Render markers
+      renderResumenMapMarkers();
+    }
+
+    function renderResumenMapMarkers() {
+      if (!_resumenMap) return;
+
+      var data = getPlazaScopedData();
+      if (!data || !data.length) return;
+
+      // Group by TIENDA
+      var tiendas = {};
+      data.forEach(function(d) {
+        var tienda = d.TIENDA || d['Friendly Name'] || 'Unknown';
+        if (!tiendas[tienda]) {
+          tiendas[tienda] = { count: 0, online: 0, offline: 0, critical: 0, worst_days_ago: 0 };
+        }
+        tiendas[tienda].count++;
+        if (d.days_ago < 1) tiendas[tienda].online++;
+        else if (d.days_ago < 4) tiendas[tienda].offline++;
+        else tiendas[tienda].critical++;
+        if (d.days_ago > tiendas[tienda].worst_days_ago) tiendas[tienda].worst_days_ago = d.days_ago;
+      });
+
+      // Add markers for each tienda
+      var tiendaList = Object.keys(tiendas);
+      tiendaList.forEach(function(tienda, idx) {
+        // If coordinates not in cache, geocode them
+        if (!_tiendaCoordinates[tienda]) {
+          geocodeTienda(tienda, tiendas[tienda]);
+        } else {
+          addTiendaMarker(tienda, _tiendaCoordinates[tienda], tiendas[tienda]);
+        }
+      });
+
+      // Fit bounds if we have markers
+      if (Object.keys(_resumenMapMarkers).length > 0) {
+        var bounds = L.latLngBounds();
+        Object.keys(_resumenMapMarkers).forEach(function(tienda) {
+          bounds.extend(_resumenMapMarkers[tienda].getLatLng());
+        });
+        if (bounds.isValid()) {
+          _resumenMap.fitBounds(bounds, { padding: [50, 50] });
+        }
+      }
+    }
+
+    function geocodeTienda(tienda, stats) {
+      // Use OpenStreetMap Nominatim API (free, no key needed)
+      var query = 'Oxxo ' + tienda + ' Mexico';
+
+      fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query) + '&format=json&limit=1')
+        .then(function(r) { return r.json(); })
+        .then(function(results) {
+          if (results && results.length > 0) {
+            var result = results[0];
+            var coords = { lat: parseFloat(result.lat), lon: parseFloat(result.lon) };
+            _tiendaCoordinates[tienda] = coords;
+            addTiendaMarker(tienda, coords, stats);
+            console.log('✅ Geocoded:', tienda, coords);
+          } else {
+            console.warn('❌ Could not geocode:', tienda);
+          }
+        })
+        .catch(function(err) {
+          console.error('Geocoding error:', err);
+        });
+    }
+
+    function addTiendaMarker(tienda, coords, stats) {
+      if (!_resumenMap || _resumenMapMarkers[tienda]) return;
+
+      // Determine color based on worst status
+      var color = '#1F7A4E';  // Green online
+      if (stats.critical > 0) color = '#8B0000';         // Red critical
+      else if (stats.offline > 0) color = '#E2001A';     // Orange offline
+      else if (stats.online === stats.count) color = '#1F7A4E';  // Green all online
+
+      // Size based on count
+      var radius = Math.min(20, 8 + (stats.count / 2));
+
+      var marker = L.circleMarker([coords.lat, coords.lon], {
+        radius: radius,
+        fillColor: color,
+        color: '#fff',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+      });
+
+      // Popup with stats
+      var popupHTML = '<div style="font-size:11px; font-weight:600;">' + tienda + '</div>' +
+        '<div style="font-size:10px; margin-top:6px;">' +
+        '🟢 Online: ' + stats.online + '<br>' +
+        '🟠 Offline 1-3d: ' + stats.offline + '<br>' +
+        '🔴 Crítico 4+d: ' + stats.critical + '<br>' +
+        '</div>';
+
+      marker.bindPopup(popupHTML);
+      marker.bindTooltip(tienda);
+      marker.addTo(_resumenMap);
+
+      _resumenMapMarkers[tienda] = marker;
+    }
 
     function getStatusColor(daysAgo) {
       if (daysAgo < 1) return '#1F7A4E';      // Green - Online
@@ -12576,365 +12643,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       if (daysAgo < 4) return 'Offline (' + daysAgo + 'd)';
       if (daysAgo < 15) return 'Crítico (' + daysAgo + 'd)';
       return 'Crítico ≥15d';
-    }
-
-    function renderMapGeo() {
-      var container = document.getElementById('mapa-geo-container');
-      if (!container) {
-        console.warn('Map container not found');
-        return;
-      }
-
-      // Initialize map if not exists
-      if (!_geoMap) {
-        _geoMap = L.map('mapa-geo-container', {
-          center: [31.8, -116.7],
-          zoom: 10,
-          scrollWheelZoom: true,
-          zoomControl: true,
-          attributionControl: true
-        });
-
-        // Add OSM tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-          maxZoom: 18,
-          minZoom: 7
-        }).addTo(_geoMap);
-
-        // Initialize marker cluster group
-        _geoMarkerClusterGroup = L.markerClusterGroup({
-          maxClusterRadius: 80,
-          showCoverageOnHover: true,
-          disableClusteringAtZoom: 14
-        });
-        _geoMap.addLayer(_geoMarkerClusterGroup);
-      }
-
-      // Clear existing markers
-      _geoMarkerClusterGroup.clearLayers();
-      _geoMarkers = [];
-
-      // Get data
-      var data = getPlazaScopedData();
-      if (!data || !data.length) {
-        console.log('No data available for map');
-        return;
-      }
-
-      // Add markers
-      data.forEach(function(d, idx) {
-        // Use existing coordinates or skip
-        if (!d.latitude || !d.longitude) return;
-
-        var color = getStatusColor(d.days_ago);
-        var marker = L.circleMarker([d.latitude, d.longitude], {
-          radius: 8,
-          fillColor: color,
-          color: '#fff',
-          weight: 2,
-          opacity: 1,
-          fillOpacity: 0.8,
-          className: 'equipo-marker'
-        });
-
-        // Popup content
-        var popupContent = '<div style="font-size:12px;">' +
-          '<strong>' + (d['Friendly Name'] || d.CR) + '</strong><br>' +
-          '<small>Plaza: ' + (d.PLAZA || '—') + '</small><br>' +
-          '<small>Tienda: ' + (d.TIENDA || '—') + '</small><br>' +
-          '<small style="color:' + color + '"><strong>' + getStatusLabel(d.days_ago) + '</strong></small><br>' +
-          '<small>Último: ' + (d['Last Seen'] || '—') + '</small>' +
-          '</div>';
-
-        marker.bindPopup(popupContent, { maxWidth: 220 });
-        marker.bindTooltip((d['Friendly Name'] || d.CR), { permanent: false });
-
-        _geoMarkerClusterGroup.addLayer(marker);
-        _geoMarkers.push({ marker: marker, data: d });
-      });
-
-      // Update equipment list in controls
-      refreshMapEquipmentList();
-    }
-
-    function refreshMapGeo() {
-      // Re-render with current filters
-      renderMapGeo();
-    }
-
-    function refreshMapEquipmentList() {
-      var listContainer = document.getElementById('mapa-equipment-list');
-      if (!listContainer) return;
-
-      var data = getPlazaScopedData();
-      if (!data || !data.length) {
-        listContainer.innerHTML = '<p style="color:var(--text-light); text-align:center; padding:12px; margin:0;">Sin datos</p>';
-        return;
-      }
-
-      var html = '<div style="max-height:500px; overflow-y:auto;">';
-      data.slice(0, 20).forEach(function(d) {
-        if (!d.latitude || !d.longitude) return;
-        var color = getStatusColor(d.days_ago);
-        html += '<div style="padding:8px; border-bottom:1px solid var(--border); cursor:pointer; font-size:11px;" onclick="flyToEquipo(' + d.latitude + ',' + d.longitude + ')">' +
-          '<div style="color:' + color + '; font-weight:600;">' + (d['Friendly Name'] || d.CR) + '</div>' +
-          '<div style="color:var(--text-light); font-size:10px;">' + (d.TIENDA || '—') + '</div>' +
-          '</div>';
-      });
-      html += '</div>';
-      if (data.length > 20) {
-        html += '<p style="font-size:10px; color:var(--text-light); text-align:center; margin:8px 0 0 0;">Mostrando 20 de ' + data.length + '</p>';
-      }
-      listContainer.innerHTML = html;
-    }
-
-    function flyToEquipo(lat, lon) {
-      if (_geoMap) {
-        _geoMap.flyTo([lat, lon], 14, { duration: 1 });
-      }
-    }
-
-    function setMapRadius(km) {
-      if (!_geoMap) {
-        alert('Mapa no inicializado');
-        return;
-      }
-
-      // Get map center
-      var center = _geoMap.getCenter();
-      var centerLat = center.lat;
-      var centerLon = center.lng;
-
-      // Set filter
-      _geoRadiusFilter = {
-        centerLat: centerLat,
-        centerLon: centerLon,
-        radiusKm: km
-      };
-
-      // Draw circle on map
-      if (_geoRadiusCircle) {
-        _geoMap.removeLayer(_geoRadiusCircle);
-      }
-      _geoRadiusCircle = L.circle([centerLat, centerLon], {
-        radius: km * 1000,  // Convert km to meters
-        color: '#1976D2',
-        weight: 2,
-        opacity: 0.6,
-        fill: true,
-        fillColor: '#1976D2',
-        fillOpacity: 0.1
-      }).addTo(_geoMap);
-
-      // Filter equipment and update list
-      filterEquipmentByRadius();
-    }
-
-    function filterEquipmentByRadius() {
-      if (!_geoRadiusFilter) return;
-
-      var data = getPlazaScopedData();
-      var filtered = data.filter(function(d) {
-        if (!d.latitude || !d.longitude) return false;
-
-        var dist = geolib.getDistance(
-          { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
-          { latitude: d.latitude, longitude: d.longitude }
-        );
-
-        return dist <= (_geoRadiusFilter.radiusKm * 1000);
-      });
-
-      // Sort by distance
-      filtered.sort(function(a, b) {
-        var distA = geolib.getDistance(
-          { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
-          { latitude: a.latitude, longitude: a.longitude }
-        );
-        var distB = geolib.getDistance(
-          { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
-          { latitude: b.latitude, longitude: b.longitude }
-        );
-        return distA - distB;
-      });
-
-      // Update list
-      updateMapEquipmentListFiltered(filtered);
-    }
-
-    function updateMapEquipmentListFiltered(filtered) {
-      var listContainer = document.getElementById('mapa-equipment-list');
-      if (!listContainer) return;
-
-      if (!filtered || !filtered.length) {
-        listContainer.innerHTML = '<p style="color:var(--text-light); text-align:center; padding:12px; margin:0;">Sin equipos en este radio</p>';
-        return;
-      }
-
-      var html = '<div style="max-height:500px; overflow-y:auto;">';
-      filtered.slice(0, 30).forEach(function(d, idx) {
-        var color = getStatusColor(d.days_ago);
-        var dist = geolib.getDistance(
-          { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
-          { latitude: d.latitude, longitude: d.longitude }
-        );
-        var distKm = (dist / 1000).toFixed(1);
-
-        html += '<div style="padding:8px; border-bottom:1px solid var(--border); cursor:pointer; font-size:11px;" onclick="flyToEquipo(' + d.latitude + ',' + d.longitude + ')">' +
-          '<div style="display:flex; justify-content:space-between; align-items:center;">' +
-          '<div style="color:' + color + '; font-weight:600;">' + (d['Friendly Name'] || d.CR) + '</div>' +
-          '<span style="color:var(--primary); font-weight:600; font-size:10px;">' + distKm + ' km</span>' +
-          '</div>' +
-          '<div style="color:var(--text-light); font-size:10px;">' + (d.TIENDA || '—') + '</div>' +
-          '</div>';
-      });
-      html += '</div>';
-      if (filtered.length > 30) {
-        html += '<p style="font-size:10px; color:var(--text-light); text-align:center; margin:8px 0 0 0;">Mostrando 30 de ' + filtered.length + '</p>';
-      }
-      listContainer.innerHTML = html;
-    }
-
-    function clearRadiusFilter() {
-      _geoRadiusFilter = null;
-      if (_geoRadiusCircle) {
-        _geoMap.removeLayer(_geoRadiusCircle);
-        _geoRadiusCircle = null;
-      }
-      refreshMapEquipmentList();
-    }
-
-    function optimizeRoute() {
-      var data = getPlazaScopedData();
-
-      // Use filtered data if radius filter is active
-      if (_geoRadiusFilter) {
-        data = data.filter(function(d) {
-          if (!d.latitude || !d.longitude) return false;
-          var dist = geolib.getDistance(
-            { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
-            { latitude: d.latitude, longitude: d.longitude }
-          );
-          return dist <= (_geoRadiusFilter.radiusKm * 1000);
-        });
-      }
-
-      if (!data || data.length < 2) {
-        alert('Se necesitan al menos 2 equipos para optimizar ruta');
-        return;
-      }
-
-      // Filter to only equipment with coordinates
-      var equiposConCoordenadas = data.filter(function(d) {
-        return d.latitude && d.longitude;
-      });
-
-      if (equiposConCoordenadas.length < 2) {
-        alert('Se necesitan al menos 2 equipos con coordenadas');
-        return;
-      }
-
-      var optimized = calculateOptimizedRoute(equiposConCoordenadas.slice(0, 20)); // Limit to 20 for performance
-      _geoCurrentRoute = optimized;
-
-      // Draw route on map
-      drawRouteOnMap(optimized);
-
-      // Show results
-      var totalDist = calculateRouteTotalDistance(optimized);
-      alert('✅ Ruta optimizada para ' + optimized.length + ' equipos\n\n' +
-            'Distancia total: ' + (totalDist / 1000).toFixed(1) + ' km\n\n' +
-            'Ver consola para orden detallado');
-
-      console.log('Optimized route order:');
-      optimized.forEach(function(e, idx) {
-        console.log((idx + 1) + '. ' + (e['Friendly Name'] || e.CR) + ' (' + e.TIENDA + ')');
-      });
-    }
-
-    function drawRouteOnMap(route) {
-      if (!_geoMap || !route || route.length < 2) return;
-
-      // Remove existing route lines
-      _geoMap.eachLayer(function(layer) {
-        if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
-          _geoMap.removeLayer(layer);
-        }
-      });
-
-      // Draw route polyline
-      var latlngs = route.map(function(e) {
-        return [e.latitude, e.longitude];
-      });
-
-      L.polyline(latlngs, {
-        color: '#1976D2',
-        weight: 3,
-        opacity: 0.8,
-        dashArray: '5, 5'
-      }).addTo(_geoMap);
-
-      // Add numbered markers for route order
-      route.forEach(function(e, idx) {
-        L.circleMarker([e.latitude, e.longitude], {
-          radius: 12,
-          fillColor: '#FFF',
-          color: '#1976D2',
-          weight: 3,
-          opacity: 1,
-          fillOpacity: 1,
-          zIndexOffset: 1000
-        }).bindPopup('<div style="font-size:11px;"><strong>' + (idx + 1) + '.</strong> ' + (e['Friendly Name'] || e.CR) + '</div>').addTo(_geoMap);
-      });
-    }
-
-    function calculateRouteTotalDistance(route) {
-      var total = 0;
-      for (var i = 0; i < route.length - 1; i++) {
-        total += geolib.getDistance(
-          { latitude: route[i].latitude, longitude: route[i].longitude },
-          { latitude: route[i+1].latitude, longitude: route[i+1].longitude }
-        );
-      }
-      return total;
-    }
-
-    function calculateOptimizedRoute(equipos) {
-      if (equipos.length < 2) return equipos;
-
-      var route = [equipos[0]];
-      var remaining = equipos.slice(1);
-
-      while (remaining.length > 0) {
-        var last = route[route.length - 1];
-        var nearest = remaining.reduce(function(closest, e) {
-          var dist = geolib.getDistance(
-            { latitude: last.latitude, longitude: last.longitude },
-            { latitude: e.latitude, longitude: e.longitude }
-          );
-          return dist < (closest.dist || Infinity)
-            ? { equipo: e, dist: dist }
-            : closest;
-        }, {});
-
-        route.push(nearest.equipo);
-        remaining = remaining.filter(function(e) { return e !== nearest.equipo; });
-      }
-
-      // Calculate total distance
-      var totalDist = 0;
-      for (var i = 0; i < route.length - 1; i++) {
-        totalDist += geolib.getDistance(
-          { latitude: route[i].latitude, longitude: route[i].longitude },
-          { latitude: route[i+1].latitude, longitude: route[i+1].longitude }
-        );
-      }
-
-      console.log('Total distance:', (totalDist / 1000).toFixed(2) + ' km');
-      console.log('Route order:', route.map(function(e) { return e['Friendly Name'] || e.CR; }));
-
-      return route;
     }
 
     function switchTabFromSidebar(e, tab) {
@@ -12967,7 +12675,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         'garantia': 'stock',
         'exportacion': 'exportación',
         'configuracion': 'configuración',
-        'mapa-geo': 'mapa geo',
         'analytics': 'analytics'
       };
 
@@ -12999,12 +12706,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         if (typeof refreshGarantiaTab === 'function') refreshGarantiaTab();
       }
       if (tab === 'garantia' && typeof refreshGarantiaTab === 'function') refreshGarantiaTab();
-      if (tab === 'mapa-geo') {
-        renderMapGeo();
-        setTimeout(function(){
-          if (_geoMap) _geoMap.invalidateSize();
-        }, 150);
-      }
       if (tab === 'analytics') {
         setTimeout(function(){
           renderAnalytics();
@@ -14358,6 +14059,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         renderAnalytics();
         resizeAllECharts();
       }, 200);
+
+      // === RENDERIZAR MAPA GEOGRÁFICO (GOOGLE MAPS GEOCODING) ===
+      setTimeout(function() {
+        initResumenMap();
+      }, 300);
 
       // renderResumenCruceTable eliminado — reemplazado por círculos KPI
     }
