@@ -24661,35 +24661,29 @@ function renderOSModelos() {
 }
 
 function renderOSVersionTable(data) {
-  if (!data || data.length === 0) {
-    document.getElementById('os-version-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center;">No hay datos</td></tr>';
-    return;
-  }
-
   var osStats = {};
-  var total = data.length;
   var i;
 
-  for (i = 0; i < total; i++) {
-    var osVal = data[i]['OS'];
-    if (!osVal) osVal = 'Sin info';
-    osVal = String(osVal).trim();
-    osStats[osVal] = (osStats[osVal] || 0) + 1;
+  for (i = 0; i < data.length; i++) {
+    var os = String(data[i].OS || 'Sin info').trim();
+    osStats[os] = (osStats[os] || 0) + 1;
   }
 
   var osArray = [];
-  var osKey;
-  for (osKey in osStats) {
+  for (var osKey in osStats) {
     osArray.push({ os: osKey, count: osStats[osKey] });
   }
   osArray.sort(function(a, b) { return b.count - a.count; });
 
   var html = '';
+  var total = data.length;
+  var colors = ['#1F7A4E', '#1976D2', '#F5A623', '#8E24AA'];
+
   for (i = 0; i < osArray.length; i++) {
     var item = osArray[i];
     var pct = ((item.count / total) * 100).toFixed(1);
     var is13 = item.os.indexOf('13') >= 0;
-    var color = is13 ? '#1F7A4E' : '#1976D2';
+    var color = is13 ? '#1F7A4E' : colors[i % colors.length];
     var bgColor = is13 ? 'rgba(31,122,78,0.05)' : '';
 
     html += '<tr style="background:' + bgColor + '; border-bottom:1px solid var(--border);">' +
@@ -24700,19 +24694,16 @@ function renderOSVersionTable(data) {
       '</tr>';
   }
 
-  var tbody = document.getElementById('os-version-table-body');
-  if (tbody) {
-    tbody.innerHTML = html;
-  }
+  document.getElementById('os-version-table-body').innerHTML = html;
 }
 
 function renderUpdateRequiredTable(data) {
   var needUpdate = [];
-  var i, os;
+  var i;
 
   for (i = 0; i < data.length; i++) {
-    os = String(data[i].OS || '').toLowerCase().trim();
-    if (os.indexOf('13') < 0 && os !== 'sin info' && os !== '') {
+    var osVal = String(data[i].OS || '').toLowerCase();
+    if (osVal.indexOf('13') < 0 && osVal !== 'sin info' && osVal.length > 0) {
       needUpdate.push(data[i]);
       if (needUpdate.length >= 50) break;
     }
@@ -24724,13 +24715,16 @@ function renderUpdateRequiredTable(data) {
   } else {
     for (i = 0; i < needUpdate.length; i++) {
       var eq = needUpdate[i];
-      var osValue = String(eq.OS || 'Sin info');
-      var modelValue = String(eq.Model || '-');
+      var osVal = String(eq.OS || 'Sin info');
+      var modelVal = String(eq.Model || '-');
+      var nameVal = String(eq['Friendly Name'] || eq.CR || '-');
+      var plazaVal = String(eq.PLAZA || '-');
+
       html += '<tr style="border-bottom:1px solid var(--border); background:rgba(245,166,35,0.02);">' +
-        '<td style="padding:10px 14px;"><strong>' + escHTML(eq['Friendly Name'] || eq.CR || '-') + '</strong></td>' +
-        '<td style="padding:10px 14px;">' + escHTML(eq.PLAZA || '-') + '</td>' +
-        '<td style="padding:10px 14px;"><span style="background:#F5A623; color:white; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700;">' + escHTML(osValue) + '</span></td>' +
-        '<td style="padding:10px 14px;">' + escHTML(modelValue) + '</td>' +
+        '<td style="padding:10px 14px;"><strong>' + escHTML(nameVal) + '</strong></td>' +
+        '<td style="padding:10px 14px;">' + escHTML(plazaVal) + '</td>' +
+        '<td style="padding:10px 14px;"><span style="background:#F5A623; color:white; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700;">' + escHTML(osVal) + '</span></td>' +
+        '<td style="padding:10px 14px;">' + escHTML(modelVal) + '</td>' +
         '</tr>';
     }
   }
