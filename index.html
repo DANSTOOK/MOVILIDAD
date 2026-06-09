@@ -24652,24 +24652,27 @@ function renderOSModelos() {
 }
 
 function renderOSVersionTable(data) {
-  var osStats = {};
+  if (!data || data.length === 0) {
+    document.getElementById('os-version-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos disponibles</td></tr>';
+    return;
+  }
 
+  var osStats = {};
   data.forEach(function(eq) {
-    // Buscar la columna OS en diferentes nombres posibles
-    var os = (eq.OS || eq['OS'] || eq['Sistema Operativo'] || eq['sistema operativo'] || eq['SO'] || 'Sin info').trim();
+    var os = String(eq.OS || 'Sin info').trim();
     osStats[os] = (osStats[os] || 0) + 1;
   });
 
   var total = data.length;
   var osArray = Object.keys(osStats)
-    .map(function(os) {
-      return { os: os, count: osStats[os] };
+    .map(function(osKey) {
+      return { os: osKey, count: osStats[osKey] };
     })
     .sort(function(a, b) { return b.count - a.count; });
 
   var html = '';
-  osArray.forEach(function(item, idx) {
-    var pct = ((item.count / total) * 100).toFixed(1);
+  osArray.forEach(function(item) {
+    var pct = total > 0 ? ((item.count / total) * 100).toFixed(1) : 0;
     var isAndroid13 = item.os.toLowerCase().includes('13');
     var rowColor = isAndroid13 ? 'rgba(31,122,78,0.05)' : (item.os === 'Sin info' ? 'rgba(179,38,30,0.05)' : '');
     var barColor = isAndroid13 ? '#1F7A4E' : (item.os === 'Sin info' ? '#B3261E' : '#1976D2');
@@ -24678,7 +24681,7 @@ function renderOSVersionTable(data) {
       '<td style="padding:12px 14px;"><strong>' + escHTML(item.os) + '</strong></td>' +
       '<td style="padding:12px 14px; text-align:right;"><span style="background:' + barColor + '; color:white; padding:4px 8px; border-radius:6px; font-weight:700;">' + item.count + '</span></td>' +
       '<td style="padding:12px 14px; text-align:right; font-weight:700; color:var(--text);">' + pct + '%</td>' +
-      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:4px; height:6px; width:120px; overflow:hidden;"><div style="background:' + barColor + '; height:100%; width:' + pct + '%; transition:width 0.3s;"></div></div></td>' +
+      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:4px; height:6px; width:120px; overflow:hidden;"><div style="background:' + barColor + '; height:100%; width:' + pct + '%; transition:width 0.15s;"></div></div></td>' +
       '</tr>';
   });
 
@@ -24686,21 +24689,23 @@ function renderOSVersionTable(data) {
 }
 
 function renderUpdateRequiredTable(data) {
-  var needUpdate = data.filter(function(eq) {
-    var os = (eq.OS || eq['OS'] || eq['Sistema Operativo'] || eq['sistema operativo'] || eq['SO'] || '').toLowerCase().trim();
-    return !os.includes('13') && os !== '';
-  });
+  if (!data || data.length === 0) {
+    document.getElementById('update-required-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos disponibles</td></tr>';
+    return;
+  }
 
-  // Limitar a 50 primeros para no saturar
-  needUpdate = needUpdate.slice(0, 50);
+  var needUpdate = data.filter(function(eq) {
+    var os = String(eq.OS || '').toLowerCase().trim();
+    return !os.includes('13') && os !== 'sin info' && os !== '';
+  });
 
   var html = '';
   if (needUpdate.length === 0) {
-    html = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light); background:rgba(31,122,78,0.05);">✅ Todos los equipos tienen Android 13 o sin info registrada</td></tr>';
+    html = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light); background:rgba(31,122,78,0.05);">✅ Todos los equipos tienen Android 13</td></tr>';
   } else {
-    needUpdate.forEach(function(eq) {
-      var osValue = eq.OS || eq['OS'] || eq['Sistema Operativo'] || eq['sistema operativo'] || eq['SO'] || 'Sin info';
-      var modelValue = eq.Modelo || eq.Model || eq['Model'] || '-';
+    needUpdate.slice(0, 50).forEach(function(eq) {
+      var osValue = String(eq.OS || 'Sin info');
+      var modelValue = String(eq.Model || '-');
       html += '<tr style="border-bottom:1px solid var(--border); background:rgba(245,166,35,0.02);">' +
         '<td style="padding:10px 14px;"><strong>' + escHTML(eq['Friendly Name'] || eq.CR || '-') + '</strong></td>' +
         '<td style="padding:10px 14px;">' + escHTML(eq.PLAZA || '-') + '</td>' +
@@ -24714,18 +24719,21 @@ function renderUpdateRequiredTable(data) {
 }
 
 function renderModelsTable(data) {
-  var modelStats = {};
+  if (!data || data.length === 0) {
+    document.getElementById('models-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos disponibles</td></tr>';
+    return;
+  }
 
+  var modelStats = {};
   data.forEach(function(eq) {
-    // Buscar la columna Modelo en diferentes nombres posibles
-    var model = (eq.Modelo || eq.Model || eq['Model'] || eq['Modelo'] || 'Sin info').trim();
+    var model = String(eq.Model || 'Sin info').trim();
     modelStats[model] = (modelStats[model] || 0) + 1;
   });
 
   var total = data.length;
   var modelArray = Object.keys(modelStats)
-    .map(function(model) {
-      return { model: model, count: modelStats[model] };
+    .map(function(modelKey) {
+      return { model: modelKey, count: modelStats[modelKey] };
     })
     .sort(function(a, b) { return b.count - a.count; });
 
@@ -24733,14 +24741,14 @@ function renderModelsTable(data) {
   var colors = ['#E2001A', '#1976D2', '#1F7A4E', '#F5A623', '#8E24AA', '#00897B', '#FF6F00', '#5E35B1'];
 
   modelArray.forEach(function(item, idx) {
-    var pct = ((item.count / total) * 100).toFixed(1);
+    var pct = total > 0 ? ((item.count / total) * 100).toFixed(1) : 0;
     var color = colors[idx % colors.length];
 
     html += '<tr style="border-bottom:1px solid var(--border);">' +
       '<td style="padding:12px 14px;"><strong>' + escHTML(item.model) + '</strong></td>' +
       '<td style="padding:12px 14px; text-align:right;"><span style="background:' + color + '; color:white; padding:4px 8px; border-radius:6px; font-weight:700;">' + item.count + '</span></td>' +
       '<td style="padding:12px 14px; text-align:right; font-weight:700; color:var(--text);">' + pct + '%</td>' +
-      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:4px; height:6px; width:120px; overflow:hidden;"><div style="background:' + color + '; height:100%; width:' + pct + '%; transition:width 0.3s;"></div></div></td>' +
+      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:4px; height:6px; width:120px; overflow:hidden;"><div style="background:' + color + '; height:100%; width:' + pct + '%; transition:width 0.15s;"></div></div></td>' +
       '</tr>';
   });
 
