@@ -10734,7 +10734,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               </button>
               <!-- Acciones secundarias -->
               <div style="display:flex;gap:8px;">
-                <button onclick="exportReportByFormat('email')"
+                <button onclick="previewEmail()"
                   style="flex:1;padding:9px 12px;background:rgba(226,0,26,0.06);color:#E2001A;
                          border:1px solid rgba(226,0,26,0.2);border-radius:8px;font-weight:600;
                          font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;"
@@ -10742,7 +10742,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                   onmouseout="this.style.background='rgba(226,0,26,0.06)';">
                   <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Vista previa
                 </button>
-                <button onclick="copyEmailHTMLToClipboard()"
+                <button onclick="downloadReportEmail()"
                   style="flex:1;padding:9px 12px;background:rgba(226,0,26,0.06);color:#E2001A;
                          border:1px solid rgba(226,0,26,0.2);border-radius:8px;font-weight:600;
                          font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;"
@@ -10789,16 +10789,25 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <span class="material-symbols-outlined" style="font-size:20px;">download</span>
                 Descargar Excel (.xlsx)
               </button>
-              <!-- CSV secundario -->
-              <button onclick="exportDataByFormat('csv-todo')"
-                style="padding:10px 16px;background:rgba(33,115,70,0.06);color:#217346;
-                       border:1px solid rgba(33,115,70,0.25);border-radius:8px;font-weight:600;
-                       font-size:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;"
-                onmouseover="this.style.background='rgba(33,115,70,0.12)';"
-                onmouseout="this.style.background='rgba(33,115,70,0.06)';">
-                <span class="material-symbols-outlined" style="font-size:16px;">description</span>
-                También descargar CSV (.csv)
-              </button>
+              <!-- Acciones secundarias Excel -->
+              <div style="display:flex;gap:8px;">
+                <button onclick="previewExcel()"
+                  style="flex:1;padding:9px 12px;background:rgba(33,115,70,0.06);color:#217346;
+                         border:1px solid rgba(33,115,70,0.2);border-radius:8px;font-weight:600;
+                         font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;"
+                  onmouseover="this.style.background='rgba(33,115,70,0.12)';"
+                  onmouseout="this.style.background='rgba(33,115,70,0.06)';">
+                  <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Vista previa
+                </button>
+                <button onclick="exportDataByFormat('csv-todo')"
+                  style="flex:1;padding:9px 12px;background:rgba(33,115,70,0.06);color:#217346;
+                         border:1px solid rgba(33,115,70,0.2);border-radius:8px;font-weight:600;
+                         font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;"
+                  onmouseover="this.style.background='rgba(33,115,70,0.12)';"
+                  onmouseout="this.style.background='rgba(33,115,70,0.06)';">
+                  <span class="material-symbols-outlined" style="font-size:14px;">description</span> CSV (.csv)
+                </button>
+              </div>
             </div>
 
             <!-- ═══════════ CARD 3: PDF ═══════════ -->
@@ -10836,6 +10845,15 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(204,51,0,0.35)';">
                 <span class="material-symbols-outlined" style="font-size:20px;">download</span>
                 Descargar PDF
+              </button>
+              <!-- Acción secundaria PDF -->
+              <button onclick="previewReportPDF(null, getPlazaScopedData())"
+                style="padding:9px 12px;background:rgba(204,51,0,0.06);color:#CC3300;
+                       border:1px solid rgba(204,51,0,0.2);border-radius:8px;font-weight:600;
+                       font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;width:100%;"
+                onmouseover="this.style.background='rgba(204,51,0,0.12)';"
+                onmouseout="this.style.background='rgba(204,51,0,0.06)';">
+                <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Vista previa
               </button>
             </div>
 
