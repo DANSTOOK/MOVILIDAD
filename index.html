@@ -115,8 +115,16 @@
       color-scheme: dark;
     }
 
-    /* Transiciones globales fluidas */
-    * {
+    /* Transiciones fluidas selectivas (no en all para evitar conflictos) */
+    input,
+    select,
+    textarea,
+    button,
+    a,
+    .card,
+    .metric-card,
+    [class*="btn"],
+    [class*="button"] {
       transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
     }
 
@@ -774,7 +782,7 @@
       color: var(--text-light);
       font-weight: 500;
       font-size: 12px;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: color 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), font-weight 0.3s ease;
       border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
@@ -13112,7 +13120,27 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       // Si salgo de CRUCE, cerrar el panel de detalle de KPI
       if (tab !== 'cruce' && typeof closeKpiDetail === 'function') closeKpiDetail();
 
-      // Transición suave: fade out rápido, cambiar contenido, fade in
+      // Actualizar tabs primero (sin fade, para que la barra roja sea correcta)
+      var tabNames = {
+        'cruce': 'cruce',
+        'resumen': 'resumen',
+        'detalle': 'detalle',
+        'inconsistencias': 'inconsistencias',
+        'garantia': 'stock',
+        'exportacion': 'exportación',
+        'configuracion': 'configuración',
+        'analytics': 'analytics'
+      };
+
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => {
+        var tabLabel = tabNames[tab];
+        if (tabLabel && t.textContent.toLowerCase().includes(tabLabel)) {
+          t.classList.add('active');
+        }
+      });
+
+      // Transición suave solo en secciones: fade out rápido, cambiar contenido, fade in
       var activeSection = document.querySelector('.section.active');
       if (activeSection) {
         activeSection.style.opacity = '0';
@@ -13121,31 +13149,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       setTimeout(function() {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         var newSection = document.getElementById(tab);
         if (newSection) {
           newSection.classList.add('active');
           newSection.style.opacity = '1';
           newSection.style.transform = 'translateY(0)';
         }
-
-        var tabNames = {
-          'cruce': 'cruce',
-          'resumen': 'resumen',
-          'detalle': 'detalle',
-          'inconsistencias': 'inconsistencias',
-          'garantia': 'stock',
-          'exportacion': 'exportación',
-          'configuracion': 'configuración',
-          'analytics': 'analytics'
-        };
-
-        document.querySelectorAll('.tab').forEach(t => {
-          var tabLabel = tabNames[tab];
-          if (tabLabel && t.textContent.toLowerCase().includes(tabLabel)) {
-            t.classList.add('active');
-          }
-        });
 
         // Renderizar contenido de la pestaña después de la transición
         if (tab === 'resumen') {
