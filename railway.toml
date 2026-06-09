@@ -3,9 +3,9 @@ builder = "dockerfile"
 dockerfile = "Dockerfile"
 
 [deploy]
-startCommand = "node server.js"
-healthcheckPath = "/api/auth/verify"
-healthcheckTimeout = 100
+startCommand = "node backend/server.js"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 120
 
 [env]
 NODE_ENV = "production"

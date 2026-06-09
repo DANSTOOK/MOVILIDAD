@@ -4,9 +4,9 @@
   },
   "deploy": {
     "numReplicas": 1,
-    "startCommand": "npm start",
-    "healthcheckPath": "/api/auth/verify",
-    "healthcheckTimeout": 100,
+    "startCommand": "node backend/server.js",
+    "healthcheckPath": "/api/health",
+    "healthcheckTimeout": 120,
     "restartPolicyMaxRetries": 5
   }
 }

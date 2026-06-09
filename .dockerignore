@@ -1,0 +1,10 @@
+**/node_modules
+backend/data
+.git
+*.md
+setup_railway*.py
+auto_setup.sh
+SETUP_COMMANDS.sh
+docker-compose.yml
+.railwayrc.json
+requirements.txt

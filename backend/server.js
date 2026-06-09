@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const { dbAll, dbRun, dbGet, initDB, initDemoUser } = require('./db');
@@ -12,6 +13,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secret-key-change-me';
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Servir el frontend estático (index.html y demás archivos del repo raíz)
+const STATIC_DIR = path.join(__dirname, '..');
+app.use(express.static(STATIC_DIR));
 
 // Verificar JWT
 const verifyToken = (req, res, next) => {
@@ -197,12 +202,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Fallback: cualquier ruta que no sea /api sirve el frontend (index.html)
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(STATIC_DIR, 'index.html'));
+});
+
 // Inicializar BD y arrancar servidor
 const startServer = async () => {
   await initDB();
   await initDemoUser();
 
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n🚀 API running on http://localhost:${PORT}`);
     console.log(`📚 Docs: POST /api/auth/login (username: admin, password: admin123)`);
     console.log(`   GET  /api/equipos (needs token)`);

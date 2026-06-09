@@ -2,15 +2,13 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy backend files
-COPY backend/package*.json ./
-RUN npm install --production
+# Install backend dependencies first (better layer caching)
+COPY backend/package*.json ./backend/
+RUN cd backend && npm install --production
 
-COPY backend/ ./
-
-# Create data directory
-RUN mkdir -p data
+# Copy the whole repo (frontend index.html + backend source)
+COPY . .
 
 EXPOSE 3001
 
-CMD ["npm", "start"]
+CMD ["node", "backend/server.js"]
