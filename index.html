@@ -16941,10 +16941,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       if (countEl) countEl.textContent = data.length + ' asesores';
     }
 
+    // Cache para renderización optimizada
+    var _detalleCache = { sorted: null, searchKey: null };
+    var _detallePagination = { page: 0, pageSize: 50 };
+
     function renderDetalle() {
-      var sorted = getFilteredDetalle() // Sort
+      var sorted = getFilteredDetalle(); // Sort
       var field = detalleState.sortBy;
       var dir = detalleState.sortDir;
+
+      // Sort inline para evitar crear array intermedio
       sorted.sort(function(a, b){
         var aVal, bVal;
         if (field === 'Last Seen')        { aVal = a['Last Seen']||''; bVal = b['Last Seen']||''; }
@@ -16960,22 +16966,47 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       });
 
       updateDetalleSortIcons();
+      _detallePagination.page = 0; // Reset pagination
 
-      var html = '';
-      sorted.forEach(function(d){
-        // Resaltado fuerte para ≥15 días offline (consistente con CRUCE)
+      // Renderizar con paginación
+      renderDetallePage(sorted);
+
+      var countEl = document.getElementById('detalle-count');
+      if (countEl) countEl.textContent = sorted.length + ' de ' + D.length + ' equipos';
+    }
+
+    function renderDetallePage(sorted) {
+      var pageSize = _detallePagination.pageSize;
+      var page = _detallePagination.page;
+      var start = page * pageSize;
+      var end = Math.min(start + pageSize, sorted.length);
+      var pageData = sorted.slice(start, end);
+
+      // Usar DocumentFragment para evitar múltiples reflows
+      var fragment = document.createDocumentFragment();
+
+      if (pageData.length === 0) {
+        var emptyHtml = emptyStateRow(12, { msg: 'Ningún equipo cumple los filtros activos. Prueba limpiar los filtros de columna o la búsqueda.', clearFn: 'clearDetalleFilters()' });
+        document.getElementById('detalle-table').innerHTML = emptyHtml;
+        return;
+      }
+
+      pageData.forEach(function(d, idx){
+        var tr = document.createElement('tr');
         var _dias = Number(d.days_ago) || 0;
-        var _clases = [];
-        if (isAttended(d)) _clases.push('attended-row');
-        if (_dias >= 15) _clases.push('sev-extreme');
-        var rowCls = _clases.length ? ' class="' + _clases.join(' ') + '"' : '';
+
+        // Classes (sin string concatenation)
+        if (isAttended(d)) tr.classList.add('attended-row');
+        if (_dias >= 15) tr.classList.add('sev-extreme');
+
         var diasCell = (_dias >= 15)
           ? '<span class="days-extreme-badge">' + d.days_ago + '</span>'
           : '<strong>' + d.days_ago + '</strong>';
-        var serialNum = formatSerialNumber(d['Serial Number']) // Usa función para evitar notación científica
-        var lastSeenFormatted = formatDateDayjs(d['Last Seen'], 'DD/MM/YYYY HH:mm'); // Day.js formatting
-        html += '<tr' + rowCls + '>'
-          + '<td style="text-align:center">' + buildAttendedCheckbox(d) + '</td>'
+        var serialNum = formatSerialNumber(d['Serial Number']);
+        var lastSeenFormatted = formatDateDayjs(d['Last Seen'], 'DD/MM/YYYY HH:mm');
+
+        // Construir HTML de forma más eficiente (sin onclick inline)
+        var html = '<td style="text-align:center">' + buildAttendedCheckbox(d) + '</td>'
           + '<td>' + lastSeenFormatted + '</td>'
           + '<td>' + diasCell + '</td>'
           + '<td><strong>' + (d.CR || '—') + '</strong></td>'
@@ -16987,21 +17018,78 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           + '<td>' + (d.Model || '—') + '</td>'
           + '<td>' + buildCommentSelect(d) + '</td>'
           + '<td>' + buildNoteInput(d) + '</td>'
-          + '<td style="text-align:center;">' +
-            '<button onclick="openNotesTimeline(' + JSON.stringify(d).replace(/"/g, '&quot;') + ')" ' +
-              'style="background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:4px; color:#E2001A; font-weight:600; transition:all 0.2s;" ' +
-              'onmouseover="this.style.background=\'rgba(226,0,26,0.1)\';" ' +
-              'onmouseout="this.style.background=\'transparent\';" ' +
-              'title="Ver historial de seguimiento">' +
-              '<span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle;">history</span>' +
-            '</button>' +
-          '</td>'
-        + '</tr>';
-      });
-      document.getElementById('detalle-table').innerHTML = html || emptyStateRow(12, { msg: 'Ningún equipo cumple los filtros activos. Prueba limpiar los filtros de columna o la búsqueda.', clearFn: 'clearDetalleFilters()' });
+          + '<td style="text-align:center;" class="detalle-history-cell" data-equipo-cr="' + escHTML(d.CR || '') + '">'
+            + '<button class="detalle-history-btn" style="background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:4px; color:#E2001A; font-weight:600; transition:all 0.2s;" title="Ver historial de seguimiento">'
+              + '<span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle;">history</span>'
+            + '</button>'
+          + '</td>';
 
-      var countEl = document.getElementById('detalle-count');
-      if (countEl) countEl.textContent = sorted.length + ' de ' + D.length + ' equipos';
+        tr.innerHTML = html;
+        fragment.appendChild(tr);
+      });
+
+      // Reemplazar tabla de una sola vez
+      document.getElementById('detalle-table').innerHTML = '';
+      document.getElementById('detalle-table').appendChild(fragment);
+
+      // Renderizar controles de paginación si es necesario
+      if (sorted.length > pageSize) {
+        renderDetallePaginationControls(sorted.length);
+      }
+    }
+
+    // Event delegation para botones de historial (evita crear listeners para cada fila)
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('.detalle-history-btn')) {
+        var cell = e.target.closest('.detalle-history-cell');
+        if (cell) {
+          var cr = cell.getAttribute('data-equipo-cr');
+          var d = D.find(function(x) { return x.CR === cr; });
+          if (d) openNotesTimeline(d);
+        }
+      }
+    });
+
+    function renderDetallePaginationControls(totalItems) {
+      var pageSize = _detallePagination.pageSize;
+      var totalPages = Math.ceil(totalItems / pageSize);
+      var currentPage = _detallePagination.page;
+
+      // Buscar o crear contenedor de paginación
+      var paginationContainer = document.getElementById('detalle-pagination');
+      if (!paginationContainer) {
+        paginationContainer = document.createElement('div');
+        paginationContainer.id = 'detalle-pagination';
+        paginationContainer.style.cssText = 'display:flex; justify-content:center; align-items:center; gap:8px; margin-top:16px; padding:12px;';
+        document.getElementById('detalle-table').parentNode.parentNode.insertBefore(paginationContainer, document.getElementById('detalle-table').parentNode.nextSibling);
+      }
+
+      var html = '';
+      if (currentPage > 0) {
+        html += '<button onclick="prevDetallePage()" style="padding:6px 12px; border:1px solid var(--border); border-radius:4px; cursor:pointer;">← Anterior</button>';
+      }
+      html += '<span style="padding:0 8px; font-size:12px; color:var(--text-light);">Página ' + (currentPage + 1) + ' de ' + totalPages + '</span>';
+      if (currentPage < totalPages - 1) {
+        html += '<button onclick="nextDetallePage()" style="padding:6px 12px; border:1px solid var(--border); border-radius:4px; cursor:pointer;">Siguiente →</button>';
+      }
+      paginationContainer.innerHTML = html;
+    }
+
+    function nextDetallePage() {
+      var sorted = getFilteredDetalle();
+      var totalPages = Math.ceil(sorted.length / _detallePagination.pageSize);
+      if (_detallePagination.page < totalPages - 1) {
+        _detallePagination.page++;
+        renderDetallePage(sorted);
+      }
+    }
+
+    function prevDetallePage() {
+      if (_detallePagination.page > 0) {
+        _detallePagination.page--;
+        var sorted = getFilteredDetalle();
+        renderDetallePage(sorted);
+      }
     }
 
     function renderPlazaIssues() {
