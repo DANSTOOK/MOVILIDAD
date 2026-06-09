@@ -1,0 +1,12 @@
+{
+  "build": {
+    "builder": "dockerfile"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "startCommand": "npm start",
+    "healthcheckPath": "/api/auth/verify",
+    "healthcheckTimeout": 100,
+    "restartPolicyMaxRetries": 5
+  }
+}
