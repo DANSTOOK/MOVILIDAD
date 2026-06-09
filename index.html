@@ -10688,6 +10688,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
 <!-- OS & MODELOS TAB -->
       <div id="os-modelos" class="section">
+        <style>
+          /* Las tablas de este tab no deben tener header sticky: al tener pocas
+             filas, el thead sticky se quedaba fijo y tapaba la fila de datos. */
+          #os-modelos table thead {
+            position: static !important;
+          }
+        </style>
         <!-- HEADER -->
         <div style="display:flex; align-items:center; gap:14px; margin-bottom:28px; padding:0 14px;">
           <div style="width:44px;height:44px;background:#1976D2;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(25,118,210,0.3);">
