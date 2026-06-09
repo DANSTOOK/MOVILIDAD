@@ -11161,10 +11161,18 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
 
             <!-- ROUTE OPTIMIZATION -->
-            <div style="margin-bottom:16px;">
+            <div style="margin-bottom:12px;">
               <button class="btn btn-primary" onclick="optimizeRoute()" style="width:100%;">
                 <span class="material-symbols-outlined" style="font-size:16px;">route</span>
                 Optimizar Ruta
+              </button>
+            </div>
+
+            <!-- CLEAR FILTER -->
+            <div style="margin-bottom:16px;">
+              <button class="btn btn-secondary" onclick="clearRadiusFilter()" style="width:100%; font-size:12px;">
+                <span class="material-symbols-outlined" style="font-size:14px;">clear</span>
+                Limpiar Filtro
               </button>
             </div>
 
@@ -12552,6 +12560,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     var _geoMap = null;
     var _geoMarkers = [];
     var _geoMarkerClusterGroup = null;
+    var _geoRadiusFilter = null;    // { centerLat, centerLon, radiusKm }
+    var _geoRadiusCircle = null;    // Leaflet circle for visualization
+    var _geoCurrentRoute = [];       // Last calculated route
 
     function getStatusColor(daysAgo) {
       if (daysAgo < 1) return '#1F7A4E';      // Green - Online
@@ -12685,12 +12696,130 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
 
     function setMapRadius(km) {
-      console.log('Radius filter: ' + km + ' km - Feature coming in Phase 2B');
-      // TODO: Implement radius filtering with geolib
+      if (!_geoMap) {
+        alert('Mapa no inicializado');
+        return;
+      }
+
+      // Get map center
+      var center = _geoMap.getCenter();
+      var centerLat = center.lat;
+      var centerLon = center.lng;
+
+      // Set filter
+      _geoRadiusFilter = {
+        centerLat: centerLat,
+        centerLon: centerLon,
+        radiusKm: km
+      };
+
+      // Draw circle on map
+      if (_geoRadiusCircle) {
+        _geoMap.removeLayer(_geoRadiusCircle);
+      }
+      _geoRadiusCircle = L.circle([centerLat, centerLon], {
+        radius: km * 1000,  // Convert km to meters
+        color: '#1976D2',
+        weight: 2,
+        opacity: 0.6,
+        fill: true,
+        fillColor: '#1976D2',
+        fillOpacity: 0.1
+      }).addTo(_geoMap);
+
+      // Filter equipment and update list
+      filterEquipmentByRadius();
+    }
+
+    function filterEquipmentByRadius() {
+      if (!_geoRadiusFilter) return;
+
+      var data = getPlazaScopedData();
+      var filtered = data.filter(function(d) {
+        if (!d.latitude || !d.longitude) return false;
+
+        var dist = geolib.getDistance(
+          { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
+          { latitude: d.latitude, longitude: d.longitude }
+        );
+
+        return dist <= (_geoRadiusFilter.radiusKm * 1000);
+      });
+
+      // Sort by distance
+      filtered.sort(function(a, b) {
+        var distA = geolib.getDistance(
+          { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
+          { latitude: a.latitude, longitude: a.longitude }
+        );
+        var distB = geolib.getDistance(
+          { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
+          { latitude: b.latitude, longitude: b.longitude }
+        );
+        return distA - distB;
+      });
+
+      // Update list
+      updateMapEquipmentListFiltered(filtered);
+    }
+
+    function updateMapEquipmentListFiltered(filtered) {
+      var listContainer = document.getElementById('mapa-equipment-list');
+      if (!listContainer) return;
+
+      if (!filtered || !filtered.length) {
+        listContainer.innerHTML = '<p style="color:var(--text-light); text-align:center; padding:12px; margin:0;">Sin equipos en este radio</p>';
+        return;
+      }
+
+      var html = '<div style="max-height:500px; overflow-y:auto;">';
+      filtered.slice(0, 30).forEach(function(d, idx) {
+        var color = getStatusColor(d.days_ago);
+        var dist = geolib.getDistance(
+          { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
+          { latitude: d.latitude, longitude: d.longitude }
+        );
+        var distKm = (dist / 1000).toFixed(1);
+
+        html += '<div style="padding:8px; border-bottom:1px solid var(--border); cursor:pointer; font-size:11px;" onclick="flyToEquipo(' + d.latitude + ',' + d.longitude + ')">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+          '<div style="color:' + color + '; font-weight:600;">' + (d['Friendly Name'] || d.CR) + '</div>' +
+          '<span style="color:var(--primary); font-weight:600; font-size:10px;">' + distKm + ' km</span>' +
+          '</div>' +
+          '<div style="color:var(--text-light); font-size:10px;">' + (d.TIENDA || '—') + '</div>' +
+          '</div>';
+      });
+      html += '</div>';
+      if (filtered.length > 30) {
+        html += '<p style="font-size:10px; color:var(--text-light); text-align:center; margin:8px 0 0 0;">Mostrando 30 de ' + filtered.length + '</p>';
+      }
+      listContainer.innerHTML = html;
+    }
+
+    function clearRadiusFilter() {
+      _geoRadiusFilter = null;
+      if (_geoRadiusCircle) {
+        _geoMap.removeLayer(_geoRadiusCircle);
+        _geoRadiusCircle = null;
+      }
+      refreshMapEquipmentList();
     }
 
     function optimizeRoute() {
       var data = getPlazaScopedData();
+
+      // Use filtered data if radius filter is active
+      if (_geoRadiusFilter) {
+        data = data.filter(function(d) {
+          if (!d.latitude || !d.longitude) return false;
+          var dist = geolib.getDistance(
+            { latitude: _geoRadiusFilter.centerLat, longitude: _geoRadiusFilter.centerLon },
+            { latitude: d.latitude, longitude: d.longitude }
+          );
+          return dist <= (_geoRadiusFilter.radiusKm * 1000);
+        });
+      }
+
       if (!data || data.length < 2) {
         alert('Se necesitan al menos 2 equipos para optimizar ruta');
         return;
@@ -12706,9 +12835,69 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         return;
       }
 
-      var optimized = calculateOptimizedRoute(equiposConCoordenadas.slice(0, 15)); // Limit to 15 for performance
-      console.log('Optimized route:', optimized);
-      alert('Ruta optimizada para ' + optimized.length + ' equipos\n\nVer consola para detalles');
+      var optimized = calculateOptimizedRoute(equiposConCoordenadas.slice(0, 20)); // Limit to 20 for performance
+      _geoCurrentRoute = optimized;
+
+      // Draw route on map
+      drawRouteOnMap(optimized);
+
+      // Show results
+      var totalDist = calculateRouteTotalDistance(optimized);
+      alert('✅ Ruta optimizada para ' + optimized.length + ' equipos\n\n' +
+            'Distancia total: ' + (totalDist / 1000).toFixed(1) + ' km\n\n' +
+            'Ver consola para orden detallado');
+
+      console.log('Optimized route order:');
+      optimized.forEach(function(e, idx) {
+        console.log((idx + 1) + '. ' + (e['Friendly Name'] || e.CR) + ' (' + e.TIENDA + ')');
+      });
+    }
+
+    function drawRouteOnMap(route) {
+      if (!_geoMap || !route || route.length < 2) return;
+
+      // Remove existing route lines
+      _geoMap.eachLayer(function(layer) {
+        if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+          _geoMap.removeLayer(layer);
+        }
+      });
+
+      // Draw route polyline
+      var latlngs = route.map(function(e) {
+        return [e.latitude, e.longitude];
+      });
+
+      L.polyline(latlngs, {
+        color: '#1976D2',
+        weight: 3,
+        opacity: 0.8,
+        dashArray: '5, 5'
+      }).addTo(_geoMap);
+
+      // Add numbered markers for route order
+      route.forEach(function(e, idx) {
+        L.circleMarker([e.latitude, e.longitude], {
+          radius: 12,
+          fillColor: '#FFF',
+          color: '#1976D2',
+          weight: 3,
+          opacity: 1,
+          fillOpacity: 1,
+          zIndexOffset: 1000
+        }).bindPopup('<div style="font-size:11px;"><strong>' + (idx + 1) + '.</strong> ' + (e['Friendly Name'] || e.CR) + '</div>').addTo(_geoMap);
+      });
+    }
+
+    function calculateRouteTotalDistance(route) {
+      var total = 0;
+      for (var i = 0; i < route.length - 1; i++) {
+        total += geolib.getDistance(
+          { latitude: route[i].latitude, longitude: route[i].longitude },
+          { latitude: route[i+1].latitude, longitude: route[i+1].longitude }
+        );
+      }
+      return total;
     }
 
     function calculateOptimizedRoute(equipos) {
