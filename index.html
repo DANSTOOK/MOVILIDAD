@@ -9965,89 +9965,128 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         <!-- 13. MAPA INTERACTIVO DE PLAZAS (BAJA CALIFORNIA) -->
         <div class="mexico-map-wrap">
-          <!-- 🔍 BUSCADOR MODERNO DE OXXO -->
-          <div style="margin-bottom:20px;">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
-              <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px;">search</span>
-              <label style="font-size:12px; font-weight:700; color:var(--text); margin:0;">BUSCAR OXXO</label>
+          <!-- 🔍 BUSCADOR PREMIUM -->
+          <div style="margin-bottom:28px;">
+            <!-- SEARCH INPUT CON ESTILO PREMIUM -->
+            <div style="position:relative; margin-bottom:20px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                <label style="font-size:13px; font-weight:700; color:var(--text); letter-spacing:0.5px; text-transform:uppercase;">🔍 Localizador de Tiendas</label>
+              </div>
+              <div style="position:relative; background:linear-gradient(135deg, var(--card-bg) 0%, rgba(25,118,210,0.02) 100%);
+                          border:2px solid var(--border); border-radius:14px; transition:all 0.3s ease;
+                          box-shadow: 0 4px 16px rgba(0,0,0,0.08);"
+                   id="search-wrapper"
+                   onmouseover="document.getElementById('search-wrapper').style.borderColor='var(--primary)'; document.getElementById('search-wrapper').style.boxShadow='0 6px 24px rgba(25,118,210,0.12)';"
+                   onmouseout="document.getElementById('search-wrapper').style.borderColor='var(--border)'; document.getElementById('search-wrapper').style.boxShadow='0 4px 16px rgba(0,0,0,0.08)';">
+                <div style="display:flex; align-items:center; padding:4px;">
+                  <span class="material-symbols-outlined" style="color:var(--primary); font-size:24px; padding:12px 12px 12px 16px;">search</span>
+                  <input type="text" id="oxxo-search-input" placeholder="Buscar tienda (Ej: Maples, Centro, Playas...)"
+                    style="flex:1; border:none; background:transparent; color:var(--text); font-size:14px; padding:12px 16px 12px 8px;
+                           outline:none; font-weight:500;"
+                    oninput="searchOxxoByName(this.value)">
+                  <span id="search-clear-btn" style="display:none; cursor:pointer; color:var(--text-light); padding:12px 16px;
+                                                      font-size:20px; transition:color 0.2s;"
+                        onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-light)'"
+                        onclick="document.getElementById('oxxo-search-input').value=''; searchOxxoByName(''); document.getElementById('search-clear-btn').style.display='none';">✕</span>
+                </div>
+              </div>
             </div>
-            <input type="text" id="oxxo-search-input" placeholder="Escribe el nombre de la tienda... (Ej: Maples, Centro, Playas)"
-              style="width:100%; padding:14px 16px; border:2px solid var(--border); border-radius:10px;
-                     background:var(--card-bg); color:var(--text); font-size:14px; font-weight:500;
-                     transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05);"
-              onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 2px 12px rgba(25,118,210,0.15)';"
-              onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.05)';"
-              oninput="searchOxxoByName(this.value)">
 
-            <!-- GRID DE RESULTADOS -->
-            <div id="search-results-container" style="display:none; margin-top:16px;">
-              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;" id="search-results-grid">
+            <!-- GRID DE RESULTADOS PREMIUM -->
+            <div id="search-results-container" style="display:none;">
+              <div style="margin-bottom:8px; font-size:12px; font-weight:600; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px;">
+                <span id="results-count">0</span> Resultados encontrados
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:20px;" id="search-results-grid">
               </div>
             </div>
           </div>
 
-          <!-- 📊 PANEL DE DETALLES DEL OXXO SELECCIONADO (MEJORADO) -->
-          <div id="oxxo-details-panel" style="display:none; margin-bottom:20px; background:linear-gradient(135deg, var(--card-bg) 0%, rgba(25,118,210,0.03) 100%);
-                                               border:2px solid var(--primary); border-radius:16px; padding:24px;
-                                               box-shadow: 0 8px 24px rgba(25,118,210,0.1);">
-            <!-- HEADER CON NOMBRE Y BOTÓN CERRAR -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid var(--border);">
-              <div>
-                <h4 id="oxxo-details-name" style="margin:0; font-size:20px; font-weight:700; color:var(--primary);">Oxxo Seleccionado</h4>
-                <div id="oxxo-location-label" style="font-size:11px; color:var(--text-light); margin-top:4px;">📍 Ubicación geográfica</div>
+          <!-- 📊 PANEL DE DETALLES PREMIUM -->
+          <div id="oxxo-details-panel" style="display:none; margin-bottom:28px; background:linear-gradient(135deg, #FFFFFF 0%, rgba(25,118,210,0.02) 100%);
+                                               border:1px solid rgba(0,0,0,0.08); border-radius:20px; padding:32px;
+                                               box-shadow: 0 12px 40px rgba(0,0,0,0.12);">
+
+            <!-- HEADER PREMIUM -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px;">
+              <div style="flex:1;">
+                <div style="font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Información de Tienda</div>
+                <h2 id="oxxo-details-name" style="margin:0; font-size:28px; font-weight:700; color:var(--text); letter-spacing:-0.5px;">Oxxo Seleccionado</h2>
+                <div id="oxxo-location-label" style="font-size:13px; color:var(--text-light); margin-top:8px; display:flex; align-items:center; gap:6px;">
+                  <span class="material-symbols-outlined" style="font-size:18px;">location_on</span>
+                  📍 Ubicación geográfica
+                </div>
               </div>
-              <button onclick="closeOxxoDetails()" style="background:rgba(255,0,0,0.1); border:none; color:#E2001A; cursor:pointer; font-size:24px;
-                                                          width:44px; height:44px; border-radius:50%; transition:all 0.2s;
+              <button onclick="closeOxxoDetails()" style="background:none; border:none; color:var(--text-light); cursor:pointer; font-size:28px;
+                                                          width:48px; height:48px; border-radius:50%; transition:all 0.2s;
                                                           display:flex; align-items:center; justify-content:center;"
-                onmouseover="this.style.background='rgba(255,0,0,0.2)'" onmouseout="this.style.background='rgba(255,0,0,0.1)'">✕</button>
+                onmouseover="this.style.background='rgba(0,0,0,0.05)'; this.style.color='var(--text)';" onmouseout="this.style.background='none'; this.style.color='var(--text-light)';">✕</button>
             </div>
 
-            <!-- COORDENADAS EN DESTAQUE -->
-            <div style="background:var(--surface); padding:16px; border-radius:12px; margin-bottom:20px; border-left:4px solid var(--primary);">
-              <div style="font-size:11px; font-weight:700; color:var(--text-light); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">📍 Coordenadas Exactas</div>
-              <div id="oxxo-coords" style="font-size:14px; font-weight:600; color:var(--primary); font-family:'Courier New', monospace; line-height:1.6;">—</div>
+            <!-- COORDENADAS DESTACADAS -->
+            <div style="background:linear-gradient(135deg, rgba(25,118,210,0.08) 0%, rgba(25,118,210,0.03) 100%); padding:20px; border-radius:16px; margin-bottom:28px;
+                        border-left:5px solid var(--primary);">
+              <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:12px; letter-spacing:0.5px;">
+                <span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:6px;">location_on</span>
+                Coordenadas Exactas
+              </div>
+              <div id="oxxo-coords" style="font-size:18px; font-weight:600; color:var(--primary); font-family:'Courier New', monospace; line-height:1.8; letter-spacing:0.5px;">—</div>
             </div>
 
-            <!-- ESTADÍSTICAS EN GRID 2x2 -->
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
-              <!-- Total Equipos -->
-              <div style="background:linear-gradient(135deg, rgba(25,118,210,0.1) 0%, rgba(25,118,210,0.05) 100%);
-                          padding:16px; border-radius:12px; border:2px solid rgba(25,118,210,0.2);">
-                <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">📊 Total de Equipos</div>
-                <div id="oxxo-total-count" style="font-size:28px; font-weight:700; color:var(--primary);">—</div>
+            <!-- ESTADÍSTICAS EN GRID 2x2 CON ESTILO PREMIUM -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px;">
+
+              <!-- Total Equipos - Card Principal -->
+              <div style="grid-column:1/3; background:linear-gradient(135deg, var(--primary) 0%, #1565C0 100%);
+                          color:white; padding:28px; border-radius:16px;
+                          box-shadow: 0 8px 24px rgba(25,118,210,0.3);">
+                <div style="font-size:12px; font-weight:700; text-transform:uppercase; opacity:0.9; letter-spacing:0.5px; margin-bottom:12px;">
+                  <span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle; margin-right:6px;">devices</span>
+                  Total de Equipos
+                </div>
+                <div id="oxxo-total-count" style="font-size:48px; font-weight:700; line-height:1;">—</div>
+                <div style="font-size:13px; margin-top:12px; opacity:0.85;">Dispositivos activos y monitoreados</div>
               </div>
 
               <!-- Online -->
-              <div style="background:linear-gradient(135deg, rgba(31,122,78,0.15) 0%, rgba(31,122,78,0.05) 100%);
-                          padding:16px; border-radius:12px; border:2px solid rgba(31,122,78,0.3); position:relative;">
-                <div style="position:absolute; top:-12px; right:16px; background:#1F7A4E; color:white; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:700;">EN LÍNEA</div>
-                <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">🟢 Equipos Online</div>
-                <div id="oxxo-online-count" style="font-size:24px; font-weight:700; color:#1F7A4E;">—</div>
+              <div style="background:linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+                          padding:24px; border-radius:16px; border:1px solid rgba(31,122,78,0.2);
+                          position:relative; overflow:hidden;">
+                <div style="position:absolute; top:16px; right:16px; font-size:32px; opacity:0.1;">🟢</div>
+                <div style="font-size:11px; font-weight:700; color:#1F7A4E; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">Equipos Online</div>
+                <div id="oxxo-online-count" style="font-size:36px; font-weight:700; color:#1F7A4E;">—</div>
+                <div style="font-size:12px; color:rgba(31,122,78,0.7); margin-top:8px;">En funcionamiento</div>
               </div>
 
               <!-- Offline 1-3d -->
-              <div style="background:linear-gradient(135deg, rgba(226,0,26,0.15) 0%, rgba(226,0,26,0.05) 100%);
-                          padding:16px; border-radius:12px; border:2px solid rgba(226,0,26,0.3);">
-                <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">🟠 Offline 1-3 Días</div>
-                <div id="oxxo-offline-count" style="font-size:24px; font-weight:700; color:#E2001A;">—</div>
+              <div style="background:linear-gradient(135deg, #FFF3E0 0%, #FFF8E1 100%);
+                          padding:24px; border-radius:16px; border:1px solid rgba(226,0,26,0.15);
+                          position:relative; overflow:hidden;">
+                <div style="position:absolute; top:16px; right:16px; font-size:32px; opacity:0.1;">🟠</div>
+                <div style="font-size:11px; font-weight:700; color:#E2001A; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">Offline 1-3 Días</div>
+                <div id="oxxo-offline-count" style="font-size:36px; font-weight:700; color:#E2001A;">—</div>
+                <div style="font-size:12px; color:rgba(226,0,26,0.7); margin-top:8px;">Requiere atención</div>
               </div>
 
               <!-- Crítico 4+d -->
-              <div style="background:linear-gradient(135deg, rgba(139,0,0,0.15) 0%, rgba(139,0,0,0.05) 100%);
-                          padding:16px; border-radius:12px; border:2px solid rgba(139,0,0,0.3); position:relative;">
-                <div style="position:absolute; top:-12px; right:16px; background:#8B0000; color:white; padding:4px 12px; border-radius:20px; font-size:10px; font-weight:700;">CRÍTICO</div>
-                <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">🔴 Crítico 4+ Días</div>
-                <div id="oxxo-critical-count" style="font-size:24px; font-weight:700; color:#8B0000;">—</div>
+              <div style="background:linear-gradient(135deg, #FFEBEE 0%, #FFF1F1 100%);
+                          padding:24px; border-radius:16px; border:1px solid rgba(139,0,0,0.2);
+                          position:relative; overflow:hidden;">
+                <div style="position:absolute; top:16px; right:16px; font-size:32px; opacity:0.1;">🔴</div>
+                <div style="font-size:11px; font-weight:700; color:#8B0000; text-transform:uppercase; margin-bottom:10px; letter-spacing:0.5px;">Crítico 4+ Días</div>
+                <div id="oxxo-critical-count" style="font-size:36px; font-weight:700; color:#8B0000;">—</div>
+                <div style="font-size:12px; color:rgba(139,0,0,0.7); margin-top:8px;">Acción urgente</div>
               </div>
             </div>
 
-            <!-- LISTADO DE EQUIPOS -->
-            <div style="background:var(--surface); padding:16px; border-radius:12px; border:2px solid var(--border);">
-              <div style="font-size:11px; font-weight:700; color:var(--text); text-transform:uppercase; margin-bottom:12px; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
-                <span class="material-symbols-outlined" style="font-size:16px;">list</span>
-                Desglose de Equipos
+            <!-- LISTADO DE EQUIPOS PREMIUM -->
+            <div style="background:linear-gradient(135deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.005) 100%); padding:24px; border-radius:16px;
+                        border:1px solid rgba(0,0,0,0.06);">
+              <div style="font-size:12px; font-weight:700; color:var(--text); text-transform:uppercase; margin-bottom:18px; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
+                <span class="material-symbols-outlined" style="font-size:20px;">list_alt</span>
+                Desglose Detallado de Equipos
               </div>
-              <div id="oxxo-equipment-list" style="font-size:12px; max-height:200px; overflow-y:auto; line-height:1.6;">—</div>
+              <div id="oxxo-equipment-list" style="font-size:13px; max-height:240px; overflow-y:auto; line-height:1.8;">—</div>
             </div>
           </div>
 
@@ -12725,11 +12764,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     function searchOxxoByName(query) {
       var resultsContainer = document.getElementById('search-results-container');
       var resultsGrid = document.getElementById('search-results-grid');
+      var resultsCount = document.getElementById('results-count');
+      var clearBtn = document.getElementById('search-clear-btn');
 
       if (!query || query.length < 1) {
         resultsContainer.style.display = 'none';
+        clearBtn.style.display = 'none';
         return;
       }
+
+      clearBtn.style.display = 'block';
 
       var allTiendas = getAllUniqueTiendas();
       var found = [];
@@ -12746,59 +12790,74 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         return b.stats.online - a.stats.online;
       });
 
+      resultsCount.textContent = found.length;
+
       // Display results
       if (found.length === 0) {
-        resultsGrid.innerHTML = '<div style="grid-column: 1/-1; padding:40px; text-align:center; color:var(--text-light);">' +
-          '<span class="material-symbols-outlined" style="font-size:48px; opacity:0.3;">location_off</span>' +
-          '<div style="margin-top:12px; font-size:14px;">No hay resultados para "' + query + '"</div></div>';
+        resultsGrid.innerHTML = '<div style="grid-column: 1/-1; padding:60px 40px; text-align:center;">' +
+          '<div style="margin-bottom:16px;"><span class="material-symbols-outlined" style="font-size:56px; color:var(--text-light); opacity:0.3;">location_off</span></div>' +
+          '<div style="color:var(--text-light); font-size:14px; font-weight:500;">No encontramos tiendas que coincidan con "' + query + '"</div>' +
+          '<div style="color:var(--text-light); font-size:12px; margin-top:8px; opacity:0.7;">Intenta con otro nombre</div>' +
+          '</div>';
       } else {
         var html = '';
         found.forEach(function(item) {
           var healthColor = item.stats.critical > 0 ? '#8B0000' : item.stats.offline > 0 ? '#E2001A' : '#1F7A4E';
-          var healthStatus = item.stats.critical > 0 ? 'Crítico' : item.stats.offline > 0 ? 'Problemas' : 'Saludable';
-          var healthIcon = item.stats.critical > 0 ? '⚠️' : item.stats.offline > 0 ? '⚡' : '✅';
+          var healthStatus = item.stats.critical > 0 ? 'Crítico' : item.stats.offline > 0 ? 'Con Problemas' : 'Saludable';
+          var healthBg = item.stats.critical > 0 ? 'rgba(139,0,0,0.1)' : item.stats.offline > 0 ? 'rgba(226,0,26,0.1)' : 'rgba(31,122,78,0.1)';
 
-          html += '<div style="background:var(--card-bg); border:2px solid var(--border); border-radius:12px; padding:16px; cursor:pointer;' +
-            'transition: all 0.3s ease; position:relative; overflow:hidden;"' +
-            'onmouseover="this.style.transform=\'translateY(-4px)\'; this.style.boxShadow=\'0 12px 24px rgba(0,0,0,0.1)\';"' +
-            'onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.05)\';"' +
+          var healthPercentage = item.stats.count > 0 ? Math.round((item.stats.online / item.stats.count) * 100) : 0;
+
+          html += '<div style="background:linear-gradient(135deg, white 0%, rgba(25,118,210,0.02) 100%); border:1px solid rgba(0,0,0,0.08); border-radius:16px; padding:20px; cursor:pointer;' +
+            'transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position:relative; overflow:hidden;"' +
+            'onmouseover="this.style.transform=\'translateY(-6px)\'; this.style.boxShadow=\'0 16px 40px rgba(0,0,0,0.12)\';"' +
+            'onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 2px 12px rgba(0,0,0,0.06)\';"' +
             'onclick="selectOxxoFromSearch(\'' + item.name.replace(/'/g, "\\'") + '\')">' +
 
-            // Barra de estado
-            '<div style="position:absolute; top:0; left:0; right:0; height:4px; background:' + healthColor + ';"></div>' +
+            // Barra de estado superior
+            '<div style="position:absolute; top:0; left:0; right:0; height:5px; background:' + healthColor + ';"></div>' +
 
-            // Header con nombre y status
-            '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">' +
+            // Header con nombre y badge
+            '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">' +
+            '<div style="flex:1; padding-right:12px;">' +
+            '<h3 style="margin:0 0 6px 0; font-size:15px; font-weight:700; color:var(--text); word-break:break-word; line-height:1.3;">' + item.name + '</h3>' +
+            '<div style="font-size:12px; color:' + healthColor + '; font-weight:600; display:flex; align-items:center; gap:4px;">' +
+            (item.stats.critical > 0 ? '⚠️' : item.stats.offline > 0 ? '⚡' : '✅') + ' ' + healthStatus +
+            '</div>' +
+            '</div>' +
+            '<div style="background:' + healthColor + '; color:white; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:700; white-space:nowrap; text-align:center; min-width:60px;">' +
+            item.stats.count + '<br><span style="font-size:9px; opacity:0.8;">equipos</span>' +
+            '</div>' +
+            '</div>' +
+
+            // Grid de stats premium
+            '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px;">' +
+            '<div style="background:rgba(31,122,78,0.08); padding:12px; border-radius:10px; border:1px solid rgba(31,122,78,0.15); text-align:center;">' +
+            '<div style="font-size:14px; font-weight:700; color:#1F7A4E; line-height:1.2;">' + item.stats.online + '</div>' +
+            '<div style="font-size:10px; color:var(--text-light); margin-top:4px; font-weight:500;">En línea</div>' +
+            '</div>' +
+            '<div style="background:rgba(226,0,26,0.08); padding:12px; border-radius:10px; border:1px solid rgba(226,0,26,0.15); text-align:center;">' +
+            '<div style="font-size:14px; font-weight:700; color:#E2001A; line-height:1.2;">' + item.stats.offline + '</div>' +
+            '<div style="font-size:10px; color:var(--text-light); margin-top:4px; font-weight:500;">1-3 días</div>' +
+            '</div>' +
+            '<div style="background:rgba(139,0,0,0.08); padding:12px; border-radius:10px; border:1px solid rgba(139,0,0,0.15); text-align:center;">' +
+            '<div style="font-size:14px; font-weight:700; color:#8B0000; line-height:1.2;">' + item.stats.critical + '</div>' +
+            '<div style="font-size:10px; color:var(--text-light); margin-top:4px; font-weight:500;">4+ días</div>' +
+            '</div>' +
+            '</div>' +
+
+            // Health bar premium
+            '<div style="display:flex; align-items:center; gap:10px;">' +
             '<div style="flex:1;">' +
-            '<h3 style="margin:0; font-size:14px; font-weight:700; color:var(--text); word-break:break-word;">' + item.name + '</h3>' +
-            '<div style="font-size:11px; color:' + healthColor + '; font-weight:600; margin-top:4px;">' + healthIcon + ' ' + healthStatus + '</div>' +
+            '<div style="background:rgba(0,0,0,0.05); height:8px; border-radius:4px; overflow:hidden;">' +
+            '<div style="height:100%; background:linear-gradient(90deg, #1F7A4E 0%, #FFD54F 50%, #E2001A 100%);' +
+            'width:' + healthPercentage + '%;' +
+            'transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);"></div>' +
             '</div>' +
-            '<div style="background:' + healthColor + '; color:white; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:700; white-space:nowrap;">' +
-            item.stats.count + ' equipos' +
-            '</div></div>' +
-
-            // Grid de stats
-            '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px;">' +
-            '<div style="background:rgba(31,122,78,0.1); padding:8px; border-radius:6px; text-align:center;">' +
-            '<div style="font-size:13px; font-weight:700; color:#1F7A4E;">' + item.stats.online + '</div>' +
-            '<div style="font-size:9px; color:var(--text-light);">Online</div>' +
             '</div>' +
-            '<div style="background:rgba(226,0,26,0.1); padding:8px; border-radius:6px; text-align:center;">' +
-            '<div style="font-size:13px; font-weight:700; color:#E2001A;">' + item.stats.offline + '</div>' +
-            '<div style="font-size:9px; color:var(--text-light);">1-3d</div>' +
-            '</div>' +
-            '<div style="background:rgba(139,0,0,0.1); padding:8px; border-radius:6px; text-align:center;">' +
-            '<div style="font-size:13px; font-weight:700; color:#8B0000;">' + item.stats.critical + '</div>' +
-            '<div style="font-size:9px; color:var(--text-light);">4+d</div>' +
-            '</div>' +
+            '<div style="font-size:11px; font-weight:600; color:var(--text-light); min-width:32px; text-align:right;">' + healthPercentage + '%</div>' +
             '</div>' +
 
-            // Progress bar de salud
-            '<div style="background:var(--surface); height:6px; border-radius:3px; overflow:hidden;">' +
-            '<div style="height:100%; background:linear-gradient(90deg, #1F7A4E 0%, #FFB800 50%, #8B0000 100%);' +
-            'width:' + (item.stats.count > 0 ? ((item.stats.online / item.stats.count) * 100) : 0) + '%;' +
-            'transition: width 0.5s ease;"></div>' +
-            '</div>' +
             '</div>';
         });
         resultsGrid.innerHTML = html;
@@ -12833,7 +12892,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       document.getElementById('oxxo-details-name').textContent = tienda;
       document.getElementById('oxxo-location-label').textContent = '📍 ' + coords.lat.toFixed(4) + ', ' + coords.lon.toFixed(4);
-      document.getElementById('oxxo-coords').textContent = coords.lat.toFixed(6) + '°N, ' + coords.lon.toFixed(6) + '°W';
+      document.getElementById('oxxo-coords').textContent = coords.lat.toFixed(6) + '°N  |  ' + coords.lon.toFixed(6) + '°W';
       document.getElementById('oxxo-total-count').textContent = stats.count;
       document.getElementById('oxxo-online-count').textContent = stats.online;
       document.getElementById('oxxo-offline-count').textContent = stats.offline;
@@ -12846,36 +12905,40 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       stats.equipment.forEach(function(e) {
         var type = (e.equipo_type === 'TABLET' || e['Equipo'] === 'TABLET') ? 'TT' : 'HH';
         var status = e.days_ago < 1 ? 'online' : e.days_ago < 4 ? 'offline' : 'critical';
-        var label = (e['Friendly Name'] || e.CR) + ' (' + e.days_ago + 'd)';
+        var label = (e['Friendly Name'] || e.CR) + ' <span style="color:var(--text-light); font-size:11px;">(' + e.days_ago + 'd)</span>';
 
         if (type === 'HH') hh[status].push(label);
         else tt[status].push(label);
       });
 
-      // Build enhanced HTML for equipment list
+      // Build premium HTML for equipment list
       var equipmentHtml = '';
 
       // HH Section
       if (hh.online.length > 0 || hh.offline.length > 0 || hh.critical.length > 0) {
-        equipmentHtml += '<div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">' +
-          '<div style="font-weight:700; color:var(--text); margin-bottom:8px;">📱 HANDHELDS (HH):</div>';
-        if (hh.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; font-size:11px; margin-bottom:4px;">🟢 Online: ' + hh.online.join(' • ') + '</div>';
-        if (hh.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; font-size:11px; margin-bottom:4px;">🟠 Offline: ' + hh.offline.join(' • ') + '</div>';
-        if (hh.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; font-size:11px;">🔴 Crítico: ' + hh.critical.join(' • ') + '</div>';
+        equipmentHtml += '<div style="margin-bottom:18px;">' +
+          '<div style="font-weight:700; color:var(--text); margin-bottom:10px; display:flex; align-items:center; gap:6px;">' +
+          '<span class="material-symbols-outlined" style="font-size:18px;">phone_android</span>' +
+          'HANDHELDS (HH)</div>';
+        if (hh.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; font-size:12px; margin-bottom:6px; padding-left:24px;">🟢 Online: ' + hh.online.join(' • ') + '</div>';
+        if (hh.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; font-size:12px; margin-bottom:6px; padding-left:24px;">🟠 Offline: ' + hh.offline.join(' • ') + '</div>';
+        if (hh.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; font-size:12px; padding-left:24px;">🔴 Crítico: ' + hh.critical.join(' • ') + '</div>';
         equipmentHtml += '</div>';
       }
 
       // TT Section
       if (tt.online.length > 0 || tt.offline.length > 0 || tt.critical.length > 0) {
         equipmentHtml += '<div>' +
-          '<div style="font-weight:700; color:var(--text); margin-bottom:8px;">💻 TABLETS (TT):</div>';
-        if (tt.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; font-size:11px; margin-bottom:4px;">🟢 Online: ' + tt.online.join(' • ') + '</div>';
-        if (tt.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; font-size:11px; margin-bottom:4px;">🟠 Offline: ' + tt.offline.join(' • ') + '</div>';
-        if (tt.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; font-size:11px;">🔴 Crítico: ' + tt.critical.join(' • ') + '</div>';
+          '<div style="font-weight:700; color:var(--text); margin-bottom:10px; display:flex; align-items:center; gap:6px;">' +
+          '<span class="material-symbols-outlined" style="font-size:18px;">tablet</span>' +
+          'TABLETS (TT)</div>';
+        if (tt.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; font-size:12px; margin-bottom:6px; padding-left:24px;">🟢 Online: ' + tt.online.join(' • ') + '</div>';
+        if (tt.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; font-size:12px; margin-bottom:6px; padding-left:24px;">🟠 Offline: ' + tt.offline.join(' • ') + '</div>';
+        if (tt.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; font-size:12px; padding-left:24px;">🔴 Crítico: ' + tt.critical.join(' • ') + '</div>';
         equipmentHtml += '</div>';
       }
 
-      document.getElementById('oxxo-equipment-list').innerHTML = equipmentHtml || '<div style="color:var(--text-light); font-style:italic;">Sin equipos registrados</div>';
+      document.getElementById('oxxo-equipment-list').innerHTML = equipmentHtml || '<div style="color:var(--text-light); font-style:italic; text-align:center; padding:24px;">📭 Sin equipos registrados</div>';
 
       panel.style.display = 'block';
     }
