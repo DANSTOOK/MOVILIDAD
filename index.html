@@ -18607,65 +18607,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         html += '</tbody></table>';
         html += '</div>'; // card
         html += '</div>'; // section
-
-        // === DETALLES DE EQUIPOS EN GARANTÍA / ROBO / DAÑADA ===
-        var garantiaEquipos = Dscope.filter(function(d){ return mapCommentToEstado(getComment(d)) === 'GARANTÍA'; });
-        var roboEquipos = Dscope.filter(function(d){ return mapCommentToEstado(getComment(d)) === 'ROBO'; });
-
-        if (garantiaEquipos.length > 0) {
-          html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
-          html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
-          html += '<div style="background:' + slate + '; padding:10px 16px;">';
-          html += '<span style="color:white; font-size:13px; font-weight:700;">DETALLE — EQUIPOS EN GARANTÍA</span>';
-          html += '</div>';
-          html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
-          html += '<thead><tr style="background:#f8f9fa;">';
-          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">CR</th>';
-          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Tienda</th>';
-          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Asesor</th>';
-          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Detalle</th>';
-          html += '</tr></thead><tbody>';
-          garantiaEquipos.forEach(function(d, gi){
-            var gBg = (gi % 2 === 1) ? 'background:#fafafa;' : '';
-            html += '<tr style="' + gBg + '">';
-            html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + escHTML(d.CR || '—') + '</td>';
-            html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.TIENDA || '—') + '</td>';
-            html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.ASESOR || '—') + '</td>';
-            html += '<td style="' + tdBase + tdBorder + '">' + escHTML(getComment(d) || '—') + '</td>';
-            html += '</tr>';
-          });
-          html += '</tbody></table>';
-          html += '</div>'; // card
-          html += '</div>'; // section
-        }
-
-        // === EQUIPOS EN ROBO ===
-        if (roboEquipos.length > 0) {
-          html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
-          html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
-          html += '<div style="background:#B3261E; padding:10px 16px;">';
-          html += '<span style="color:white; font-size:13px; font-weight:700;">⚠ CRÍTICO — EQUIPOS EN ROBO</span>';
-          html += '</div>';
-          html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
-          html += '<thead><tr style="background:#f8f9fa;">';
-          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">CR</th>';
-          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Tienda</th>';
-          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Asesor</th>';
-          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Detalles</th>';
-          html += '</tr></thead><tbody>';
-          roboEquipos.forEach(function(d, ri){
-            var rBg = (ri % 2 === 1) ? 'background:#fafafa;' : '';
-            html += '<tr style="' + rBg + 'border-left:4px solid #B3261E;">';
-            html += '<td style="' + tdBase + tdBorder + 'font-weight:600; color:#B3261E;">' + escHTML(d.CR || '—') + '</td>';
-            html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.TIENDA || '—') + '</td>';
-            html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.ASESOR || '—') + '</td>';
-            html += '<td style="' + tdBase + tdBorder + '">' + escHTML(getComment(d) || '—') + '</td>';
-            html += '</tr>';
-          });
-          html += '</tbody></table>';
-          html += '</div>'; // card
-          html += '</div>'; // section
-        }
       }
 
       // === STOCK DE EQUIPO ===
