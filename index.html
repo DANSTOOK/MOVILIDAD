@@ -23764,9 +23764,13 @@ function previewEmail() {
   if (!emailHTML) return;
 
   var container = document.getElementById('email-preview-content');
-  // Usar srcdoc en lugar de contentDocument.write para mejor compatibilidad
-  var escapedHTML = emailHTML.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  container.innerHTML = '<iframe style="width:100%; height:100%; border:none; background:white;" srcdoc="' + escapedHTML + '"></iframe>';
+  container.innerHTML = '<iframe style="width:100%; height:100%; border:none; background:white;"></iframe>';
+  var iframe = container.querySelector('iframe');
+
+  // Usar blob URL para mejor compatibilidad y confiabilidad
+  var blob = new Blob([emailHTML], { type: 'text/html;charset=utf-8' });
+  var blobURL = URL.createObjectURL(blob);
+  iframe.src = blobURL;
 
   document.getElementById('email-preview-modal').style.display = 'flex';
 }
