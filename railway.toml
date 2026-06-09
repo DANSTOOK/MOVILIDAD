@@ -1,0 +1,12 @@
+[build]
+builder = "dockerfile"
+dockerfile = "Dockerfile"
+
+[deploy]
+startCommand = "node server.js"
+healthcheckPath = "/api/auth/verify"
+healthcheckTimeout = 100
+
+[env]
+NODE_ENV = "production"
+PORT = "3001"
