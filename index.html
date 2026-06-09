@@ -18378,37 +18378,47 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       html += '</p>';
       html += '</div>';
 
-      // === RESUMEN EJECUTIVO CON INFORMACIÓN CRÍTICA ===
+      // === RESUMEN EJECUTIVO CON INFORMACIÓN CRÍTICA (MEJORADO) ===
       html += '<div style="background:#f8fafb; padding:28px 40px; max-width:1000px; margin:0 auto; border-top:1px solid #f0f0f0;">';
-      html += '<div style="font-size:13px; font-weight:700; color:#E2001A; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px;">⚡ Resumen de Situación Crítica</div>';
-      html += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%; border-collapse:collapse;">';
-      html += '<tr>';
-      // Equipos en riesgo
-      html += '<td style="width:25%; padding:12px; background:white; border:1px solid #e5e7eb; border-radius:6px; text-align:center; margin-right:12px;">';
-      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; margin-bottom:8px; font-weight:700; letter-spacing:0.5px;">Equipos Críticos</div>';
-      html += '<div style="font-size:32px; font-weight:800; color:#B3261E;">' + s.totalCritical + '</div>';
-      html += '<div style="font-size:10px; color:#9e9e9e; margin-top:4px;">Requieren acción inmediata</div>';
-      html += '</td>';
-      // Tiendas afectadas
-      html += '<td style="width:25%; padding:12px; background:white; border:1px solid #e5e7eb; border-radius:6px; text-align:center; margin-right:12px;">';
+      html += '<div style="font-size:13px; font-weight:700; color:#E2001A; text-transform:uppercase; letter-spacing:1px; margin-bottom:20px;">⚡ Resumen de Situación Crítica</div>';
+      html += '<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px;">';
+
+      // Equipos Críticos
+      html += '<div style="background:white; border:2px solid #B3261E; border-radius:10px; padding:20px; text-align:center; position:relative; overflow:hidden;">';
+      html += '<div style="position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,#B3261E,#E2001A);"></div>';
+      html += '<div style="font-size:10px; color:#999; text-transform:uppercase; margin-bottom:12px; font-weight:700; letter-spacing:1px;">Equipos Críticos</div>';
+      html += '<div style="font-size:48px; font-weight:900; color:#B3261E; line-height:1;">' + s.totalCritical + '</div>';
+      html += '<div style="font-size:9px; color:#aaa; margin-top:10px;">Requieren acción<br>inmediata</div>';
+      html += '</div>';
+
+      // Tiendas Afectadas
       var tiendas_afectadas = criticos.length > 0 ? criticos.map(function(c){ return c.TIENDA; }).filter(function(v, i, a){ return a.indexOf(v) === i; }).length : 0;
-      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; margin-bottom:8px; font-weight:700; letter-spacing:0.5px;">Tiendas Afectadas</div>';
-      html += '<div style="font-size:32px; font-weight:800; color:#E2001A;">' + tiendas_afectadas + '</div>';
-      html += '<div style="font-size:10px; color:#9e9e9e; margin-top:4px;">Con equipos críticos</div>';
-      html += '</td>';
+      html += '<div style="background:white; border:2px solid #E2001A; border-radius:10px; padding:20px; text-align:center; position:relative; overflow:hidden;">';
+      html += '<div style="position:absolute; top:0; left:0; right:0; height:4px; background:#E2001A;"></div>';
+      html += '<div style="font-size:10px; color:#999; text-transform:uppercase; margin-bottom:12px; font-weight:700; letter-spacing:1px;">Tiendas Afectadas</div>';
+      html += '<div style="font-size:48px; font-weight:900; color:#E2001A; line-height:1;">' + tiendas_afectadas + '</div>';
+      html += '<div style="font-size:9px; color:#aaa; margin-top:10px;">Con equipos<br>críticos</div>';
+      html += '</div>';
+
       // Disponibilidad HH
-      html += '<td style="width:25%; padding:12px; background:white; border:1px solid #e5e7eb; border-radius:6px; text-align:center; margin-right:12px;">';
-      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; margin-bottom:8px; font-weight:700; letter-spacing:0.5px;">Disponibilidad HH</div>';
-      html += '<div style="font-size:32px; font-weight:800; color:' + dispColor(s.dispHH) + ';">' + s.dispHH + '%</div>';
-      html += '<div style="font-size:10px; color:#9e9e9e; margin-top:4px;">' + s.hhTotalBD + ' dispositivos</div>';
-      html += '</td>';
+      var hhBorderColor = s.dispHH >= 99 ? '#1F7A4E' : s.dispHH >= 97 ? '#E8A800' : '#B3261E';
+      html += '<div style="background:white; border:2px solid ' + hhBorderColor + '; border-radius:10px; padding:20px; text-align:center; position:relative; overflow:hidden;">';
+      html += '<div style="position:absolute; top:0; left:0; right:0; height:4px; background:' + hhBorderColor + ';"></div>';
+      html += '<div style="font-size:10px; color:#999; text-transform:uppercase; margin-bottom:12px; font-weight:700; letter-spacing:1px;">Disponibilidad HH</div>';
+      html += '<div style="font-size:48px; font-weight:900; color:' + hhBorderColor + '; line-height:1;">' + s.dispHH + '%</div>';
+      html += '<div style="font-size:9px; color:#aaa; margin-top:10px;">' + s.hhTotalBD + ' dispositivos</div>';
+      html += '</div>';
+
       // Disponibilidad TT
-      html += '<td style="width:25%; padding:12px; background:white; border:1px solid #e5e7eb; border-radius:6px; text-align:center;">';
-      html += '<div style="font-size:11px; color:#757575; text-transform:uppercase; margin-bottom:8px; font-weight:700; letter-spacing:0.5px;">Disponibilidad TT</div>';
-      html += '<div style="font-size:32px; font-weight:800; color:' + dispColor(s.dispTT) + ';">' + s.dispTT + '%</div>';
-      html += '<div style="font-size:10px; color:#9e9e9e; margin-top:4px;">' + s.ttTotalBD + ' dispositivos</div>';
-      html += '</td>';
-      html += '</tr></table>';
+      var ttBorderColor = s.dispTT >= 99 ? '#1F7A4E' : s.dispTT >= 97 ? '#E8A800' : '#B3261E';
+      html += '<div style="background:white; border:2px solid ' + ttBorderColor + '; border-radius:10px; padding:20px; text-align:center; position:relative; overflow:hidden;">';
+      html += '<div style="position:absolute; top:0; left:0; right:0; height:4px; background:' + ttBorderColor + ';"></div>';
+      html += '<div style="font-size:10px; color:#999; text-transform:uppercase; margin-bottom:12px; font-weight:700; letter-spacing:1px;">Disponibilidad TT</div>';
+      html += '<div style="font-size:48px; font-weight:900; color:' + ttBorderColor + '; line-height:1;">' + s.dispTT + '%</div>';
+      html += '<div style="font-size:9px; color:#aaa; margin-top:10px;">' + s.ttTotalBD + ' dispositivos</div>';
+      html += '</div>';
+
+      html += '</div>';
       html += '</div>';
 
       // === NOTA DE AUTOMATIZACIÓN ===
