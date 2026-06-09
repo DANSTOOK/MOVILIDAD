@@ -24654,41 +24654,49 @@ function renderOSModelos() {
 }
 
 function renderOSVersionTable(data) {
-  var osStats = {};
-  var i, os;
+  if (!data || data.length === 0) {
+    document.getElementById('os-version-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center;">No hay datos</td></tr>';
+    return;
+  }
 
-  for (i = 0; i < data.length; i++) {
-    os = String(data[i].OS || 'Sin info').trim();
-    osStats[os] = (osStats[os] || 0) + 1;
+  var osStats = {};
+  var total = data.length;
+  var i;
+
+  for (i = 0; i < total; i++) {
+    var osVal = data[i]['OS'];
+    if (!osVal) osVal = 'Sin info';
+    osVal = String(osVal).trim();
+    osStats[osVal] = (osStats[osVal] || 0) + 1;
   }
 
   var osArray = [];
-  for (os in osStats) {
-    if (osStats.hasOwnProperty(os)) {
-      osArray.push({ os: os, count: osStats[os] });
-    }
+  var osKey;
+  for (osKey in osStats) {
+    osArray.push({ os: osKey, count: osStats[osKey] });
   }
   osArray.sort(function(a, b) { return b.count - a.count; });
 
   var html = '';
-  var total = data.length;
-
   for (i = 0; i < osArray.length; i++) {
     var item = osArray[i];
     var pct = ((item.count / total) * 100).toFixed(1);
-    var isAndroid13 = item.os.toLowerCase().indexOf('13') >= 0;
-    var barColor = isAndroid13 ? '#1F7A4E' : '#1976D2';
-    var rowColor = isAndroid13 ? 'rgba(31,122,78,0.05)' : '';
+    var is13 = item.os.indexOf('13') >= 0;
+    var color = is13 ? '#1F7A4E' : '#1976D2';
+    var bgColor = is13 ? 'rgba(31,122,78,0.05)' : '';
 
-    html += '<tr style="background:' + rowColor + '; border-bottom:1px solid var(--border);">' +
+    html += '<tr style="background:' + bgColor + '; border-bottom:1px solid var(--border);">' +
       '<td style="padding:12px 14px;"><strong>' + escHTML(item.os) + '</strong></td>' +
-      '<td style="padding:12px 14px; text-align:right;"><span style="background:' + barColor + '; color:white; padding:4px 8px; border-radius:6px; font-weight:700;">' + item.count + '</span></td>' +
+      '<td style="padding:12px 14px; text-align:right;"><span style="background:' + color + '; color:white; padding:4px 8px; border-radius:6px; font-weight:700; display:inline-block;">' + item.count + '</span></td>' +
       '<td style="padding:12px 14px; text-align:right; font-weight:700; color:var(--text);">' + pct + '%</td>' +
-      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:4px; height:6px; width:120px; overflow:hidden;"><div style="background:' + barColor + '; height:100%; width:' + pct + '%;"></div></div></td>' +
+      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:4px; height:8px; width:150px;"><div style="background:' + color + '; height:100%; width:' + pct + '%; border-radius:4px;"></div></div></td>' +
       '</tr>';
   }
 
-  document.getElementById('os-version-table-body').innerHTML = html;
+  var tbody = document.getElementById('os-version-table-body');
+  if (tbody) {
+    tbody.innerHTML = html;
+  }
 }
 
 function renderUpdateRequiredTable(data) {
