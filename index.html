@@ -23753,16 +23753,48 @@ function closePDFPreview() {
 // Email Preview Functions
 function previewEmail() {
   var emailHTML = buildEmailHTML();
-  if (!emailHTML) return;
+  if (!emailHTML) {
+    console.error('buildEmailHTML retornó vacío');
+    return;
+  }
 
   var container = document.getElementById('email-preview-content');
-  container.innerHTML = '<iframe style="width:100%; height:100%; border:none; background:white;"></iframe>';
-  var iframe = container.querySelector('iframe');
+  if (!container) {
+    console.error('email-preview-content no encontrado');
+    return;
+  }
 
-  // Usar blob URL para mejor compatibilidad y confiabilidad
-  var blob = new Blob([emailHTML], { type: 'text/html;charset=utf-8' });
-  var blobURL = URL.createObjectURL(blob);
-  iframe.src = blobURL;
+  // Limpiar y crear nuevo iframe
+  container.innerHTML = '';
+  var iframe = document.createElement('iframe');
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.border = 'none';
+  iframe.style.background = 'white';
+  container.appendChild(iframe);
+
+  // Usar contentDocument.write con manejo seguro
+  try {
+    var doc = iframe.contentDocument || iframe.contentWindow.document;
+    if (!doc) {
+      console.error('No se pudo acceder a contentDocument');
+      return;
+    }
+
+    doc.open();
+    doc.write(emailHTML);
+    doc.close();
+  } catch (err) {
+    console.error('Error al escribir en iframe:', err);
+    // Fallback: intentar con blob URL
+    try {
+      var blob = new Blob([emailHTML], { type: 'text/html;charset=utf-8' });
+      var blobURL = URL.createObjectURL(blob);
+      iframe.src = blobURL;
+    } catch (e2) {
+      console.error('Error con blob URL:', e2);
+    }
+  }
 
   document.getElementById('email-preview-modal').style.display = 'flex';
 }
