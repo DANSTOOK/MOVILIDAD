@@ -24646,7 +24646,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // ════════════════════════════════════════════════════════════════════════════════
 
 function renderOSModelos() {
-  var data = getPlazaScopedData();
+  var data = D && D.length > 0 ? D : [];
+
+  if (data.length === 0) {
+    document.getElementById('os-version-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center;">Cargando datos...</td></tr>';
+    document.getElementById('update-required-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center;">Cargando datos...</td></tr>';
+    document.getElementById('models-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center;">Cargando datos...</td></tr>';
+    return;
+  }
 
   renderOSVersionTable(data);
   renderUpdateRequiredTable(data);
