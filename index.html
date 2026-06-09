@@ -12796,7 +12796,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
 
     /* ============ GEOGRAPHIC MAP - OXXO STORE GEOCODING ============ */
-    var _tiendaCoordinates = {};  // Cache: { tienda: {lat, lon} }
+    // Caché de coordenadas persistente en localStorage: las tiendas se
+    // geocodifican una sola vez y se reutilizan entre recargas.
+    var _tiendaCoordinates = (function() {
+      try { return JSON.parse(localStorage.getItem('OXXO_TIENDA_COORDS') || '{}'); }
+      catch (e) { return {}; }
+    })();
+    function saveTiendaCoordsCache() {
+      try { localStorage.setItem('OXXO_TIENDA_COORDS', JSON.stringify(_tiendaCoordinates)); }
+      catch (e) { /* localStorage lleno o no disponible: ignorar */ }
+    }
     var _tiendaMarkers = {};      // Current markers on map
 
     // Crear custom icon de flecha roja (Google Maps style)
@@ -12864,16 +12873,69 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       });
       _tiendaMarkers = {};
 
-      // Geocode and add markers for each tienda
-      Object.keys(tiendas).forEach(function(tienda) {
-        if (_tiendaCoordinates[tienda]) {
-          // Use cached coordinates
-          addTiendaMarkerToMap(tienda, _tiendaCoordinates[tienda], tiendas[tienda]);
+      // Geocodificar y agregar marcadores (por lote si hay token Mapbox)
+      geocodeAllTiendasBatch(tiendas);
+    }
+
+    // Geocoding por lote: con token Mapbox usa la Batch Geocoding API
+    // (hasta 1000 tiendas por petición); sin token cae al flujo individual
+    // (Nominatim). Las tiendas ya cacheadas se dibujan al instante.
+    function geocodeAllTiendasBatch(tiendas) {
+      var token = (typeof localStorage !== 'undefined' && localStorage.getItem('MAPBOX_TOKEN')) || '';
+      var names = Object.keys(tiendas);
+
+      // Dibuja de inmediato las que ya están en caché
+      var pending = [];
+      names.forEach(function(t) {
+        if (_tiendaCoordinates[t]) {
+          addTiendaMarkerToMap(t, _tiendaCoordinates[t], tiendas[t]);
         } else {
-          // Geocode asynchronously
-          geocodeTiendaAndAdd(tienda, tiendas[tienda]);
+          pending.push(t);
         }
       });
+      if (pending.length === 0) return;
+
+      // Sin token Mapbox: flujo individual con Nominatim (como antes)
+      if (!token) {
+        pending.forEach(function(t) { geocodeTiendaAndAdd(t, tiendas[t]); });
+        return;
+      }
+
+      // Con token: Mapbox Batch Geocoding en lotes de 1000
+      function processChunk(start) {
+        var chunk = pending.slice(start, start + 1000);
+        if (chunk.length === 0) { saveTiendaCoordsCache(); return; }
+
+        var body = chunk.map(function(t) {
+          return { q: 'Oxxo ' + t + ' Mexico', limit: 1, country: 'MX' };
+        });
+
+        fetch('https://api.mapbox.com/search/geocode/v6/batch?access_token=' + token, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            var batch = (data && data.batch) || [];
+            chunk.forEach(function(t, i) {
+              var res = batch[i];
+              if (res && res.features && res.features.length > 0) {
+                var c = res.features[0].geometry.coordinates; // [lon, lat]
+                var coords = { lat: c[1], lon: c[0] };
+                _tiendaCoordinates[t] = coords;
+                addTiendaMarkerToMap(t, coords, tiendas[t]);
+              }
+            });
+            saveTiendaCoordsCache();
+            processChunk(start + 1000);
+          })
+          .catch(function(err) {
+            console.error('Batch geocoding falló, usando individual:', err);
+            chunk.forEach(function(t) { geocodeTiendaAndAdd(t, tiendas[t]); });
+          });
+      }
+      processChunk(0);
     }
 
     // Geocoding unificado: usa Mapbox si hay token en localStorage('MAPBOX_TOKEN'),
@@ -12914,6 +12976,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         .then(function(coords) {
           if (coords) {
             _tiendaCoordinates[tienda] = coords;  // Cache it
+            saveTiendaCoordsCache();
             addTiendaMarkerToMap(tienda, coords, stats);
             console.log('✅ Geocoded Oxxo:', tienda, coords);
           } else {
@@ -13118,6 +13181,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             .then(function(coords) {
               if (coords) {
                 _tiendaCoordinates[tienda] = coords;
+                saveTiendaCoordsCache();
 
                 // Mostrar detalles con coordenadas reales
                 displayOxxoDetails(tienda, coords, stats);
