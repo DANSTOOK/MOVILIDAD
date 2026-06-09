@@ -12873,16 +12873,72 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var allTiendas = getAllUniqueTiendas();
       var stats = allTiendas[tienda] || { count: 0, online: 0, offline: 0, critical: 0, equipment: [] };
 
-      // Get coordinates from cache or show default
-      var coords = _tiendaCoordinates[tienda] || { lat: 23.6345, lon: -102.5528 };
-
-      displayOxxoDetails(tienda, coords, stats);
-
       // Cierra resultados
       document.getElementById('search-results-container').style.display = 'none';
 
-      // Zoom map to tienda con animación
-      if (_leafletMap) {
+      // Función para hacer zoom cuando el marker está listo
+      function zoomToTienda() {
+        // Get coordinates - si no existen en cache, usar geocoding
+        if (!_tiendaCoordinates[tienda]) {
+          // Geocodificar ahora
+          var query = encodeURIComponent('Oxxo ' + tienda + ' Mexico');
+          var nominatimUrl = 'https://nominatim.openstreetmap.org/search?q=' + query + '&format=json&limit=1';
+
+          fetch(nominatimUrl)
+            .then(function(r) { return r.json(); })
+            .then(function(results) {
+              if (results && results.length > 0) {
+                var result = results[0];
+                var coords = { lat: parseFloat(result.lat), lon: parseFloat(result.lon) };
+                _tiendaCoordinates[tienda] = coords;
+
+                // Mostrar detalles con coordenadas reales
+                displayOxxoDetails(tienda, coords, stats);
+
+                // Crear marker si no existe
+                if (!_tiendaMarkers[tienda]) {
+                  addTiendaMarkerToMap(tienda, coords, stats);
+                }
+
+                // Hacer zoom después de 200ms
+                setTimeout(function() {
+                  performMapZoom(tienda, coords);
+                }, 200);
+              } else {
+                // Usar coordenadas por defecto
+                var defaultCoords = { lat: 23.6345, lon: -102.5528 };
+                _tiendaCoordinates[tienda] = defaultCoords;
+                displayOxxoDetails(tienda, defaultCoords, stats);
+                performMapZoom(tienda, defaultCoords);
+              }
+            })
+            .catch(function(err) {
+              console.error('Error geocoding:', err);
+              var defaultCoords = { lat: 23.6345, lon: -102.5528 };
+              displayOxxoDetails(tienda, defaultCoords, stats);
+              performMapZoom(tienda, defaultCoords);
+            });
+        } else {
+          // Ya tenemos coordenadas en cache
+          var coords = _tiendaCoordinates[tienda];
+          displayOxxoDetails(tienda, coords, stats);
+
+          // Crear marker si no existe
+          if (!_tiendaMarkers[tienda]) {
+            addTiendaMarkerToMap(tienda, coords, stats);
+            setTimeout(function() {
+              performMapZoom(tienda, coords);
+            }, 200);
+          } else {
+            performMapZoom(tienda, coords);
+          }
+        }
+      }
+
+      // Función para hacer zoom y pulso
+      function performMapZoom(tienda, coords) {
+        if (!_leafletMap) return;
+
         // Zoom suave a la ubicación
         _leafletMap.flyTo([coords.lat, coords.lon], 14, {
           duration: 1.5,
@@ -12897,29 +12953,35 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             // Animar el marker con pulso visual
             var marker = _tiendaMarkers[tienda];
             var originalRadius = marker.getRadius();
+            var pulseCount = 0;
             var pulseInterval = setInterval(function() {
-              marker.setRadius(originalRadius * 1.3);
-              setTimeout(function() {
+              if (pulseCount % 2 === 0) {
+                marker.setRadius(originalRadius * 1.3);
+              } else {
                 marker.setRadius(originalRadius);
-              }, 200);
-            }, 600);
+              }
+              pulseCount++;
 
-            // Detener animación después de 3 segundos
-            setTimeout(function() {
-              clearInterval(pulseInterval);
-              marker.setRadius(originalRadius);
-            }, 3000);
+              // Detener después de 6 cambios (3 ciclos completos)
+              if (pulseCount >= 6) {
+                clearInterval(pulseInterval);
+                marker.setRadius(originalRadius);
+              }
+            }, 300);
           }
         }, 1500);
       }
 
-      // Scroll para ver el panel de detalles
+      // Iniciar el proceso
+      zoomToTienda();
+
+      // Scroll para ver el panel de detalles (después de que se geocodifique)
       setTimeout(function() {
         var panel = document.getElementById('oxxo-details-panel');
         if (panel) {
           panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-      }, 1600);
+      }, 2000);
     }
 
     function displayOxxoDetails(tienda, coords, stats) {
