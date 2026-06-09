@@ -18296,13 +18296,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       // === MENSAJE EJECUTIVO PREMIUM ===
       html += '<div style="background:#ffffff; padding:28px 40px; max-width:1000px; margin:0 auto; border-top:1px solid #f0f0f0;">';
-      html += '<p style="font-size:14px; line-height:1.7; margin:0 0 16px 0; color:#424242; font-weight:500;">';
-      html += 'Estimado(a) Gerente,<br><br>';
+      html += '<p style="font-size:14px; line-height:1.7; margin:0; color:#424242; font-weight:500;">';
 
       // Texto dinámico según plaza seleccionada
       var plazaDisplay = plazaActiva ? escHTML(plazaActiva) : 'Región Tijuana';
       html += 'Le presento el <strong>Reporte de Estatus de Equipos de Movilidad</strong> correspondiente a <strong>' + plazaDisplay + '</strong> al <strong>' + escHTML(fecha) + '</strong>. ';
-      html += 'Este análisis automático consolida la información más relevante para la toma de decisiones.';
+      html += 'Este análisis automático consolida la información más relevante para optimizar la disponibilidad de equipos y tomar decisiones informadas.';
       html += '</p>';
       html += '</div>';
 
@@ -18485,6 +18484,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         // === DETALLES DE EQUIPOS EN GARANTÍA / ROBO / DAÑADA ===
         var garantiaEquipos = Dscope.filter(function(d){ return mapCommentToEstado(getComment(d)) === 'GARANTÍA'; });
+        var roboEquipos = Dscope.filter(function(d){ return mapCommentToEstado(getComment(d)) === 'ROBO'; });
 
         if (garantiaEquipos.length > 0) {
           html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
@@ -18503,6 +18503,34 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             var gBg = (gi % 2 === 1) ? 'background:#fafafa;' : '';
             html += '<tr style="' + gBg + '">';
             html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + escHTML(d.CR || '—') + '</td>';
+            html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.TIENDA || '—') + '</td>';
+            html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.ASESOR || '—') + '</td>';
+            html += '<td style="' + tdBase + tdBorder + '">' + escHTML(getComment(d) || '—') + '</td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+          html += '</div>'; // card
+          html += '</div>'; // section
+        }
+
+        // === EQUIPOS EN ROBO ===
+        if (roboEquipos.length > 0) {
+          html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
+          html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
+          html += '<div style="background:#B3261E; padding:10px 16px;">';
+          html += '<span style="color:white; font-size:13px; font-weight:700;">⚠ CRÍTICO — EQUIPOS EN ROBO</span>';
+          html += '</div>';
+          html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
+          html += '<thead><tr style="background:#f8f9fa;">';
+          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">CR</th>';
+          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Tienda</th>';
+          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Asesor</th>';
+          html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Detalles</th>';
+          html += '</tr></thead><tbody>';
+          roboEquipos.forEach(function(d, ri){
+            var rBg = (ri % 2 === 1) ? 'background:#fafafa;' : '';
+            html += '<tr style="' + rBg + 'border-left:4px solid #B3261E;">';
+            html += '<td style="' + tdBase + tdBorder + 'font-weight:600; color:#B3261E;">' + escHTML(d.CR || '—') + '</td>';
             html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.TIENDA || '—') + '</td>';
             html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.ASESOR || '—') + '</td>';
             html += '<td style="' + tdBase + tdBorder + '">' + escHTML(getComment(d) || '—') + '</td>';
@@ -23456,6 +23484,42 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   </div>
 </div>
 
+<!-- Email Preview Modal -->
+<div id="email-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:12px; width:90%; max-width:900px; height:90%; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e0e0e0;">
+      <h3 style="margin:0; color:#1C1B1F; font-size:18px; font-weight:700;">Vista Previa Correo Electrónico</h3>
+      <button onclick="closeEmailPreview()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">×</button>
+    </div>
+    <div id="email-preview-content" style="flex:1; overflow-y:auto; padding:0; background:#f5f5f5;"></div>
+    <div style="display:flex; gap:8px; justify-content:center; padding:16px; border-top:1px solid #e0e0e0;">
+      <button onclick="downloadReportEmail()" style="background:#E2001A; color:white; border:none; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px;">
+        <span class="material-symbols-outlined" style="font-size:18px;">download</span> Descargar MHTML
+      </button>
+      <button onclick="closeEmailPreview()" style="background:#e0e0e0; color:#333; border:none; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Excel Preview Modal -->
+<div id="excel-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:12px; width:90%; max-width:900px; height:90%; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e0e0e0;">
+      <h3 style="margin:0; color:#1C1B1F; font-size:18px; font-weight:700;">Vista Previa Excel</h3>
+      <button onclick="closeExcelPreview()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">×</button>
+    </div>
+    <div id="excel-preview-content" style="flex:1; overflow:auto; padding:16px; background:#f5f5f5;">
+      <table id="excel-preview-table" style="width:100%; border-collapse:collapse; background:white;"></table>
+    </div>
+    <div style="display:flex; gap:8px; justify-content:center; padding:16px; border-top:1px solid #e0e0e0;">
+      <button onclick="downloadReportExcel()" style="background:#1F7A4E; color:white; border:none; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px;">
+        <span class="material-symbols-outlined" style="font-size:18px;">download</span> Descargar Excel
+      </button>
+      <button onclick="closeExcelPreview()" style="background:#e0e0e0; color:#333; border:none; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600;">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- QR Code Modal -->
 <div id="qrcode-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
   <div style="background:white; border-radius:12px; padding:20px; box-shadow:0 8px 32px rgba(0,0,0,0.2); max-width:400px; text-align:center;">
@@ -23669,10 +23733,117 @@ function closePDFPreview() {
   _currentPDFBlob = null;
 }
 
-// Cerrar PDF preview con ESC
+// Email Preview Functions
+function previewEmail() {
+  var emailHTML = buildEmailHTML();
+  if (!emailHTML) return;
+
+  var container = document.getElementById('email-preview-content');
+  container.innerHTML = '<iframe style="width:100%; height:100%; border:none; background:white;" sandbox="allow-same-origin"></iframe>';
+  var iframe = container.querySelector('iframe');
+  iframe.contentDocument.write(emailHTML);
+  iframe.contentDocument.close();
+
+  document.getElementById('email-preview-modal').style.display = 'flex';
+}
+
+function closeEmailPreview() {
+  document.getElementById('email-preview-modal').style.display = 'none';
+}
+
+function downloadReportEmail() {
+  var emailHTML = buildEmailHTML();
+  var blob = new Blob([emailHTML], { type: 'text/html;charset=utf-8' });
+  var link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'Reporte-OXXO-' + new Date().toISOString().slice(0,10) + '.html';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// Excel Preview Functions
+function previewExcel() {
+  var data = getPlazaScopedData();
+  var table = document.getElementById('excel-preview-table');
+  table.innerHTML = '';
+
+  // Headers
+  var headers = ['CR', 'Tienda', 'Plaza', 'Modelo', 'Último Visto', 'Días Offline', 'Estado'];
+  var headerRow = table.insertRow();
+  headerRow.style.background = '#E2001A';
+  headerRow.style.color = 'white';
+  headerRow.style.fontWeight = '700';
+  headers.forEach(h => {
+    var cell = headerRow.insertCell();
+    cell.textContent = h;
+    cell.style.padding = '10px';
+    cell.style.borderBottom = '1px solid #ddd';
+  });
+
+  // Data
+  data.slice(0, 100).forEach(d => {
+    var row = table.insertRow();
+    row.style.borderBottom = '1px solid #e0e0e0';
+    [d.CR, d.TIENDA, d.PLAZA, d.Model || '—', formatDateDayjs(d['Last Seen']), d.days_ago, getStatusLabel(d.days_ago)].forEach((val, i) => {
+      var cell = row.insertCell();
+      cell.textContent = val;
+      cell.style.padding = '10px';
+      if (i === 4 || i === 5) cell.style.textAlign = 'center';
+    });
+  });
+
+  document.getElementById('excel-preview-modal').style.display = 'flex';
+}
+
+function closeExcelPreview() {
+  document.getElementById('excel-preview-modal').style.display = 'none';
+}
+
+function downloadReportExcel() {
+  // Usar SheetJS si está disponible
+  if (typeof XLSX === 'undefined') {
+    alert('Excel export requiere la librería SheetJS. Usamos datos en CSV por ahora.');
+    downloadReportCSV();
+    return;
+  }
+
+  var data = getPlazaScopedData();
+  var ws = XLSX.utils.json_to_sheet(data.map(d => ({
+    'CR': d.CR,
+    'Tienda': d.TIENDA,
+    'Plaza': d.PLAZA,
+    'Modelo': d.Model,
+    'Último Visto': formatDateDayjs(d['Last Seen']),
+    'Días Offline': d.days_ago,
+    'Estado': getStatusLabel(d.days_ago)
+  })));
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Equipos');
+  XLSX.writeFile(wb, 'Reporte-OXXO-' + new Date().toISOString().slice(0,10) + '.xlsx');
+}
+
+function downloadReportCSV() {
+  var data = getPlazaScopedData();
+  var csv = 'CR,Tienda,Plaza,Modelo,Último Visto,Días Offline,Estado\n';
+  data.forEach(d => {
+    csv += [d.CR, d.TIENDA, d.PLAZA, d.Model || '', formatDateDayjs(d['Last Seen']), d.days_ago, getStatusLabel(d.days_ago)].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',') + '\n';
+  });
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  var link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'Reporte-OXXO-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// Cerrar modales con ESC
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && document.getElementById('pdf-preview-modal').style.display !== 'none') {
-    closePDFPreview();
+  if (e.key === 'Escape') {
+    if (document.getElementById('pdf-preview-modal').style.display !== 'none') closePDFPreview();
+    if (document.getElementById('email-preview-modal').style.display !== 'none') closeEmailPreview();
+    if (document.getElementById('excel-preview-modal').style.display !== 'none') closeExcelPreview();
   }
 });
 
