@@ -10773,6 +10773,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
           </div>
 
+          <!-- DEBUG INFO -->
+          <div style="background:rgba(0,0,0,0.05); border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:24px;">
+            <button onclick="debugOSModelos()" style="padding:8px 16px; background:#1976D2; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:700;">
+              🔍 Ver Debug Info
+            </button>
+            <div id="debug-info" style="margin-top:12px; display:none; background:white; padding:12px; border-radius:6px; border:1px solid var(--border); font-family:monospace; font-size:11px; max-height:300px; overflow-y:auto;"></div>
+          </div>
+
         </div>
       </div>
 
@@ -24753,6 +24761,58 @@ function renderModelsTable(data) {
   });
 
   document.getElementById('models-table-body').innerHTML = html || '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light);">No hay datos</td></tr>';
+}
+
+function debugOSModelos() {
+  var debugDiv = document.getElementById('debug-info');
+  var data = getPlazaScopedData();
+
+  var info = '=== DEBUG OS & MODELOS ===\n\n';
+  info += '📊 DATOS CARGADOS:\n';
+  info += 'Total equipos: ' + (D ? D.length : 0) + '\n';
+  info += 'Equipos en plaza actual: ' + (data ? data.length : 0) + '\n\n';
+
+  if (data && data.length > 0) {
+    var sample = data[0];
+    info += '📋 PRIMERA FILA:\n';
+    info += JSON.stringify(sample, null, 2) + '\n\n';
+
+    info += '🔍 COLUMNAS DETECTADAS:\n';
+    var keys = Object.keys(sample);
+    keys.forEach(function(k) {
+      info += '  - ' + k + '\n';
+    });
+
+    info += '\n⚙️ VALORES OS:\n';
+    var osSet = {};
+    data.forEach(function(eq) {
+      var os = String(eq.OS || 'undefined');
+      osSet[os] = (osSet[os] || 0) + 1;
+    });
+    Object.keys(osSet).forEach(function(os) {
+      info += '  ' + os + ': ' + osSet[os] + '\n';
+    });
+
+    info += '\n⚙️ VALORES Model:\n';
+    var modelSet = {};
+    data.forEach(function(eq) {
+      var model = String(eq.Model || 'undefined');
+      modelSet[model] = (modelSet[model] || 0) + 1;
+    });
+    Object.keys(modelSet).slice(0, 10).forEach(function(model) {
+      info += '  ' + model + ': ' + modelSet[model] + '\n';
+    });
+    if (Object.keys(modelSet).length > 10) {
+      info += '  ... y ' + (Object.keys(modelSet).length - 10) + ' más\n';
+    }
+  } else {
+    info += '❌ NO HAY DATOS CARGADOS\n';
+    info += 'Asegúrate de haber subido un archivo CSV/Excel\n';
+  }
+
+  debugDiv.textContent = info;
+  debugDiv.style.display = 'block';
+  console.log(info);
 }
 </script>
 
