@@ -17946,9 +17946,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           // Convertir a número SOLO para validar, no para mantener
           var n = Number(s);
           if (!isNaN(n) && isFinite(n)) {
-            // Expandir usando toLocaleString (más seguro que parseInt)
-            var expanded = n.toLocaleString('en-US', {
-              useGrouping: false,
+            // Expandir usando toLocaleString con separadores de miles para mejor legibilidad
+            var expanded = n.toLocaleString('es-MX', {
+              useGrouping: true,
               maximumFractionDigits: 0,
               minimumFractionDigits: 0
             });
