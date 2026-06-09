@@ -9930,16 +9930,52 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         </div>
 
         <!-- HEATMAP: Horarios de Caídas (REDESIGNED) -->
-        <div class="analytics-heatmap-section" style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:8px;">
-          <div style="padding:14px 20px;">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
-              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">heatmap</span>
-              <span style="font-size:12px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.4px;">Horarios de Caídas (Equipos Offline por Hora)</span>
+        <div class="analytics-heatmap-section" style="background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.08); margin-bottom:16px;">
+          <!-- HEADER PREMIUM -->
+          <div style="padding:20px 24px; background:linear-gradient(135deg, rgba(25,118,210,0.08) 0%, rgba(25,118,210,0.03) 100%); border-bottom:2px solid var(--border);">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+              <span class="material-symbols-outlined" style="font-size:22px; color:var(--primary);">schedule</span>
+              <h3 style="margin:0; font-size:15px; font-weight:700; color:var(--text); letter-spacing:-0.3px;">Horarios de Desconexión por Hora</h3>
             </div>
-            <div style="font-size:11px; color:var(--text-light); margin-bottom:12px;">Distribución temporal de desconexiones durante la semana</div>
+            <div style="font-size:12px; color:var(--text-light); margin-left:32px; font-weight:500;">
+              Mapa de calor: Distribución temporal de equipos offline durante la semana • Identifica patrones y horas pico
+            </div>
           </div>
-          <div style="padding:0 16px 20px 16px;">
-            <div id="analytics-chart-heatmap" style="width:100%; height:400px;"></div>
+
+          <!-- CHART AREA -->
+          <div style="padding:24px;">
+            <div id="analytics-chart-heatmap" style="width:100%; height:520px;"></div>
+          </div>
+
+          <!-- LEGEND & INSIGHTS -->
+          <div style="padding:16px 24px; background:var(--surface); border-top:1px solid var(--border); display:grid; grid-template-columns:2fr 1fr; gap:20px;">
+            <!-- Left: Color legend -->
+            <div>
+              <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Escala de Intensidad</div>
+              <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="display:inline-block; width:16px; height:16px; background:#F0F7FF; border:1px solid var(--border); border-radius:3px;"></span>
+                  <span style="font-size:11px; color:var(--text-light);">Sin problemas</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="display:inline-block; width:16px; height:16px; background:#0288D1; border:1px solid var(--border); border-radius:3px;"></span>
+                  <span style="font-size:11px; color:var(--text-light);">Moderado</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="display:inline-block; width:16px; height:16px; background:#01579B; border:1px solid var(--border); border-radius:3px;"></span>
+                  <span style="font-size:11px; color:var(--text-light);">Alto</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="display:inline-block; width:16px; height:16px; background:#8B0000; border:1px solid var(--border); border-radius:3px;"></span>
+                  <span style="font-size:11px; color:var(--text-light);">Crítico</span>
+                </div>
+              </div>
+            </div>
+            <!-- Right: Key insight -->
+            <div style="background:rgba(25,118,210,0.08); padding:12px; border-radius:8px; border-left:3px solid var(--primary);">
+              <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:4px; letter-spacing:0.5px;">💡 Insight</div>
+              <div style="font-size:11px; color:var(--text); line-height:1.5;">Hover sobre las celdas para ver detalles. Las áreas oscuras indican mayor concentración de desconexiones.</div>
+            </div>
           </div>
         </div>
 
@@ -12525,18 +12561,30 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             var hour = p.value[1];
             var day = daysOfWeek[p.value[0]];
             var count = p.value[2];
-            return day + ' ' + hour + ':00<br/>Equipos offline: ' + count;
+            var severity = '';
+            if (count === 0) severity = '✓ Sin problemas';
+            else if (count <= 3) severity = '⚠️ Moderado';
+            else if (count <= 6) severity = '🔴 Alto';
+            else severity = '🔴 Crítico';
+            return '<strong>' + day + ' ' + (hour < 10 ? '0' : '') + hour + ':00</strong><br/>Equipos offline: <strong>' + count + '</strong><br/>' + severity;
           },
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          textStyle: { color: '#fff', fontSize: 12 },
-          borderColor: '#fff',
-          borderWidth: 1
+          backgroundColor: 'rgba(0,0,0,0.9)',
+          textStyle: { color: '#fff', fontSize: 13, fontWeight: 500 },
+          borderColor: 'rgba(255,255,255,0.3)',
+          borderWidth: 1,
+          padding: [12, 16]
         },
         xAxis: {
           type: 'category',
           data: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
-          axisLabel: { fontSize: 11, fontWeight: 600 },
-          axisLine: { lineStyle: { color: 'var(--border)' } }
+          axisLabel: {
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--text)',
+            margin: 8
+          },
+          axisLine: { lineStyle: { color: 'var(--border)', width: 1 } },
+          axisPointer: { type: 'shadow' }
         },
         yAxis: {
           type: 'category',
@@ -12544,43 +12592,61 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             var h = i < 10 ? '0' + i : String(i);
             return h + ':00';
           }),
-          axisLabel: { fontSize: 10 },
-          axisLine: { lineStyle: { color: 'var(--border)' } }
+          axisLabel: {
+            fontSize: 11,
+            color: 'var(--text)',
+            margin: 8
+          },
+          axisLine: { lineStyle: { color: 'var(--border)', width: 1 } }
         },
         visualMap: {
           min: 0,
           max: maxValue,
+          orient: 'horizontal',
+          left: 'center',
+          bottom: '0%',
           inRange: {
             color: ['#F0F7FF', '#B3E5FC', '#4FC3F7', '#0288D1', '#0277BD', '#01579B', '#8B0000']
           },
           realtime: true,
           calculable: true,
-          text: ['Alto', 'Bajo'],
-          textStyle: { color: 'var(--text)' },
-          splitNumber: 7
+          text: ['Crítico', 'Bajo'],
+          textStyle: { color: 'var(--text)', fontSize: 11, fontWeight: 600 },
+          splitNumber: 7,
+          padding: [40, 0, 0, 0]
         },
         series: [{
           name: 'Equipos Offline',
           type: 'heatmap',
           data: heatmapData,
+          itemSize: [36, 28],
           label: {
             show: true,
-            fontSize: 9,
+            fontSize: 10,
+            fontWeight: 600,
             color: function(p) {
-              // Texto blanco si fondo es oscuro
-              return p.value[2] > (maxValue * 0.6) ? '#fff' : 'var(--text)';
+              var val = p.value[2];
+              if (val === 0) return 'transparent';
+              return val > (maxValue * 0.6) ? '#fff' : '#424242';
             }
           },
           emphasis: {
             itemStyle: {
               borderColor: '#000',
               borderWidth: 2,
-              shadowColor: 'rgba(0,0,0,0.5)',
-              shadowBlur: 10
+              shadowColor: 'rgba(0,0,0,0.4)',
+              shadowBlur: 8,
+              shadowOffsetY: 2
             }
           }
         }],
-        grid: { left: '8%', right: '8%', top: '10%', bottom: '8%', containLabel: true }
+        grid: {
+          left: '12%',
+          right: '5%',
+          top: '8%',
+          bottom: '18%',
+          containLabel: false
+        }
       });
     }
 
