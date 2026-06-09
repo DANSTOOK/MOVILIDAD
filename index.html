@@ -13834,36 +13834,58 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       });
 
       updateSortIcons();
-      var html = '';
-      sorted.forEach(d => {
-        var st = statusOf(d);
-        // Severidad por días offline: ≥15 muy crítico (rojo fuerte), >10 advertencia (amarillo)
-        var dias = Number(d.days_ago) || 0;
-        var sev = dias >= 15 ? 'sev-extreme' : (dias > 10 ? 'sev-warning' : '');
-        var classes = [];
-        if (isAttended(d)) classes.push('attended-row');
-        if (sev) classes.push(sev);
-        var rowCls = classes.length ? ' class="' + classes.join(' ') + '"' : '';
-        var selKey = String(getCommentKey(d)).replace(/"/g,'&quot;');
-        var selChecked = cruceSelection.has(getCommentKey(d)) ? ' checked' : '';
-        html += `<tr${rowCls}>
-          <td style="text-align:center"><input type="checkbox" class="cruce-sel-cb" data-key="${selKey}"${selChecked} onchange="toggleCruceSelect(this.dataset.key, this.checked)" aria-label="Seleccionar equipo" style="cursor:pointer; accent-color: var(--primary);"></td>
-          <td>${d['Last Seen'] || '—'}</td>
-          <td class="days-cell ${sev}"><span class="days-badge">${d.days_ago}</span></td>
-          <td>${getEquipmentLabel(d.equipo_type)}</td>
-          <td><strong>${d.CR || '—'}</strong></td>
-          <td>${d.PLAZA || '<span style="color:var(--error)">Sin plaza</span>'}</td>
-          <td>${d.TIENDA || '—'}</td>
-          <td>${d.ASESOR || '—'}</td>
-          <td><span class="badge status-badge ${st.cls}" style="background: ${st.bg}; color: ${st.fg};"><span class="material-symbols-outlined status-icon">${st.icon}</span><span class="status-text">${st.txt}</span></span></td>
-        </tr>`;
-      });
-      document.getElementById('cruce-table').innerHTML = html || emptyStateRow(10, { msg: 'Ningún equipo cumple los filtros activos. Prueba ajustar la plaza, la búsqueda o el filtro de offline.', clearFn: 'clearCruceFilters()' });
+
+      // Usar DocumentFragment para batching eficiente
+      var fragment = document.createDocumentFragment();
+
+      if (sorted.length === 0) {
+        var emptyHtml = emptyStateRow(10, { msg: 'Ningún equipo cumple los filtros activos. Prueba ajustar la plaza, la búsqueda o el filtro de offline.', clearFn: 'clearCruceFilters()' });
+        document.getElementById('cruce-table').innerHTML = emptyHtml;
+      } else {
+        sorted.forEach(d => {
+          var tr = document.createElement('tr');
+          var st = statusOf(d);
+          var dias = Number(d.days_ago) || 0;
+          var sev = dias >= 15 ? 'sev-extreme' : (dias > 10 ? 'sev-warning' : '');
+
+          // Usar classList para clases
+          if (isAttended(d)) tr.classList.add('attended-row');
+          if (sev) tr.classList.add(sev);
+
+          var selKey = String(getCommentKey(d)).replace(/"/g,'&quot;');
+          var selChecked = cruceSelection.has(getCommentKey(d)) ? ' checked' : '';
+
+          var html = `<td style="text-align:center"><input type="checkbox" class="cruce-sel-cb" data-key="${selKey}"${selChecked} aria-label="Seleccionar equipo" style="cursor:pointer; accent-color: var(--primary);"></td>
+            <td>${d['Last Seen'] || '—'}</td>
+            <td class="days-cell ${sev}"><span class="days-badge">${d.days_ago}</span></td>
+            <td>${getEquipmentLabel(d.equipo_type)}</td>
+            <td><strong>${d.CR || '—'}</strong></td>
+            <td>${d.PLAZA || '<span style="color:var(--error)">Sin plaza</span>'}</td>
+            <td>${d.TIENDA || '—'}</td>
+            <td>${d.ASESOR || '—'}</td>
+            <td><span class="badge status-badge ${st.cls}" style="background: ${st.bg}; color: ${st.fg};"><span class="material-symbols-outlined status-icon">${st.icon}</span><span class="status-text">${st.txt}</span></span></td>`;
+
+          tr.innerHTML = html;
+          fragment.appendChild(tr);
+        });
+
+        // Reemplazar tabla de una vez
+        document.getElementById('cruce-table').innerHTML = '';
+        document.getElementById('cruce-table').appendChild(fragment);
+      }
+
       var countEl = document.getElementById('cruce-count');
       if (countEl) countEl.textContent = sorted.length.toLocaleString('es-MX') + ' de ' + D.length.toLocaleString('es-MX');
       // Limpiar selección de filas que ya no están visibles + refrescar barra masiva
       syncCruceSelection(sorted);
     }
+
+    // Event delegation para checkboxes de selección CRUCE
+    document.addEventListener('change', function(e) {
+      if (e.target.classList.contains('cruce-sel-cb')) {
+        toggleCruceSelect(e.target.dataset.key, e.target.checked);
+      }
+    });
 
     var _debouncedRenderCruce = debounce(function(){ renderCruceTable(); }, 160);
     function onCruceFilterChange() {
@@ -16921,25 +16943,52 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       updateAsesorSortIcons();
 
-      var html = '';
-      data.forEach(function(a) {
-        var pctColor = a.pct_offline >= 30 ? 'var(--error)' : (a.pct_offline >= 15 ? 'var(--warning)' : 'var(--success)');
-        html += '<tr style="cursor:pointer" onclick="applyDrillToCruce({asesor: \'' + (a.asesor||'').replace(/'/g, "\\'") + '\'});">'
-          + '<td><strong>' + (a.asesor || '—') + '</strong></td>'
-          + '<td style="text-align:center"><strong>' + a.tiendas + '</strong></td>'
-          + '<td style="text-align:center">' + a.hh_total + '</td>'
-          + '<td style="text-align:center; color:' + (a.hh_offline > 0 ? 'var(--error)' : 'var(--success)') + '"><strong>' + a.hh_offline + '</strong></td>'
-          + '<td style="text-align:center">' + a.tt_total + '</td>'
-          + '<td style="text-align:center; color:' + (a.tt_offline > 0 ? 'var(--error)' : 'var(--success)') + '"><strong>' + a.tt_offline + '</strong></td>'
-          + '<td style="text-align:center; color:' + pctColor + '; font-weight:700;">' + a.pct_offline + '%</td>'
-        + '</tr>';
-      });
+      // Usar DocumentFragment para rendering eficiente
+      var fragment = document.createDocumentFragment();
 
-      document.getElementById('asesor-table').innerHTML = html || emptyStateRow(7, { icon: 'person_off', msg: 'Ningún asesor cumple los filtros activos.', clearFn: 'clearAsesorFilters()' });
+      if (data.length === 0) {
+        var emptyHtml = emptyStateRow(7, { icon: 'person_off', msg: 'Ningún asesor cumple los filtros activos.', clearFn: 'clearAsesorFilters()' });
+        document.getElementById('asesor-table').innerHTML = emptyHtml;
+      } else {
+        data.forEach(function(a) {
+          var tr = document.createElement('tr');
+          tr.style.cursor = 'pointer';
+          tr.setAttribute('data-asesor', a.asesor || '');
+
+          var pctColor = a.pct_offline >= 30 ? 'var(--error)' : (a.pct_offline >= 15 ? 'var(--warning)' : 'var(--success)');
+          var hh_color = a.hh_offline > 0 ? 'var(--error)' : 'var(--success)';
+          var tt_color = a.tt_offline > 0 ? 'var(--error)' : 'var(--success)';
+
+          var html = '<td><strong>' + (a.asesor || '—') + '</strong></td>'
+            + '<td style="text-align:center"><strong>' + a.tiendas + '</strong></td>'
+            + '<td style="text-align:center">' + a.hh_total + '</td>'
+            + '<td style="text-align:center; color:' + hh_color + '"><strong>' + a.hh_offline + '</strong></td>'
+            + '<td style="text-align:center">' + a.tt_total + '</td>'
+            + '<td style="text-align:center; color:' + tt_color + '"><strong>' + a.tt_offline + '</strong></td>'
+            + '<td style="text-align:center; color:' + pctColor + '; font-weight:700;">' + a.pct_offline + '%</td>';
+
+          tr.innerHTML = html;
+          fragment.appendChild(tr);
+        });
+
+        document.getElementById('asesor-table').innerHTML = '';
+        document.getElementById('asesor-table').appendChild(fragment);
+      }
 
       var countEl = document.getElementById('asesor-count');
       if (countEl) countEl.textContent = data.length + ' asesores';
     }
+
+    // Event delegation para filas de asesor
+    document.addEventListener('click', function(e) {
+      var asesorRow = e.target.closest('#asesor-table tr[data-asesor]');
+      if (asesorRow) {
+        var asesor = asesorRow.getAttribute('data-asesor');
+        if (asesor) {
+          applyDrillToCruce({ asesor: asesor });
+        }
+      }
+    });
 
     // Cache para renderización optimizada
     var _detalleCache = { sorted: null, searchKey: null };
