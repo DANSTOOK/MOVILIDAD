@@ -23086,12 +23086,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       <div id="login-error" style="display:none; padding:10px; background:#FFEBEE; border:1px solid #FFCDD2; border-radius:6px; font-size:12px; color:#C62828; margin-bottom:12px;"></div>
 
-      <div style="margin-top:12px; padding:10px; background:#F0F7FF; border:1px solid #B3E5FC; border-radius:6px;">
-        <label style="display:flex; align-items:flex-start; gap:8px; font-size:12px; color:#0277BD; cursor:pointer;">
-          <input type="checkbox" id="login-local-mode" style="margin-top:2px; cursor:pointer;">
+      <div style="margin-top:12px; padding:12px; background:#E8F5E9; border:2px solid #66BB6A; border-radius:6px;">
+        <label style="display:flex; align-items:flex-start; gap:10px; font-size:12px; cursor:pointer;">
+          <input type="checkbox" id="login-local-mode" style="margin-top:3px; cursor:pointer; width:16px; height:16px;">
           <span>
-            <strong>Modo Local (Sin API)</strong><br>
-            Usa la app sin conexión al servidor backend
+            <strong style="color:#1B5E20;">⚡ Modo Local (Testing)</strong><br>
+            <span style="color:#558B2F;">Auto-login sin contraseña - Ideal para desarrollo</span>
           </span>
         </label>
       </div>
@@ -23654,18 +23654,23 @@ function handleLogin(event) {
   var username = document.getElementById('login-username').value.trim();
   var password = document.getElementById('login-password').value.trim();
 
+  // Si modo local está marcado, auto-login sin pedir credenciales
+  if (useLocal) {
+    _useLocalMode = true;
+    hideLoginModal();
+    clearLoginError();
+    loadLocalData();
+    showAlert('✓ Modo local activado (sin contraseña)', 'success');
+    return;
+  }
+
+  // Validar campos para modo API
   if (!username || !password) {
     showLoginError('Por favor completa todos los campos');
     return;
   }
 
-  if (useLocal) {
-    _useLocalMode = true;
-    hideLoginModal();
-    loadLocalData();
-  } else {
-    loginWithAPI(username, password);
-  }
+  loginWithAPI(username, password);
 }
 
 function showLoginError(message) {
