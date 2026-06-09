@@ -23734,6 +23734,9 @@ function previewEmail() {
     return;
   }
 
+  // Envolver HTML con estructura completa
+  var fullHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; } * { box-sizing: border-box; }</style></head><body style="margin:0; padding:0;">' + emailHTML + '</body></html>';
+
   // Limpiar y crear nuevo iframe
   container.innerHTML = '';
   var iframe = document.createElement('iframe');
@@ -23741,28 +23744,30 @@ function previewEmail() {
   iframe.style.height = '100%';
   iframe.style.border = 'none';
   iframe.style.background = 'white';
+  iframe.setAttribute('frameborder', '0');
+  iframe.setAttribute('scrolling', 'auto');
   container.appendChild(iframe);
 
-  // Usar contentDocument.write con manejo seguro
+  // Escribir HTML directamente en contentDocument
   try {
     var doc = iframe.contentDocument || iframe.contentWindow.document;
     if (!doc) {
-      console.error('No se pudo acceder a contentDocument');
-      return;
+      throw new Error('No se pudo acceder a contentDocument');
     }
 
     doc.open();
-    doc.write(emailHTML);
+    doc.write(fullHTML);
     doc.close();
   } catch (err) {
     console.error('Error al escribir en iframe:', err);
     // Fallback: intentar con blob URL
     try {
-      var blob = new Blob([emailHTML], { type: 'text/html;charset=utf-8' });
+      var blob = new Blob([fullHTML], { type: 'text/html;charset=utf-8' });
       var blobURL = URL.createObjectURL(blob);
       iframe.src = blobURL;
     } catch (e2) {
       console.error('Error con blob URL:', e2);
+      container.innerHTML = '<div style="padding:20px; color:#666;">Error al renderizar vista previa. Revisa la consola.</div>';
     }
   }
 
