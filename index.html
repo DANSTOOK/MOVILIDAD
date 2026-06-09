@@ -12019,12 +12019,22 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           ...row,
           'Serial Number': (function() {
             var sn = row['Serial Number'];
+            // IMPORTANTE: Los serial numbers deben ser siempre strings para evitar pérdida de precisión
+            // JavaScript trunca números muy grandes en notación científica
             if (!sn) return '';
-            if (typeof sn === 'number') {
-              // Evitar notación científica en números grandes
-              return sn.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 0 });
+            var snStr = String(sn).trim();
+            // Si contiene notación científica, expandir
+            if (/[eE]/.test(snStr)) {
+              try {
+                var expanded = Number(snStr);
+                if (!isNaN(expanded)) {
+                  // Usar toLocaleString sin separadores
+                  return expanded.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 0 });
+                }
+              } catch(e) {}
             }
-            return String(sn).trim();
+            // Retornar como string (nunca como número para evitar truncamiento)
+            return snStr;
           })(),
           CR: cr,
           CR_NORM: crNorm,
@@ -17907,24 +17917,33 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
      */
     function formatSerialNumber(value) {
       if (value === null || value === undefined || value === '') return '—';
-      if (typeof value === 'number') {
-        // Convertir número a string sin notación científica
-        // Usar toLocaleString sin separadores para evitar E notation
-        return value.toLocaleString('en-US', {
-          useGrouping: false,
-          maximumFractionDigits: 0
-        });
-      }
+
       var s = String(value).trim();
-      // El serial a veces llega como string en notación científica desde XLSX
-      // (p.ej. "2.51125E+13"). Lo normalizamos a entero completo.
-      if (/^[+-]?\d+(\.\d+)?[eE][+-]?\d+$/.test(s)) {
-        var n = Number(s);
-        if (!isNaN(n)) {
-          return n.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 0 });
+      if (!s) return '—';
+
+      // Si contiene notación científica, intentar expandir
+      // (ej: "2.51125E+13", "5E+8", etc)
+      if (/[eE]/.test(s)) {
+        try {
+          // Convertir a número SOLO para validar, no para mantener
+          var n = Number(s);
+          if (!isNaN(n) && isFinite(n)) {
+            // Expandir usando toLocaleString (más seguro que parseInt)
+            var expanded = n.toLocaleString('en-US', {
+              useGrouping: false,
+              maximumFractionDigits: 0,
+              minimumFractionDigits: 0
+            });
+            return expanded;
+          }
+        } catch(e) {
+          // Si falla, retornar como string
+          return s;
         }
       }
-      return s || '—';
+
+      // Retornar como string (nunca forzar a número para preservar dígitos)
+      return s;
     }
 
     function loadConfig() {
