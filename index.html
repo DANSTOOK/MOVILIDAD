@@ -18053,7 +18053,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       html += '<div style="background:#ffffff; padding:28px 40px; max-width:1000px; margin:0 auto; border-top:1px solid #f0f0f0;">';
       html += '<p style="font-size:14px; line-height:1.7; margin:0 0 16px 0; color:#424242; font-weight:500;">';
       html += 'Estimado(a) Gerente,<br><br>';
-      html += 'Le presento el <strong>Reporte Ejecutivo de Estatus de Equipos de Movilidad</strong> correspondiente a <strong>' + escHTML(plazaTitulo) + '</strong> al <strong>' + escHTML(fecha) + '</strong>. ';
+
+      // Texto dinámico según plaza seleccionada
+      var plazaDisplay = plazaActiva ? escHTML(plazaActiva) : 'Región Tijuana';
+      html += 'Le presento el <strong>Reporte de Estatus de Equipos de Movilidad</strong> correspondiente a <strong>' + plazaDisplay + '</strong> al <strong>' + escHTML(fecha) + '</strong>. ';
       html += 'Este análisis automático consolida la información más relevante para la toma de decisiones.';
       html += '</p>';
       html += '</div>';
