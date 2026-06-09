@@ -18419,6 +18419,40 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       // (Sección "Resumen de costos en riesgo" eliminada a pedido del usuario.)
 
+      // === STOCK DE EQUIPO ===
+      // Preferir stock en vivo (stockPlazas); fallback al guardado.
+      var stockArr = (typeof stockPlazas !== 'undefined' && stockPlazas.length) ? stockPlazas
+                   : ((garData && Array.isArray(garData.stock)) ? garData.stock : []);
+      if (stockArr.length) {
+        var tdBase = 'padding:10px 12px; font-size:13px;';
+        var tdBorder = 'border-bottom:1px solid #f0f0f0;';
+
+        html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
+        html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
+        html += '<div style="background:' + slate + '; padding:10px 16px;">';
+        html += '<span style="color:white; font-size:13px; font-weight:700;">STOCK DE EQUIPO</span>';
+        html += '</div>';
+        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse;">';
+        html += '<thead><tr style="background:#f8f9fa;">';
+        html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Plaza</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">HH</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">TT</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">Impresoras</th>';
+        html += '</tr></thead><tbody>';
+        stockArr.forEach(function(st, si){
+          var sBg = (si % 2 === 1) ? 'background:#fafafa;' : '';
+          html += '<tr style="' + sBg + '">';
+          html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + escHTML(st.plaza || '—') + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + (st.hh||0) + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + (st.tt||0) + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + (st.imp||0) + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        html += '</div>'; // card
+        html += '</div>'; // section
+      }
+
       // === SECCIÓN: DISPONIBILIDAD POR EQUIPO ===
       var tdBase = 'padding:10px 12px; font-size:13px;';
       var tdBorder = 'border-bottom:1px solid #f0f0f0;';
@@ -18551,37 +18585,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           html += '<td style="' + tdBase + tdBorder + 'text-align:center; font-weight:700; color:' + estDots[k] + ';">' + total + '</td>';
           html += '</tr>';
           rowIdx++;
-        });
-        html += '</tbody></table>';
-        html += '</div>'; // card
-        html += '</div>'; // section
-      }
-
-      // === STOCK DE EQUIPO ===
-      // Preferir stock en vivo (stockPlazas); fallback al guardado.
-      var stockArr = (typeof stockPlazas !== 'undefined' && stockPlazas.length) ? stockPlazas
-                   : ((garData && Array.isArray(garData.stock)) ? garData.stock : []);
-      if (stockArr.length) {
-        html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
-        html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
-        html += '<div style="background:' + slate + '; padding:10px 16px;">';
-        html += '<span style="color:white; font-size:13px; font-weight:700;">STOCK DE EQUIPO</span>';
-        html += '</div>';
-        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse;">';
-        html += '<thead><tr style="background:#f8f9fa;">';
-        html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">Plaza</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">HH</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">TT</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">Impresoras</th>';
-        html += '</tr></thead><tbody>';
-        stockArr.forEach(function(st, si){
-          var sBg = (si % 2 === 1) ? 'background:#fafafa;' : '';
-          html += '<tr style="' + sBg + '">';
-          html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + escHTML(st.plaza || '—') + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + (st.hh||0) + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + (st.tt||0) + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + (st.imp||0) + '</td>';
-          html += '</tr>';
         });
         html += '</tbody></table>';
         html += '</div>'; // card
