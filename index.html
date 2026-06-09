@@ -18217,6 +18217,34 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       }
     }
 
+    // Helper: Get top 5 stores by offline equipment count
+    function getTop5StoresByOffline(data) {
+      var storeStats = {};
+      data.forEach(function(d) {
+        var tienda = d.TIENDA || 'Sin tienda';
+        if (!storeStats[tienda]) storeStats[tienda] = { tienda: tienda, offline: 0, total: 0 };
+        storeStats[tienda].total++;
+        if (d.days_ago >= 1) storeStats[tienda].offline++;
+      });
+      return Object.values(storeStats)
+        .sort(function(a, b) { return b.offline - a.offline; })
+        .slice(0, 5);
+    }
+
+    // Helper: Get top stores by critical equipment
+    function getTopStoresByCritical(data) {
+      var storeStats = {};
+      data.forEach(function(d) {
+        var tienda = d.TIENDA || 'Sin tienda';
+        if (!storeStats[tienda]) storeStats[tienda] = { tienda: tienda, critical: 0 };
+        if (d.days_ago >= 4) storeStats[tienda].critical++;
+      });
+      return Object.values(storeStats)
+        .filter(function(s) { return s.critical > 0; })
+        .sort(function(a, b) { return b.critical - a.critical; })
+        .slice(0, 5);
+    }
+
     function buildEmailHTML() {
       var s = getResumenStats();
       var fecha = typeof dayjs !== 'undefined' ? dayjs().format('DD MMMM YYYY').toLowerCase() : new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
@@ -18230,6 +18258,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       // Dataset filtrado
       var Dscope = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
       var criticos = Dscope.slice().filter(function(d){ return isCritical(d); }).sort(function(a,b){ return b.days_ago - a.days_ago; });
+
+      // Top stores data
+      var top5Stores = getTop5StoresByOffline(Dscope);
+      var topCriticalStores = getTopStoresByCritical(Dscope);
 
       // Usabilidad: porcentaje de equipos disponibles (no críticos)
       var totalEquipos = Dscope.length;
@@ -18273,26 +18305,30 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       // === CONTENEDOR PRINCIPAL ===
       html += '<div style="font-family:Segoe UI,Arial,Helvetica,sans-serif; color:#1c1b1f; margin:0; padding:0; width:100%;">';
 
-      // === BANNER HEADER PREMIUM ===
-      html += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%; border-collapse:collapse; margin:0; padding:0;">';
-      html += '<tr><td bgcolor="' + oxxoRed + '" style="background:linear-gradient(135deg, ' + oxxoRed + ' 0%, #C80014 50%, ' + oxxoRedDark + ' 100%); padding:32px 40px; font-family:Segoe UI,Arial,sans-serif;">';
-      html += '<div style="max-width:1000px; margin:0 auto;">';
-      html += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%; border-collapse:collapse;">';
+      // === BANNER HEADER PREMIUM (Outlook Compatible) ===
+      html += '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; margin:0; padding:0; background:' + oxxoRed + ';">';
       html += '<tr>';
-      html += '<td style="color:white; vertical-align:middle;">';
-      html += '<div style="font-size:11px; font-weight:700; letter-spacing:2px; opacity:0.85; text-transform:uppercase; margin-bottom:6px;">Reporte Ejecutivo</div>';
-      html += '<div style="font-size:28px; font-weight:800; letter-spacing:-0.5px; margin-bottom:8px; line-height:1.1;">GESTIÓN DE EQUIPOS DE MOVILIDAD</div>';
-      html += '<div style="font-size:13px; opacity:0.9; font-weight:500;">' + escHTML(fechaTitulo) + ' — ' + escHTML(plazaTitulo) + '</div>';
+      html += '<td style="padding:40px 40px; font-family:Segoe UI,Arial,Helvetica,sans-serif; background-color:' + oxxoRed + ';">';
+      html += '<table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">';
+      html += '<tr>';
+      html += '<td style="vertical-align:middle; width:70%; color:white;">';
+      html += '<div style="font-size:12px; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; opacity:0.9;">★ REPORTE DE MOVILIDAD</div>';
+      html += '<div style="font-size:32px; font-weight:800; margin-bottom:12px; line-height:1.2; letter-spacing:-1px;">Equipos de Movilidad</div>';
+      html += '<div style="font-size:14px; font-weight:500; opacity:0.95; margin-bottom:4px;">' + escHTML(fechaTitulo) + '</div>';
+      html += '<div style="font-size:13px; opacity:0.85;">' + escHTML(plazaTitulo) + '</div>';
       html += '</td>';
-      html += '<td style="text-align:right; vertical-align:top; padding-left:24px;">';
-      html += '<div style="background:rgba(255,255,255,0.15); padding:12px 20px; border-radius:8px; border:1px solid rgba(255,255,255,0.25); text-align:center;">';
-      html += '<div style="color:white; font-size:14px; font-weight:600; letter-spacing:1px; margin-bottom:4px;">USABILIDAD</div>';
-      html += '<div style="color:white; font-size:32px; font-weight:800; line-height:1;">' + usabilidadPct + '<span style="font-size:18px;">%</span></div>';
-      html += '</div>';
+      html += '<td style="vertical-align:top; text-align:right; width:30%; padding-left:20px;">';
+      html += '<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; margin-left:auto;">';
+      html += '<tr>';
+      html += '<td style="background:rgba(255,255,255,0.15); padding:16px 20px; border-radius:6px; text-align:center; border:1px solid rgba(255,255,255,0.3);">';
+      html += '<div style="color:white; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; display:block;">Usabilidad</div>';
+      html += '<div style="color:white; font-size:40px; font-weight:900; line-height:1; display:block;">' + usabilidadPct + '%</div>';
       html += '</td>';
       html += '</tr></table>';
-      html += '</div>';
-      html += '</td></tr></table>';
+      html += '</td>';
+      html += '</tr></table>';
+      html += '</td>';
+      html += '</tr></table>';
 
       // === MENSAJE EJECUTIVO PREMIUM ===
       html += '<div style="background:#ffffff; padding:28px 40px; max-width:1000px; margin:0 auto; border-top:1px solid #f0f0f0;">';
@@ -18381,6 +18417,59 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       html += '</tbody></table>';
       html += '</div>'; // card
       html += '</div>'; // padding
+
+      // === TOP 5 TIENDAS CON MÁS EQUIPOS OFFLINE ===
+      if (top5Stores.length > 0) {
+        html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
+        html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
+        html += '<div style="background:#1976D2; padding:12px 16px;">';
+        html += '<span style="color:white; font-size:13px; font-weight:700;">📊 TOP 5 TIENDAS CON MÁS EQUIPOS OFFLINE</span>';
+        html += '</div>';
+        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
+        html += '<thead><tr style="background:#f8f9fa;">';
+        html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">TIENDA</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">OFFLINE</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">TOTAL</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">TASA</th>';
+        html += '</tr></thead><tbody>';
+        top5Stores.forEach(function(s, idx) {
+          var tasa = s.total > 0 ? ((s.offline / s.total) * 100).toFixed(0) : 0;
+          var bgColor = idx % 2 === 0 ? '#ffffff' : '#fafafa';
+          html += '<tr style="background:' + bgColor + ';">';
+          html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + escHTML(s.tienda) + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center; color:#E2001A; font-weight:700;">' + s.offline + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + s.total + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center;"><span style="background:#FFF3E0; color:#E65100; padding:2px 8px; border-radius:12px; font-weight:700;">' + tasa + '%</span></td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        html += '</div>'; // card
+        html += '</div>'; // padding
+      }
+
+      // === TOP TIENDAS CON EQUIPOS CRÍTICOS ===
+      if (topCriticalStores.length > 0) {
+        html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
+        html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
+        html += '<div style="background:#B3261E; padding:12px 16px;">';
+        html += '<span style="color:white; font-size:13px; font-weight:700;">⚠ TIENDAS CON EQUIPOS CRÍTICOS (4+ días offline)</span>';
+        html += '</div>';
+        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
+        html += '<thead><tr style="background:#f8f9fa;">';
+        html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">TIENDA</th>';
+        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">CRÍTICOS</th>';
+        html += '</tr></thead><tbody>';
+        topCriticalStores.forEach(function(s, idx) {
+          var bgColor = idx % 2 === 0 ? '#ffffff' : '#fafafa';
+          html += '<tr style="background:' + bgColor + '; border-left:4px solid #B3261E;">';
+          html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + escHTML(s.tienda) + '</td>';
+          html += '<td style="' + tdBase + tdBorder + 'text-align:center; color:#B3261E; font-weight:800;">' + s.critical + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        html += '</div>'; // card
+        html += '</div>'; // padding
+      }
 
       // === DASHBOARDS EMBEBIDOS (4 charts: 2x2 grid) ===
       var dashList = [
