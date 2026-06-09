@@ -10539,6 +10539,45 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               </div>
             </div>
 
+            <!-- === SECCIÓN DE ENTRADA === -->
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:24px;">
+              <h3 style="margin:0 0 16px 0; font-size:13px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">Agregar nuevo registro</h3>
+
+              <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:12px;">
+                <div>
+                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">Plaza</label>
+                  <input type="text" id="stock-plaza-input" placeholder="Ej: Tijuana Este" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg);">
+                </div>
+                <div>
+                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">📱 HH</label>
+                  <input type="number" id="stock-hh" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
+                </div>
+                <div>
+                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">📱 TT</label>
+                  <input type="number" id="stock-tt" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
+                </div>
+                <div>
+                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">🖨️ Impresoras</label>
+                  <input type="number" id="stock-imp" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
+                </div>
+                <div>
+                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">🔌 Cargadores</label>
+                  <input type="number" id="stock-cargadores" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px;">
+                <button onclick="addStockRow()" style="flex:1; padding:10px 16px; background:#2E7D32; color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+                  <span class="material-symbols-outlined" style="font-size:16px;">add_circle</span>
+                  Agregar a tabla
+                </button>
+                <button onclick="saveGarantiaData()" style="flex:1; padding:10px 16px; background:#1B5E20; color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+                  <span class="material-symbols-outlined" style="font-size:16px;">save</span>
+                  Guardar todo
+                </button>
+              </div>
+            </div>
+
             <!-- === GRID DE KPIs DASHBOARD === -->
             <div id="stock-dashboard-kpis" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; margin-bottom:24px;">
               <!-- KPI 1: Total HH -->
@@ -10610,45 +10649,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               </div>
             </div>
 
-            <!-- === SECCIÓN DE ENTRADA === -->
-            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:24px;">
-              <h3 style="margin:0 0 16px 0; font-size:13px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">Agregar nuevo registro</h3>
-
-              <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:12px;">
-                <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">Plaza</label>
-                  <input type="text" id="stock-plaza-input" placeholder="Ej: Tijuana Este" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg);">
-                </div>
-                <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">📱 HH</label>
-                  <input type="number" id="stock-hh" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
-                </div>
-                <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">📱 TT</label>
-                  <input type="number" id="stock-tt" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
-                </div>
-                <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">🖨️ Impresoras</label>
-                  <input type="number" id="stock-imp" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
-                </div>
-                <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">🔌 Cargadores</label>
-                  <input type="number" id="stock-cargadores" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
-                </div>
-              </div>
-
-              <div style="display:flex; gap:10px;">
-                <button onclick="addStockRow()" style="flex:1; padding:10px 16px; background:#2E7D32; color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
-                  <span class="material-symbols-outlined" style="font-size:16px;">add_circle</span>
-                  Agregar a tabla
-                </button>
-                <button onclick="saveGarantiaData()" style="flex:1; padding:10px 16px; background:#1B5E20; color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
-                  <span class="material-symbols-outlined" style="font-size:16px;">save</span>
-                  Guardar todo
-                </button>
-              </div>
-            </div>
-
             <!-- === TABLA DE REGISTROS === -->
             <div id="stock-table-wrap" style="border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:24px;"></div>
 
@@ -10695,7 +10695,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <div style="background:var(--card-bg); border:1.5px solid var(--border); border-top:4px solid #E2001A;
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
                         box-shadow:0 4px 20px rgba(0,0,0,0.07); transition:all 0.25s ease;
-                        cursor:default;"
+                        cursor:default; min-height:540px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(226,0,26,0.14)';"
                  onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)';">
               <!-- Icono + título -->
@@ -10756,7 +10756,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- ═══════════ CARD 2: EXCEL / CSV ═══════════ -->
             <div style="background:var(--card-bg); border:1.5px solid var(--border); border-top:4px solid #217346;
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
-                        box-shadow:0 4px 20px rgba(0,0,0,0.07); transition:all 0.25s ease; cursor:default;"
+                        box-shadow:0 4px 20px rgba(0,0,0,0.07); transition:all 0.25s ease; cursor:default; min-height:540px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(33,115,70,0.14)';"
                  onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)';">
               <div style="display:flex; align-items:center; gap:14px;">
@@ -10813,7 +10813,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- ═══════════ CARD 3: PDF ═══════════ -->
             <div style="background:var(--card-bg); border:1.5px solid var(--border); border-top:4px solid #CC3300;
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
-                        box-shadow:0 4px 20px rgba(0,0,0,0.07); transition:all 0.25s ease; cursor:default;"
+                        box-shadow:0 4px 20px rgba(0,0,0,0.07); transition:all 0.25s ease; cursor:default; min-height:540px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(204,51,0,0.14)';"
                  onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)';">
               <div style="display:flex; align-items:center; gap:14px;">
