@@ -19392,6 +19392,21 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         });
         y += 2*cardH + gap + 7;
 
+        // ══ STOCK DE EQUIPO (PRIMERO) ══
+        var garData = (typeof loadGarantiaData==='function')?loadGarantiaData():null;
+        var stockArr=(typeof stockPlazas!=='undefined' && stockPlazas.length)?stockPlazas
+                    :((garData&&Array.isArray(garData.stock))?garData.stock:[]);
+        if(stockArr.length){
+          T('STOCK DE EQUIPO', M, y, 11, 'bold', GREEN); y+=7;
+          var srows=stockArr.map(function(st){ return [{text:st.plaza||'—'},{text:''+(st.hh||0),align:'center'},{text:''+(st.tt||0),align:'center'},{text:''+(st.imp||0),align:'center'}]; });
+          drawTable([
+            {label:'PLAZA',w:CW*0.40,chars:36},
+            {label:'HH',w:CW*0.20,align:'center'},
+            {label:'TT',w:CW*0.20,align:'center'},
+            {label:'IMPRESORAS',w:CW*0.20,align:'center'}
+          ], srows, GREEN);
+        }
+
         // ══ HH / TT con barra de disponibilidad ══
         var types=[
           {name:'HH — HANDHELDS', total:s.hhTotalBD, off:s.hhCritical, disp:s.dispHH, color:GREEN},
@@ -19410,8 +19425,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         });
         y += tH + 8;
 
-        // ══ ESTATUS + STOCK ══
-        var garData = (typeof loadGarantiaData==='function')?loadGarantiaData():null;
+        // ══ ESTATUS DE EQUIPOS ══
         var estatusCounts = (garData&&garData.estatus)?garData.estatus:null;
         if(!estatusCounts){
           estatusCounts={garantia:{hh:0,tt:0,imp:0},robo:{hh:0,tt:0,imp:0},danada:{hh:0,tt:0,imp:0},apagada:{hh:0,tt:0,imp:0}};
@@ -19423,14 +19437,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           }
         }
         var hayEstatus=['garantia','robo','danada','apagada'].some(function(k){var v=estatusCounts[k]||{};return (v.hh||0)+(v.tt||0)+(v.imp||0)>0;});
-        // Preferir el stock en vivo (stockPlazas) aunque aún no se haya pulsado
-        // "Guardar todo"; fallback al guardado en localStorage.
-        var stockArr=(typeof stockPlazas!=='undefined' && stockPlazas.length)?stockPlazas
-                    :((garData&&Array.isArray(garData.stock))?garData.stock:[]);
-
         if(hayEstatus){
-          T('STOCK & ESTATUS DE EQUIPOS', M, y, 11, 'bold', GREEN); y+=7;
-          T('Estatus por tipo', M, y, 8.5, 'bold', '#555555'); y+=6;
+          T('ESTATUS DE EQUIPOS', M, y, 11, 'bold', RED); y+=7;
           var estLabels={garantia:'En garantía',robo:'Robo',danada:'Dañada',apagada:'Apagada'};
           var estColor={garantia:'#1976D2',robo:CRIT,danada:AMBER,apagada:'#B80018'};
           var erows=['garantia','robo','danada','apagada'].map(function(k){
@@ -19443,18 +19451,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             {label:'TABLET',w:CW*0.165,align:'center'},
             {label:'IMPRESORAS',w:CW*0.165,align:'center'},
             {label:'TOTAL',w:CW*0.165,align:'center'}
-          ], erows, SLATE);
-        }
-        if(stockArr.length){
-          if(!hayEstatus){ T('STOCK & ESTATUS DE EQUIPOS', M, y, 11, 'bold', GREEN); y+=7; }
-          T('Stock de equipo', M, y, 8.5, 'bold', '#555555'); y+=6;
-          var srows=stockArr.map(function(st){ return [{text:st.plaza||'—'},{text:''+(st.hh||0),align:'center'},{text:''+(st.tt||0),align:'center'},{text:''+(st.imp||0),align:'center'}]; });
-          drawTable([
-            {label:'PLAZA',w:CW*0.40,chars:36},
-            {label:'HH',w:CW*0.20,align:'center'},
-            {label:'TT',w:CW*0.20,align:'center'},
-            {label:'IMPRESORAS',w:CW*0.20,align:'center'}
-          ], srows, GREEN);
+          ], erows, RED);
         }
 
         // ══ EQUIPOS OFFLINE ≥4D ══
