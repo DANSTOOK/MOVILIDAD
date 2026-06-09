@@ -18378,54 +18378,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       html += '</p>';
       html += '</div>';
 
-      // === BANDA DECORATIVA ===
-      html += '<div style="max-width:1000px; margin:0 auto; padding:0 40px;">';
-      html += '<svg width="100%" height="4" style="display:block; opacity:0.3;" viewBox="0 0 1000 4" preserveAspectRatio="none"><line x1="0" y1="2" x2="1000" y2="2" stroke="#E2001A" stroke-width="3" stroke-dasharray="20,10"/></svg>';
-      html += '</div>';
-
-      // === RESUMEN EJECUTIVO CON INFORMACIÓN CRÍTICA (COMPACTO) ===
-      html += '<div style="background:#f8fafb; padding:16px 40px; max-width:1000px; margin:0 auto; border-top:1px solid #f0f0f0; position:relative;">';
-      // Background sutil de alerta
-      html += '<svg width="200" height="200" style="position:absolute; top:10px; right:20px; opacity:0.06; z-index:0;" viewBox="0 0 200 200"><polygon points="100,20 180,170 20,170" fill="#E2001A"/><text x="100" y="140" font-size="80" font-weight="bold" text-anchor="middle" fill="#E2001A">!</text></svg>';
-      html += '<div style="position:relative; z-index:1;">';
-      html += '<div style="font-size:12px; font-weight:700; color:#E2001A; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">⚡ Situación Crítica</div>';
-      html += '<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;">';
-
-      // Equipos Críticos
-      html += '<div style="background:white; border-left:3px solid #B3261E; border-radius:6px; padding:10px 12px; text-align:center;">';
-      html += '<div style="font-size:9px; color:#888; text-transform:uppercase; margin-bottom:6px; font-weight:700;">Equipos Críticos</div>';
-      html += '<div style="font-size:32px; font-weight:900; color:#B3261E; line-height:1;">' + s.totalCritical + '</div>';
-      html += '</div>';
-
-      // Tiendas Afectadas
-      var tiendas_afectadas = criticos.length > 0 ? criticos.map(function(c){ return c.TIENDA; }).filter(function(v, i, a){ return a.indexOf(v) === i; }).length : 0;
-      html += '<div style="background:white; border-left:3px solid #E2001A; border-radius:6px; padding:10px 12px; text-align:center;">';
-      html += '<div style="font-size:9px; color:#888; text-transform:uppercase; margin-bottom:6px; font-weight:700;">Tiendas Afectadas</div>';
-      html += '<div style="font-size:32px; font-weight:900; color:#E2001A; line-height:1;">' + tiendas_afectadas + '</div>';
-      html += '</div>';
-
-      // Disponibilidad HH
-      var hhBorderColor = s.dispHH >= 99 ? '#1F7A4E' : s.dispHH >= 97 ? '#E8A800' : '#B3261E';
-      html += '<div style="background:white; border-left:3px solid ' + hhBorderColor + '; border-radius:6px; padding:10px 12px; text-align:center;">';
-      html += '<div style="font-size:9px; color:#888; text-transform:uppercase; margin-bottom:6px; font-weight:700;">Disp. HH</div>';
-      html += '<div style="font-size:32px; font-weight:900; color:' + hhBorderColor + '; line-height:1;">' + s.dispHH + '%</div>';
-      html += '</div>';
-
-      // Disponibilidad TT
-      var ttBorderColor = s.dispTT >= 99 ? '#1F7A4E' : s.dispTT >= 97 ? '#E8A800' : '#B3261E';
-      html += '<div style="background:white; border-left:3px solid ' + ttBorderColor + '; border-radius:6px; padding:10px 12px; text-align:center;">';
-      html += '<div style="font-size:9px; color:#888; text-transform:uppercase; margin-bottom:6px; font-weight:700;">Disp. TT</div>';
-      html += '<div style="font-size:32px; font-weight:900; color:' + ttBorderColor + '; line-height:1;">' + s.dispTT + '%</div>';
-      html += '</div>';
-
-      html += '</div>';
-      html += '</div>';
-
-      // === BANDA DECORATIVA ===
-      html += '<div style="max-width:1000px; margin:0 auto; padding:0 40px; margin-top:12px;">';
-      html += '<svg width="100%" height="4" style="display:block; opacity:0.3;" viewBox="0 0 1000 4" preserveAspectRatio="none"><line x1="0" y1="2" x2="1000" y2="2" stroke="#E2001A" stroke-width="3" stroke-dasharray="20,10"/></svg>';
-      html += '</div>';
-
       // === NOTA DE AUTOMATIZACIÓN ===
       html += '<div style="background:#e8f5e9; padding:16px 40px; max-width:1000px; margin:0 auto; border-left:4px solid #1F7A4E; border-top:1px solid #f0f0f0;">';
       html += '<div style="font-size:12px; color:#1F7A4E; font-weight:600;"><strong>✓ Información Actualizada Automáticamente</strong></div>';
