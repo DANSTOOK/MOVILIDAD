@@ -24655,7 +24655,8 @@ function renderOSVersionTable(data) {
   var osStats = {};
 
   data.forEach(function(eq) {
-    var os = (eq.OS || 'Sin info').trim();
+    // Buscar la columna OS en diferentes nombres posibles
+    var os = (eq.OS || eq['OS'] || eq['Sistema Operativo'] || eq['sistema operativo'] || eq['SO'] || 'Sin info').trim();
     osStats[os] = (osStats[os] || 0) + 1;
   });
 
@@ -24686,7 +24687,7 @@ function renderOSVersionTable(data) {
 
 function renderUpdateRequiredTable(data) {
   var needUpdate = data.filter(function(eq) {
-    var os = (eq.OS || '').toLowerCase().trim();
+    var os = (eq.OS || eq['OS'] || eq['Sistema Operativo'] || eq['sistema operativo'] || eq['SO'] || '').toLowerCase().trim();
     return !os.includes('13') && os !== '';
   });
 
@@ -24698,11 +24699,13 @@ function renderUpdateRequiredTable(data) {
     html = '<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--text-light); background:rgba(31,122,78,0.05);">✅ Todos los equipos tienen Android 13 o sin info registrada</td></tr>';
   } else {
     needUpdate.forEach(function(eq) {
+      var osValue = eq.OS || eq['OS'] || eq['Sistema Operativo'] || eq['sistema operativo'] || eq['SO'] || 'Sin info';
+      var modelValue = eq.Modelo || eq.Model || eq['Model'] || '-';
       html += '<tr style="border-bottom:1px solid var(--border); background:rgba(245,166,35,0.02);">' +
         '<td style="padding:10px 14px;"><strong>' + escHTML(eq['Friendly Name'] || eq.CR || '-') + '</strong></td>' +
         '<td style="padding:10px 14px;">' + escHTML(eq.PLAZA || '-') + '</td>' +
-        '<td style="padding:10px 14px;"><span style="background:#F5A623; color:white; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700;">' + escHTML(eq.OS || 'Sin info') + '</span></td>' +
-        '<td style="padding:10px 14px;">' + escHTML(eq.Modelo || '-') + '</td>' +
+        '<td style="padding:10px 14px;"><span style="background:#F5A623; color:white; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700;">' + escHTML(osValue) + '</span></td>' +
+        '<td style="padding:10px 14px;">' + escHTML(modelValue) + '</td>' +
         '</tr>';
     });
   }
@@ -24714,7 +24717,8 @@ function renderModelsTable(data) {
   var modelStats = {};
 
   data.forEach(function(eq) {
-    var model = (eq.Modelo || 'Sin info').trim();
+    // Buscar la columna Modelo en diferentes nombres posibles
+    var model = (eq.Modelo || eq.Model || eq['Model'] || eq['Modelo'] || 'Sin info').trim();
     modelStats[model] = (modelStats[model] || 0) + 1;
   });
 
