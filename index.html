@@ -18455,56 +18455,56 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       html += '</div>'; // card
       html += '</div>'; // padding
 
-      // === TOP 5 TIENDAS CON MÁS EQUIPOS OFFLINE ===
-      if (top5Stores.length > 0) {
+      // === TOP 5 TIENDAS CON MÁS EQUIPOS OFFLINE + TOP TIENDAS CRÍTICAS (2-COLUMN COMPACT LAYOUT) ===
+      if (top5Stores.length > 0 || topCriticalStores.length > 0) {
         html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
-        html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
-        html += '<div style="background:#1976D2; padding:12px 16px;">';
-        html += '<span style="color:white; font-size:13px; font-weight:700;">📊 TOP 5 TIENDAS CON MÁS EQUIPOS OFFLINE</span>';
-        html += '</div>';
-        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
-        html += '<thead><tr style="background:#f8f9fa;">';
-        html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">TIENDA</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">OFFLINE</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">TOTAL</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">TASA</th>';
-        html += '</tr></thead><tbody>';
-        top5Stores.forEach(function(s, idx) {
-          var tasa = s.total > 0 ? ((s.offline / s.total) * 100).toFixed(0) : 0;
-          var bgColor = idx % 2 === 0 ? '#ffffff' : '#fafafa';
-          html += '<tr style="background:' + bgColor + ';">';
-          html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + escHTML(s.tienda) + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center; color:#E2001A; font-weight:700;">' + s.offline + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + s.total + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center;"><span style="background:#FFF3E0; color:#E65100; padding:2px 8px; border-radius:12px; font-weight:700;">' + tasa + '%</span></td>';
-          html += '</tr>';
-        });
-        html += '</tbody></table>';
-        html += '</div>'; // card
-        html += '</div>'; // padding
-      }
+        html += '<div style="display:table; width:100%; border-spacing:8px;">';
 
-      // === TOP TIENDAS CON EQUIPOS CRÍTICOS ===
-      if (topCriticalStores.length > 0) {
-        html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
-        html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:16px;">';
-        html += '<div style="background:#B3261E; padding:12px 16px;">';
-        html += '<span style="color:white; font-size:13px; font-weight:700;">⚠ TIENDAS CON EQUIPOS CRÍTICOS (4+ días offline)</span>';
-        html += '</div>';
-        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
-        html += '<thead><tr style="background:#f8f9fa;">';
-        html += '<th style="' + tdBase + 'text-align:left; font-weight:700; border-bottom:2px solid #e0e0e0;">TIENDA</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight:700; border-bottom:2px solid #e0e0e0;">CRÍTICOS</th>';
-        html += '</tr></thead><tbody>';
-        topCriticalStores.forEach(function(s, idx) {
-          var bgColor = idx % 2 === 0 ? '#ffffff' : '#fafafa';
-          html += '<tr style="background:' + bgColor + '; border-left:4px solid #B3261E;">';
-          html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + escHTML(s.tienda) + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center; color:#B3261E; font-weight:800;">' + s.critical + '</td>';
-          html += '</tr>';
-        });
-        html += '</tbody></table>';
-        html += '</div>'; // card
+        // LEFT COLUMN: TOP 5 OFFLINE
+        if (top5Stores.length > 0) {
+          html += '<div style="display:table-cell; width:50%; vertical-align:top; background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;">';
+          html += '<div style="background:#1976D2; padding:8px 12px;">';
+          html += '<span style="color:white; font-size:12px; font-weight:700;">TOP 5 OFFLINE</span>';
+          html += '</div>';
+          html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:11px;">';
+          html += '<thead><tr style="background:#f0f4f8;">';
+          html += '<th style="padding:6px 8px; border-bottom:1px solid #e0e0e0; text-align:left; font-weight:700;">Tienda</th>';
+          html += '<th style="padding:6px 8px; border-bottom:1px solid #e0e0e0; text-align:center; font-weight:700;">Offline</th>';
+          html += '</tr></thead><tbody>';
+          top5Stores.slice(0, 5).forEach(function(s, idx) {
+            var bgColor = idx % 2 === 0 ? '#ffffff' : '#fafafa';
+            html += '<tr style="background:' + bgColor + ';">';
+            html += '<td style="padding:5px 8px; border-bottom:1px solid #f0f0f0; font-size:10px;">' + escHTML(s.tienda) + '</td>';
+            html += '<td style="padding:5px 8px; border-bottom:1px solid #f0f0f0; text-align:center; color:#E2001A; font-weight:700;">' + s.offline + '</td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+          html += '</div>';
+        }
+
+        // RIGHT COLUMN: TOP CRITICAL
+        if (topCriticalStores.length > 0) {
+          html += '<div style="display:table-cell; width:50%; vertical-align:top; background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;">';
+          html += '<div style="background:#B3261E; padding:8px 12px;">';
+          html += '<span style="color:white; font-size:12px; font-weight:700;">CRÍTICOS (4+ días)</span>';
+          html += '</div>';
+          html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:11px;">';
+          html += '<thead><tr style="background:#f8f4f4;">';
+          html += '<th style="padding:6px 8px; border-bottom:1px solid #e0e0e0; text-align:left; font-weight:700;">Tienda</th>';
+          html += '<th style="padding:6px 8px; border-bottom:1px solid #e0e0e0; text-align:center; font-weight:700;">Críticos</th>';
+          html += '</tr></thead><tbody>';
+          topCriticalStores.slice(0, 5).forEach(function(s, idx) {
+            var bgColor = idx % 2 === 0 ? '#ffffff' : '#fafafa';
+            html += '<tr style="background:' + bgColor + '; border-left:3px solid #B3261E;">';
+            html += '<td style="padding:5px 8px; border-bottom:1px solid #f0f0f0; font-size:10px;">' + escHTML(s.tienda) + '</td>';
+            html += '<td style="padding:5px 8px; border-bottom:1px solid #f0f0f0; text-align:center; color:#B3261E; font-weight:700;">' + s.critical + '</td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+          html += '</div>';
+        }
+
+        html += '</div>'; // table layout
         html += '</div>'; // padding
       }
 
