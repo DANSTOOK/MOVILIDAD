@@ -18455,50 +18455,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       html += '</div>'; // card
       html += '</div>'; // padding
 
-      // === TOP 5 TIENDAS CON MÁS EQUIPOS OFFLINE + TOP TIENDAS CRÍTICAS (DASHBOARD CARD LAYOUT) ===
-      if (top5Stores.length > 0 || topCriticalStores.length > 0) {
-        html += '<div style="padding:0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
-        html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">';
-
-        // LEFT COLUMN: TOP 5 OFFLINE (CARDS)
-        if (top5Stores.length > 0) {
-          html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;">';
-          html += '<div style="background:#1976D2; padding:10px 12px;">';
-          html += '<span style="color:white; font-size:12px; font-weight:700;">TOP 5 OFFLINE</span>';
-          html += '</div>';
-          html += '<div style="padding:8px; display:flex; flex-direction:column; gap:6px;">';
-          top5Stores.slice(0, 5).forEach(function(s, idx) {
-            var intensity = Math.min(s.offline / Math.max(s.total, 1), 1);
-            var bgColor = '#E2001A';
-            html += '<div style="background:#f8f9fa; border-left:3px solid ' + bgColor + '; padding:6px 8px; border-radius:4px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">';
-            html += '<span style="font-weight:600; color:#424242;">' + escHTML(s.tienda) + '</span>';
-            html += '<span style="background:' + bgColor + '; color:white; padding:2px 6px; border-radius:3px; font-weight:700; font-size:10px;">' + s.offline + '</span>';
-            html += '</div>';
-          });
-          html += '</div>';
-          html += '</div>';
-        }
-
-        // RIGHT COLUMN: TOP CRITICAL (CARDS)
-        if (topCriticalStores.length > 0) {
-          html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;">';
-          html += '<div style="background:#B3261E; padding:10px 12px;">';
-          html += '<span style="color:white; font-size:12px; font-weight:700;">CRÍTICOS (4+ días)</span>';
-          html += '</div>';
-          html += '<div style="padding:8px; display:flex; flex-direction:column; gap:6px;">';
-          topCriticalStores.slice(0, 5).forEach(function(s, idx) {
-            html += '<div style="background:#f8f4f4; border-left:3px solid #B3261E; padding:6px 8px; border-radius:4px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">';
-            html += '<span style="font-weight:600; color:#424242;">' + escHTML(s.tienda) + '</span>';
-            html += '<span style="background:#B3261E; color:white; padding:2px 6px; border-radius:3px; font-weight:700; font-size:10px;">' + s.critical + '</span>';
-            html += '</div>';
-          });
-          html += '</div>';
-          html += '</div>';
-        }
-
-        html += '</div>'; // grid layout
-        html += '</div>'; // padding
-      }
 
       // === DASHBOARDS EMBEBIDOS (4 charts: 2x2 grid) ===
       var dashList = [
@@ -23798,10 +23754,9 @@ function previewEmail() {
   if (!emailHTML) return;
 
   var container = document.getElementById('email-preview-content');
-  container.innerHTML = '<iframe style="width:100%; height:100%; border:none; background:white;" sandbox="allow-same-origin"></iframe>';
-  var iframe = container.querySelector('iframe');
-  iframe.contentDocument.write(emailHTML);
-  iframe.contentDocument.close();
+  // Usar srcdoc en lugar de contentDocument.write para mejor compatibilidad
+  var escapedHTML = emailHTML.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  container.innerHTML = '<iframe style="width:100%; height:100%; border:none; background:white;" srcdoc="' + escapedHTML + '"></iframe>';
 
   document.getElementById('email-preview-modal').style.display = 'flex';
 }
