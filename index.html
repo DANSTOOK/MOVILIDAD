@@ -5484,7 +5484,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     
     #detalle .table-wrapper .filter-row {
-      background: linear-gradient(135deg, #F8F1F5, #FFFBFE);
+      background: var(--table-head-bg); /* antes gradiente claro fijo: quedaba claro en modo oscuro */
     }
     
     #detalle .table-wrapper .filter-row th {
@@ -5507,7 +5507,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     
     #detalle .table-wrapper tbody tr:nth-child(even) {
-      background: #F8F1F5;
+      background: var(--table-row-alt); /* antes #F8F1F5 fijo: quedaba claro en modo oscuro */
     }
     
     #detalle .table-wrapper tbody tr:hover {
@@ -5547,7 +5547,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     
     #cruce .table-wrapper tbody tr:nth-child(even) {
-      background: #F8F1F5;
+      background: var(--table-row-alt); /* antes #F8F1F5 fijo: quedaba claro en modo oscuro */
     }
     
     #cruce .table-wrapper tbody tr:hover {
@@ -5601,7 +5601,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     
     #stock-table-wrap tbody tr:nth-child(even) {
-      background: #F8F1F5;
+      background: var(--table-row-alt); /* antes #F8F1F5 fijo: quedaba claro en modo oscuro */
     }
     
     #stock-table-wrap tbody tr:hover {
@@ -5620,7 +5620,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     
     #cruce .table-wrapper table tbody tr:nth-child(even) {
-      background: #F8F1F5;
+      background: var(--table-row-alt); /* antes #F8F1F5 fijo: quedaba claro en modo oscuro */
     }
     
     #cruce .table-wrapper table tbody tr:hover {
@@ -6031,6 +6031,44 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .dropzone-v2.success .robot-energy-pulse,
     .dropzone-v2.success .robot-shadow {
       animation: none !important;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       ROBOT — FALLBACK CSS para el idle (clases del SVG actual).
+       El idle principal lo maneja GSAP (cdnjs); si el CDN está bloqueado
+       (red corporativa) el robot quedaba ESTÁTICO. Estas animaciones CSS
+       solo corren mientras GSAP no haya tomado control: cuando initRobot()
+       arranca GSAP, agrega .gsap-on al .robot-stage y estas se apagan.
+       ════════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: no-preference) {
+      .robot-stage:not(.gsap-on) .robot-body-group {
+        animation: robotFloat 3.4s ease-in-out infinite;
+      }
+      .robot-stage:not(.gsap-on) .robot-ground {
+        transform-origin: 120px 265px;
+        transform-box: view-box;
+        animation: robotShadow 3.4s ease-in-out infinite;
+      }
+      .robot-stage:not(.gsap-on) .robot-eye-left,
+      .robot-stage:not(.gsap-on) .robot-eye-right {
+        transform-origin: center;
+        transform-box: fill-box;
+        animation: robotBlink 4.2s ease-in-out infinite;
+      }
+      .robot-stage:not(.gsap-on) .robot-antenna-ball {
+        transform-origin: center;
+        transform-box: fill-box;
+        animation: robotPulse 1.4s ease-in-out infinite;
+      }
+      .robot-stage:not(.gsap-on) .robot-chest-light {
+        transform-origin: center;
+        transform-box: fill-box;
+        animation: robotPulse 2.2s ease-in-out infinite;
+      }
+    }
+    @keyframes robotPulse {
+      0%, 100% { transform: scale(1);    opacity: 1; }
+      50%      { transform: scale(1.25); opacity: 0.75; }
     }
 
     /* === RESUMEN HEADER STATS === */
@@ -21294,16 +21332,22 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       /* ===== ADVANCED ROBOT INTERACTION SYSTEM ===== */
       (function() {
-        // Wait for GSAP to load
+        // Wait for GSAP to load (máx ~5s: si el CDN está bloqueado, el
+        // fallback CSS de .robot-stage:not(.gsap-on) mantiene el idle vivo)
+        let _gsapTries = 0;
         function initRobot() {
           if (typeof gsap === 'undefined') {
-            setTimeout(initRobot, 100);
+            if (++_gsapTries < 50) setTimeout(initRobot, 100);
             return;
           }
-          
+
           const dropZone = document.getElementById('drop-zone-1');
           const robotSvg = document.querySelector('.robot-svg');
           if (!dropZone || !robotSvg) return;
+
+          // GSAP toma el idle: apagar el fallback CSS para no duplicar animación
+          const stage = document.querySelector('.robot-stage');
+          if (stage) stage.classList.add('gsap-on');
           
           const armLeft = document.querySelector('.robot-arm-left');
           const armRight = document.querySelector('.robot-arm-right');
@@ -23359,7 +23403,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   /* ---------- TABLAS estilo Argon ---------- */
   .table-wrapper table th {
     background: #f6f9fc !important;
-    color: #8898aa !important;
+    color: #67748e !important; /* antes #8898aa: contraste 2.7:1, ilegible p/texto 11px */
     text-transform: uppercase;
     font-size: 11px !important;
     font-weight: 700 !important;
@@ -23370,6 +23414,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   .table-wrapper table tbody tr:hover { background: #f6f9fc !important; }
   [data-theme="dark"] .table-wrapper table th { background: rgba(255,255,255,0.04) !important; color: var(--text-light) !important; }
   [data-theme="dark"] .table-wrapper table tbody tr:hover { background: rgba(255,255,255,0.03) !important; }
+  /* El override de tema oscuro cubría th y hover pero NO los td: el texto
+     quedaba #525f7f (pensado para fondo claro) sobre fondo oscuro con
+     contraste 2.6:1 — las tablas se veían "apagadas"/ilegibles. */
+  [data-theme="dark"] .table-wrapper table td {
+    color: var(--text) !important;
+    border-top-color: rgba(255,255,255,0.07);
+  }
 
   /* ---------- INPUTS / SELECTS estilo Argon ---------- */
   input[type="text"], input[type="search"], input[type="number"],
