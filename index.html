@@ -18391,11 +18391,26 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     /**
      * Subconjunto del dataset D según el filtro de plaza activo.
      * Si "Todas" → devuelve todo D.
+     *
+     * Memoizado: el filtrado O(n) por plaza se calcula una sola vez por
+     * combinación (referencia de D, plaza) y se reutiliza dentro del mismo
+     * ciclo de render (se llama ~25 veces). Siempre devuelve una COPIA
+     * (.slice()) para que ningún caller que ordene/mute in-place corrompa
+     * la caché — comportamiento idéntico al de antes, solo que más rápido.
+     * La caché se invalida sola: al recargar, D es un array nuevo (cambia la
+     * referencia); al cambiar de plaza, cambia la clave.
      */
+    var _plazaScopeCache = { D: null, plaza: undefined, filtered: null };
     function getPlazaScopedData() {
       var plaza = getActivePlazaFilter();
-      if (!plaza) return D.slice();
-      return D.filter(function(d){ return d.PLAZA === plaza; });
+      if (_plazaScopeCache.D === D && _plazaScopeCache.plaza === plaza && _plazaScopeCache.filtered) {
+        return _plazaScopeCache.filtered.slice();
+      }
+      var filtered = plaza ? D.filter(function(d){ return d.PLAZA === plaza; }) : D.slice();
+      _plazaScopeCache.D = D;
+      _plazaScopeCache.plaza = plaza;
+      _plazaScopeCache.filtered = filtered;
+      return filtered.slice();
     }
 
     function getResumenStats() {
@@ -21047,7 +21062,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         } catch (err) { /* no-op */ }
       }
       window.updateHeaderStats = updateHeaderStats;
-      setInterval(updateHeaderStats, 30000);
+      setInterval(function(){ if (!document.hidden) updateHeaderStats(); }, 30000);
       document.addEventListener('DOMContentLoaded', updateHeaderStats) // Envolver renderAll para refrescar stats tras cargar datos
       var _origRenderAll = window.renderAll;
       if (typeof _origRenderAll === 'function') {
@@ -22283,7 +22298,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     // Trigger after entrance animation completes
     setTimeout(updateAll, 1000);
     // Re-check periodically to catch programmatic updates
-    setInterval(updateAll, 8000);  // Reducido de 2.5s a 8s (suficientemente reactivo, sin lag)
+    setInterval(function(){ if (!document.hidden) updateAll(); }, 8000);  // Reducido de 2.5s a 8s; se pausa con pestaña oculta
   }
 
   if (document.readyState === 'loading') {
@@ -22708,7 +22723,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       makeConfetti();
     }
   }
-  setInterval(checkPerfect, 10000);  // Aumentado de 5s a 10s (verificación menos frecuente)
+  setInterval(function(){ if (!document.hidden) checkPerfect(); }, 10000);  // se pausa con pestaña oculta
 
   // ---- WELCOME TOAST after splash ----
   setTimeout(() => {
@@ -22943,7 +22958,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       dismissInsight();
     }, 5000);  // 5 segundos exactos
   }
-  setInterval(renderInsight, 12000);  // Aumentado de 4.5s a 12s (la alerta ya dura 5s, no necesita re-renderizar)
+  setInterval(function(){ if (!document.hidden) renderInsight(); }, 12000);  // se pausa con pestaña oculta
 
   // ---- TOUCH SWIPE BETWEEN TABS (mobile) ----
   let touchStartX = 0;
@@ -23045,7 +23060,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     gauge.querySelector('.health-gauge-num').textContent = health.toFixed(0) + '%';
     gauge.querySelector('.health-gauge-bar-fill').style.width = health + '%';
   }
-  setInterval(updateHealthGauge, 8000);  // Reducido de 2.5s a 8s (suficiente para visualización de salud)
+  setInterval(function(){ if (!document.hidden) updateHealthGauge(); }, 8000);  // se pausa con pestaña oculta
 
   // ---- KIOSK / TV MODE - auto-rotate tabs ----
   let kioskTimer = null;
@@ -24331,7 +24346,7 @@ function checkEquiposStatusChanges() {
 }
 
 // Ejecutar verificación de cambios cada 30 segundos
-setInterval(checkEquiposStatusChanges, 30000);
+setInterval(function(){ if (!document.hidden) checkEquiposStatusChanges(); }, 30000);
 
 // ════════════════════════════════════════════════════════════════
 // API INTEGRATION & AUTHENTICATION
