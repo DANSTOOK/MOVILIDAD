@@ -1,12 +1,19 @@
 const { Pool } = require('pg');
 
 // PostgreSQL connection pool
+if (!process.env.DATABASE_URL) {
+  console.warn('⚠ DATABASE_URL no configurado — usando localhost (solo desarrollo)');
+}
+// SSL se decide por la URL de conexión (host remoto la requiere), no por
+// NODE_ENV, que puede no estar seteado. Solo localhost va sin SSL.
+const _dbUrl = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/oxxo_movilidad';
+const _needsSsl = !/@(localhost|127\.0\.0\.1)[:/]/.test(_dbUrl);
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/oxxo_movilidad',
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  connectionString: _dbUrl,
+  ssl: _needsSsl ? { rejectUnauthorized: false } : false,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000, // 2s era muy poco para una BD gestionada fría
 });
 
 pool.on('connect', () => {
@@ -56,10 +63,27 @@ const dbGet = async (sql, params = []) => {
 };
 
 // Convert SQLite style parameter placeholders (?) to PostgreSQL style ($1, $2, etc)
+// Recorre el SQL carácter por carácter para NO convertir un `?` literal que
+// esté dentro de un string entre comillas simples (p. ej. LIKE '%?%' o un
+// operador JSON de Postgres escrito en un literal).
 const convertSqliteToPostgres = (sql, params) => {
   let paramIndex = 1;
-  const query = sql.replace(/\?/g, () => `$${paramIndex++}`);
-  return { query, values: params };
+  let out = '';
+  let inString = false;
+  for (let i = 0; i < sql.length; i++) {
+    const ch = sql[i];
+    if (ch === "'") {
+      // '' dentro de un string es una comilla escapada, no cierra el string
+      if (inString && sql[i + 1] === "'") { out += "''"; i++; continue; }
+      inString = !inString;
+      out += ch;
+    } else if (ch === '?' && !inString) {
+      out += `$${paramIndex++}`;
+    } else {
+      out += ch;
+    }
+  }
+  return { query: out, values: params };
 };
 
 // Inicializar tablas
@@ -141,6 +165,9 @@ const initDB = async () => {
     console.log('✓ Database tables initialized');
   } catch (err) {
     console.error('Error initializing database:', err);
+    // Relanzar: si el esquema no se pudo crear, el servidor NO debe arrancar
+    // (antes se tragaba el error y los endpoints fallaban en runtime).
+    throw err;
   }
 };
 

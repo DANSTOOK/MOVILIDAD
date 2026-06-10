@@ -25,3 +25,4 @@ backend/package-lock.json
 .idea/
 *.swp
 *.swo
+_test_data.csv

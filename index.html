@@ -11887,6 +11887,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       if (text == null) return [];          // guard null/undefined
       text = String(text);
 
+      // Quitar BOM UTF-8 (los exports de AirWatch/Excel lo traen): si no se
+      // quita, la primera columna queda como "﻿Last Seen" y los lookups
+      // exactos por 'Last Seen' devuelven undefined en TODAS las filas.
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+
       // Intentar usar Papa Parse si está disponible, fallback a método simple
       if (typeof Papa !== 'undefined') {
         try {
@@ -11894,12 +11899,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             header: true,
             skipEmptyLines: true,
             dynamicTyping: false,
-            transformHeader: h => h.trim()
+            transformHeader: h => h.replace(/^﻿/, '').trim()
           });
           if (result.errors && result.errors.length > 0) {
+            console.warn('parseCSV: ' + result.errors.length + ' fila(s) con problemas de formato', result.errors.slice(0, 3));
           }
           return result.data || [];
         } catch(e) {
+          console.warn('parseCSV: Papa Parse falló, usando parser propio', e);
         }
       }
 
@@ -12895,13 +12902,30 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       });
       if (pending.length === 0) return;
 
-      // Sin token Mapbox: flujo individual con Nominatim (como antes)
+      // Sin token Mapbox: Nominatim en cola SERIALIZADA (su política exige
+      // máx. 1 req/segundo; dispararlas en paralelo provoca baneo de IP).
       if (!token) {
-        pending.forEach(function(t) { geocodeTiendaAndAdd(t, tiendas[t]); });
+        var qi = 0;
+        (function nextNominatim() {
+          if (qi >= pending.length) return;
+          var t = pending[qi++];
+          geocodeTiendaAndAdd(t, tiendas[t]);
+          setTimeout(nextNominatim, 1100);
+        })();
         return;
       }
 
       // Con token: Mapbox Batch Geocoding en lotes de 1000
+      function fallbackIndividual(chunk) {
+        // Cae al flujo individual (también serializado)
+        var fi = 0;
+        (function nextFb() {
+          if (fi >= chunk.length) return;
+          var t = chunk[fi++];
+          geocodeTiendaAndAdd(t, tiendas[t]);
+          setTimeout(nextFb, 1100);
+        })();
+      }
       function processChunk(start) {
         var chunk = pending.slice(start, start + 1000);
         if (chunk.length === 0) { saveTiendaCoordsCache(); return; }
@@ -12915,12 +12939,19 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         })
-          .then(function(r) { return r.json(); })
+          .then(function(r) {
+            // Un token inválido (401) o rate limit (429) devuelve JSON de error,
+            // no {batch}; sin este check el mapa quedaba vacío en silencio.
+            if (!r.ok) throw new Error('Mapbox batch HTTP ' + r.status);
+            return r.json();
+          })
           .then(function(data) {
-            var batch = (data && data.batch) || [];
-            chunk.forEach(function(t, i) {
-              var res = batch[i];
-              if (res && res.features && res.features.length > 0) {
+            if (!data || !Array.isArray(data.batch)) {
+              throw new Error('Respuesta batch inesperada de Mapbox');
+            }
+            data.batch.forEach(function(res, i) {
+              var t = chunk[i];
+              if (t && res && res.features && res.features.length > 0) {
                 var c = res.features[0].geometry.coordinates; // [lon, lat]
                 var coords = { lat: c[1], lon: c[0] };
                 _tiendaCoordinates[t] = coords;
@@ -12932,7 +12963,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           })
           .catch(function(err) {
             console.error('Batch geocoding falló, usando individual:', err);
-            chunk.forEach(function(t) { geocodeTiendaAndAdd(t, tiendas[t]); });
+            fallbackIndividual(chunk);
           });
       }
       processChunk(0);
@@ -13196,9 +13227,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                   performMapZoom(tienda, coords);
                 }, 200);
               } else {
-                // Usar coordenadas por defecto
+                // Coordenadas por defecto SOLO para el zoom inmediato.
+                // NO se cachean: si se guardaran, la tienda quedaría fijada
+                // para siempre al centro de México y nunca se reintentaría.
                 var defaultCoords = { lat: 23.6345, lon: -102.5528 };
-                _tiendaCoordinates[tienda] = defaultCoords;
                 displayOxxoDetails(tienda, defaultCoords, stats);
                 performMapZoom(tienda, defaultCoords);
               }
@@ -14207,27 +14239,25 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       updateSortIcons();
 
-      // Usar DocumentFragment para batching eficiente
-      var fragment = document.createDocumentFragment();
-
       if (sorted.length === 0) {
         var emptyHtml = emptyStateRow(10, { msg: 'Ningún equipo cumple los filtros activos. Prueba ajustar la plaza, la búsqueda o el filtro de offline.', clearFn: 'clearCruceFilters()' });
         document.getElementById('cruce-table').innerHTML = emptyHtml;
       } else {
+        // Construir UN solo string HTML y asignarlo una vez: con miles de
+        // filas, hacer tr.innerHTML por fila invoca el parser HTML N veces
+        // (~2x más lento). Los handlers usan event delegation, así que
+        // reconstruir el tbody no pierde listeners.
+        var parts = [];
         sorted.forEach(d => {
-          var tr = document.createElement('tr');
           var st = statusOf(d);
           var dias = Number(d.days_ago) || 0;
           var sev = dias >= 15 ? 'sev-extreme' : (dias > 10 ? 'sev-warning' : '');
-
-          // Usar classList para clases
-          if (isAttended(d)) tr.classList.add('attended-row');
-          if (sev) tr.classList.add(sev);
+          var trClasses = (isAttended(d) ? 'attended-row ' : '') + sev;
 
           var selKey = String(getCommentKey(d)).replace(/"/g,'&quot;');
           var selChecked = cruceSelection.has(getCommentKey(d)) ? ' checked' : '';
 
-          var html = `<td style="text-align:center"><input type="checkbox" class="cruce-sel-cb" data-key="${selKey}"${selChecked} aria-label="Seleccionar equipo" style="cursor:pointer; accent-color: var(--primary);"></td>
+          parts.push(`<tr class="${trClasses.trim()}"><td style="text-align:center"><input type="checkbox" class="cruce-sel-cb" data-key="${selKey}"${selChecked} aria-label="Seleccionar equipo" style="cursor:pointer; accent-color: var(--primary);"></td>
             <td>${d['Last Seen'] || '—'}</td>
             <td class="days-cell ${sev}"><span class="days-badge">${d.days_ago}</span></td>
             <td>${getEquipmentLabel(d.equipo_type)}</td>
@@ -14235,15 +14265,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <td>${d.PLAZA || '<span style="color:var(--error)">Sin plaza</span>'}</td>
             <td>${d.TIENDA || '—'}</td>
             <td>${d.ASESOR || '—'}</td>
-            <td><span class="badge status-badge ${st.cls}" style="background: ${st.bg}; color: ${st.fg};"><span class="material-symbols-outlined status-icon">${st.icon}</span><span class="status-text">${st.txt}</span></span></td>`;
-
-          tr.innerHTML = html;
-          fragment.appendChild(tr);
+            <td><span class="badge status-badge ${st.cls}" style="background: ${st.bg}; color: ${st.fg};"><span class="material-symbols-outlined status-icon">${st.icon}</span><span class="status-text">${st.txt}</span></span></td></tr>`);
         });
 
         // Reemplazar tabla de una vez
-        document.getElementById('cruce-table').innerHTML = '';
-        document.getElementById('cruce-table').appendChild(fragment);
+        document.getElementById('cruce-table').innerHTML = parts.join('');
       }
 
       var countEl = document.getElementById('cruce-count');
@@ -15638,14 +15664,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         ['3-7d', '8-15d', '16-30d', '>30d']) // ----- D9: Pie de modelos de equipos offline -----
       var modelEntries;
       if (typeof _ !== 'undefined' && _.countBy) {
-        var modelCounts = _.countBy(offlineRecs, d => d.model || '(desconocido)');
+        var modelCounts = _.countBy(offlineRecs, d => d.Model || '(desconocido)');
         modelEntries = Object.entries(modelCounts)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 10);
       } else {
         var modelCounts = {};
         offlineRecs.forEach(d => {
-          var model = d.model || '(desconocido)';
+          var model = d.Model || '(desconocido)';
           modelCounts[model] = (modelCounts[model] || 0) + 1;
         });
         modelEntries = Object.entries(modelCounts)
@@ -17835,7 +17861,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     function exportCruceAsXLSX() {
       if (!D || !D.length) { alert('No hay datos cargados.'); return; }
       var plazaData = (typeof getPlazaScopedData === 'function') ? getPlazaScopedData() : D.slice();
-      var criticos = plazaData.filter(d => isCritical(d)).slice(0, 100);
+      // Exportar TODOS los críticos (antes se cortaba en 100 sin avisar,
+      // entregando un reporte incompleto). XLSX maneja miles de filas sin problema.
+      var criticos = plazaData.filter(d => isCritical(d));
       var data = criticos.map(d => ({
         'Última Conexión': d['Last Seen'] || '—',
         'Días Offline': d.days_ago,
@@ -17844,7 +17872,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         'Plaza': d.PLAZA || '—',
         'Tienda': d.TIENDA || '—',
         'Asesor': d.ASESOR || '—',
-        'Modelo': d.model || '—',
+        'Modelo': d.Model || '—',
         'Serie': formatSerialNumber(d['Serial Number']) || '—',
         'Comentario': getComment(d) || '',
         'Nota': getNote(d) || ''
@@ -19230,10 +19258,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           '----\n\n' +
           buildEmailText();
 
-        var url = 'mailto:?subject=' + encodeURIComponent(subject) +
-                  '&body=' + encodeURIComponent(bodyText) // Limitar tamaño porque algunos clientes truncan mailto largo
-        if (url.length > 1900) {
-          url = 'mailto:?subject=' + encodeURIComponent(subject);
+        // Limitar tamaño porque algunos clientes truncan mailto largo:
+        // recortar el cuerpo progresivamente en vez de descartarlo entero
+        // (antes el usuario perdía TODO el texto sin aviso).
+        var baseBody = bodyText;
+        var keep = baseBody.length;
+        var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyText);
+        while (url.length > 1900 && keep > 120) {
+          keep = Math.floor(keep * 0.8);
+          bodyText = baseBody.slice(0, keep) + '\n…(recortado, pega el resto con Ctrl+V)';
+          url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyText);
         }
         window.location.href = url;
       } catch (e) {
@@ -19545,7 +19579,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var criticos = Dscope.filter(isCritical).sort(function(a,b){ return b.days_ago-a.days_ago; });
         var fecha    = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'}).toUpperCase();
         var plaza    = (typeof getActivePlazaFilter==='function' && getActivePlazaFilter()) ? getActivePlazaFilter().toUpperCase() : 'TODAS LAS PLAZAS';
-        var usabPct  = Dscope.length>0 ? ((Dscope.length-criticos.length)/Dscope.length*100).toFixed(1) : '100.0';
+        // Sin datos en la plaza el % no existe: mostrar N/D en vez de un
+        // 100.0 falso que aparenta que todo está bien.
+        var usabPct  = Dscope.length>0 ? ((Dscope.length-criticos.length)/Dscope.length*100).toFixed(1) : 'N/D';
 
         var y = 0;
         function ensureSpace(h){ if(y+h > PH-14){ pdf.addPage(); y=16; return true; } return false; }
@@ -19592,7 +19628,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         T('ESTATUS DE EQUIPOS DE MOVILIDAD', M, 17, 17, 'bold', WHITE);
         T(fecha+'   ·   '+plaza, M, 31, 9.5, 'normal', '#FFE3E6');
         font('bold',10);
-        var badge='Usabilidad '+usabPct+'%'; var bw=pdf.getTextWidth(badge)+10;
+        var badge = (usabPct === 'N/D') ? 'Sin datos en la plaza' : ('Usabilidad '+usabPct+'%'); var bw=pdf.getTextWidth(badge)+10;
         fill('#B3001A'); pdf.roundedRect(PW-M-bw, 9, bw, 8, 2,2,'F');
         T(badge, PW-M-bw+5, 11.2, 10, 'bold', WHITE);
         y=58;
@@ -24567,8 +24603,8 @@ async function fetchEquiposFromAPI(plaza) {
       };
     });
 
-    // Procesar plaza
-    processData();
+    // renderAll() ya procesa y pinta todo; processData() no existía y
+    // lanzaba ReferenceError, impidiendo que los datos del API se mostraran.
     renderAll();
 
     showAlert('✓ ' + D.length + ' equipos cargados del API', 'success', 2000);
@@ -24763,7 +24799,10 @@ document.addEventListener('DOMContentLoaded', function() {
 // ════════════════════════════════════════════════════════════════════════════════
 
 function renderOSModelos() {
-  var data = D && D.length > 0 ? D : [];
+  // Respeta el filtro de plaza activo, igual que el resto de pestañas
+  var data = (typeof getPlazaScopedData === 'function' && D && D.length > 0)
+    ? getPlazaScopedData()
+    : (D && D.length > 0 ? D : []);
 
   if (data.length === 0) {
     document.getElementById('os-version-table-body').innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center;">Cargando datos...</td></tr>';
