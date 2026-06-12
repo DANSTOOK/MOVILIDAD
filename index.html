@@ -1006,9 +1006,11 @@
       animation: lineGlow 1.8s ease-in-out infinite;
     }
 
+    /* Antes animaba width (reflow en cada frame). scaleX da el mismo
+       efecto visual (60→70px) solo con compositor/GPU. */
     @keyframes lineGlow {
-      0%, 100% { opacity: 1; width: 60px; }
-      50% { opacity: 0.6; width: 70px; }
+      0%, 100% { opacity: 1; transform: translateX(-50%) scaleX(1); }
+      50% { opacity: 0.6; transform: translateX(-50%) scaleX(1.167); }
     }
 
     #disp-hh.success::after,
@@ -3975,6 +3977,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       .app-bar-icon-btn { width: 32px; height: 32px; }
       .app-bar-icon-btn .material-symbols-outlined { font-size: 18px; }
       .app-bar-avatar { width: 32px; height: 32px; font-size: 12px; }
+      /* Área táctil mínima 44px (Apple/Material) sin crecer visualmente:
+         un ::after transparente extiende la zona clickeable 6px por lado. */
+      .app-bar-icon-btn, .app-bar-avatar { position: relative; }
+      .app-bar-icon-btn::after, .app-bar-avatar::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+      }
       .app-bar-stats { gap: 10px; width: 100%; margin-left: 0; justify-content: flex-start; }
       .app-bar-stat { font-size: 10.5px; }
 
@@ -6902,6 +6912,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     /* FLUIDEZ: cortar animaciones infinitas en móvil (repintado continuo) */
     .kpi-circular-widget .kpi-circle-container { animation: none !important; }
+    .kpi-circular-widget .kpi-circle-container::before { animation: none !important; opacity: 0 !important; }
     .robot-body-group, .robot-antenna, .robot-antenna-ball,
     .robot-ground, .robot-head-group { animation: none !important; }
     /* Sin lift/scale en hover táctil (no aporta y causa repaint) */
@@ -8036,15 +8047,28 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
           /* Glow como box-shadow CIRCULAR en el contenedor (no como filter
              sobre el aro): así el brillo se conserva pero el trazo del aro
-             queda 100% nítido en vez de difuminarse. */
-          @keyframes circleGlowPulse {
-            0%, 100% { box-shadow: 0 0 7px 0 var(--widget-glow, rgba(226,0,26,0.30)); }
-            50%      { box-shadow: 0 0 16px 1px var(--widget-glow, rgba(226,0,26,0.55)); }
-          }
-
+             queda 100% nítido en vez de difuminarse.
+             PERF: animar box-shadow repinta los 6 KPIs en cada frame. En su
+             lugar: sombra base estática + un ::before con la sombra fuerte
+             cuya OPACIDAD pulsa (solo compositor/GPU, mismo efecto visual). */
           .kpi-circular-widget .kpi-circle-container {
             border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 7px 0 var(--widget-glow, rgba(226,0,26,0.30));
+          }
+          .kpi-circular-widget .kpi-circle-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            box-shadow: 0 0 16px 1px var(--widget-glow, rgba(226,0,26,0.55));
+            opacity: 0;
+            pointer-events: none;
             animation: circleGlowPulse 3.6s ease-in-out infinite;
+          }
+          @keyframes circleGlowPulse {
+            0%, 100% { opacity: 0; }
+            50%      { opacity: 1; }
           }
 
           .kpi-circular-widget:hover .kpi-circle-container {
@@ -13457,6 +13481,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var tabLabel = tabNames[tab];
         if (tabLabel && t.textContent.toLowerCase().includes(tabLabel)) {
           t.classList.add('active');
+          // En móvil la barra es deslizable: traer la pestaña activa a la vista
+          try {
+            if (window.innerWidth <= 768 && t.scrollIntoView) {
+              t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+          } catch(e) {}
         }
       });
 
@@ -14307,7 +14337,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         });
 
         // Reemplazar tabla de una vez
-        document.getElementById('cruce-table').innerHTML = parts.join('');
+        var tbodyEl = document.getElementById('cruce-table');
+        tbodyEl.innerHTML = parts.join('');
+        // Con muchas filas, apagar el parpadeo de badges (perf de compositor)
+        tbodyEl.classList.toggle('many-rows', sorted.length > 200);
       }
 
       var countEl = document.getElementById('cruce-count');
@@ -23507,6 +23540,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   .status-badge.status-offline {
     animation: statusBlink 1.5s ease-in-out infinite;
   }
+  /* PERF: con la tabla sin filtros (miles de filas) cada badge animado se
+     promueve a capa de compositor → jank. renderCruceTable marca .many-rows
+     cuando hay >200 filas y el parpadeo se apaga (imperceptible a esa escala). */
+  #cruce-table.many-rows .status-badge.status-offline { animation: none; }
 
   @keyframes statusBlink {
     0%, 100% { opacity: 1; }
@@ -23609,6 +23646,22 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     margin: 18px auto !important;
     padding: 7px !important;
     overflow: visible !important;
+  }
+  /* MÓVIL: la barra mide ~650px y el viewport ~375px. El overflow:visible
+     de arriba + justify-content:center dejaban pestañas CORTADAS e
+     inalcanzables (con flex centrado y desborde, el lado izquierdo no se
+     puede alcanzar con scroll). En móvil: deslizable horizontal. */
+  @media (max-width: 768px) {
+    .tabs {
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      justify-content: flex-start !important;
+      max-width: calc(100% - 24px) !important;
+      flex-wrap: nowrap !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
   }
   /* Tab activa = pill rojo limpio, contenido y sin sombra dura/cola */
   .tabs .tab {
