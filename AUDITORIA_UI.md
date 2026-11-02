@@ -4,7 +4,7 @@ Revisión de la interfaz con el dashboard corriendo en local y 190 equipos
 cargados en las 4 plazas (Tijuana Este, Tijuana Centro, Ensenada, Playas).
 Se recorrieron las 8 pestañas en claro y oscuro, a 1440×900 y a 375×812.
 
-> **Estado:** la **Fase 1 está aplicada** (ver sección 11). Las cifras de
+> **Estado:** las **Fases 1 y 2 están aplicadas** (ver sección 11). Las cifras de
 > las secciones 1, 3 y 4 son las de **antes** de aplicarla; al final de la
 > sección 11 están las de después.
 
@@ -370,3 +370,33 @@ Fase 3, porque depende de que los colores de las tarjetas salgan de variables.
 Lo que la Fase 1 **no** tocó: las sombras escritas como propiedad de JavaScript
 (`this.style.boxShadow = '...'` en los `onmouseover`), que siguen con valores
 a pelo, y los 139 glows de color, que son intencionados.
+
+### Resultado de la Fase 2 (aplicada)
+
+- **MAYÚSCULAS:** de 40 elementos forzados a mayúsculas por CSS a **0** en la
+  pantalla de Resumen. El texto ya estaba escrito en capitalización normal:
+  eran las reglas las que gritaban. Se conservan a propósito en 9 sitios donde
+  ayudan — cabeceras de tabla, badges diminutos y el splash de marca.
+- **Cabecera:** las dos barras rojas son ahora una sola. Se van el borde
+  divisorio y la franja oscura de la fila 2; la cabecera adelgaza unos 19px.
+- **Hueco del logo:** deja de ser un recuadro blanco con "LOGO" punteado y pasa
+  a un icono discreto sobre el rojo. **Sigue siendo pulsable** para cargar el
+  logo: solo cambia su aspecto vacío.
+- **Contadores de la cabecera:** resultó que `— equipos` y `— offline` nunca
+  tuvieron datos. La función `updateHeaderStats()` lee `reportData`, una
+  variable que **no existe en toda la aplicación** (el array real se llama `D`).
+  Como el encargo era no tocar el funcionamiento, se ocultan mientras no haya
+  cifra en lugar de enseñar rayitas. Apuntarlos a `D` es una línea, pero es una
+  decisión de datos, no visual.
+- **Indicador de tiempo duplicado:** al fundir las barras quedaron dos "hace N
+  min" uno encima de otro (`#data-load-ago` y el chip de la fila de stats). Se
+  oculta el duplicado.
+- **Gráficas:** el rojo deja de usarse donde no significa nada. *Asesores con
+  más llamadas* (un conteo de equipos por asesor) pasa a azul pizarra; las que
+  cuentan equipos offline mantienen el rojo, que ahora es el rojo de error
+  (`#B3261E`) y no el de marca (`#E2001A`), para que la identidad quede libre.
+
+Sin desbordes de texto ni scroll horizontal en escritorio ni en móvil.
+
+**Pendiente para la Fase 3:** el modo oscuro, los nombres cortados en los ejes
+de las gráficas y las barras que salen todas al 100% del ancho.
