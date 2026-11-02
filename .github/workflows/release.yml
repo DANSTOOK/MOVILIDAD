@@ -1,0 +1,82 @@
+name: Release
+
+# Se dispara con los tags que crea scripts/release.js (vX.Y.Z).
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # historia completa: las notas salen de los commits
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Comprobar que el servidor arranca
+        working-directory: ./backend
+        run: |
+          node server.js &
+          SERVER_PID=$!
+          for i in $(seq 1 30); do
+            if curl -fs http://localhost:3001/api/health > /dev/null; then
+              echo "✓ healthcheck OK"
+              kill $SERVER_PID
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "✗ el servidor no respondió en /api/health"
+          kill $SERVER_PID 2>/dev/null
+          exit 1
+
+      - name: Comprobar que el tag coincide con backend/package.json
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(node -p "require('./backend/package.json').version")
+          if [ "$TAG" != "$PKG" ]; then
+            echo "✗ el tag ($TAG) no coincide con backend/package.json ($PKG)"
+            exit 1
+          fi
+          echo "✓ versión $PKG"
+
+      - name: Extraer las notas del CHANGELOG
+        id: notes
+        run: |
+          TAG="$GITHUB_REF_NAME"
+          # Sección del CHANGELOG que empieza en "## <tag>" hasta el siguiente "## "
+          awk -v tag="## $TAG" '
+            $0 ~ "^"tag" " || $0 == tag { found=1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md || true
+          if [ ! -s notes.md ]; then
+            echo "Sin sección en CHANGELOG.md; se generan notas automáticas." > notes.md
+            echo "auto=true" >> "$GITHUB_OUTPUT"
+          fi
+          cat notes.md
+
+      - name: Publicar el GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ steps.notes.outputs.auto }}" = "true" ]; then
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+          else
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md
+          fi
