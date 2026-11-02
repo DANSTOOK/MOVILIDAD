@@ -18,7 +18,6 @@ backend/data/
 backend/.env
 backend/.env.local
 backend/npm-debug.log
-backend/package-lock.json
 
 # IDE
 .vscode/

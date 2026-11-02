@@ -27,7 +27,10 @@ const ALLOWED_ORIGINS = [
   'https://movilidad-production.up.railway.app',
   'http://localhost:8777',
   'http://127.0.0.1:8777',
-  'http://localhost:3001'
+  'http://localhost:8080',
+  'http://127.0.0.1:8080',
+  'http://localhost:3001',
+  'http://127.0.0.1:3001'
 ];
 app.use(cors({
   origin: function (origin, cb) {

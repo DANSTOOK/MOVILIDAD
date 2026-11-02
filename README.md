@@ -38,30 +38,46 @@ OXXO Movilidad/
 
 ## ⚡ INICIO RÁPIDO
 
-### Opción 1: Localhost (Ahora)
-```bash
-# Terminal 1: Servidor local
-node server-local.js
+### Todo en uno (lo normal)
 
-# Terminal 2: Navegador
-http://localhost:8080
+El backend sirve también el `index.html`, así que con un solo proceso tienes
+frontend y API en el mismo sitio:
+
+```bash
+cd backend
+npm install        # la primera vez
+npm start
 ```
 
-### Opción 2: Railway (Producción)
+Abre **http://localhost:3001** y entra con `admin` / `admin123`.
+
+**No hace falta instalar PostgreSQL.** Si no defines `DATABASE_URL`, el backend
+levanta un Postgres embebido (PGlite) que guarda los datos en `backend/data/`.
+Para usar un Postgres de verdad, crea `backend/.env` a partir de
+`backend/.env.example` y pon ahí tu `DATABASE_URL`.
+
+### Sólo el frontend (sin API)
+
 ```bash
-# 1. Va a https://railway.app
-# 2. Conecta GitHub (DANSTOOK/MOVILIDAD)
-# 3. Deploy automático
-# 4. Actualiza API URL:
-node update-api-url.js "https://tu-railway-url.com"
-# 5. Commit y push
+node server-local.js     # http://localhost:8080
 ```
 
-### Opción 3: Docker Local
+Marca **"Modo Local (Testing)"** en el login y carga un CSV/XLSX a mano.
+
+### Docker
+
 ```bash
-docker-compose up
-# http://localhost:3001
+docker-compose up        # http://localhost:3001
 ```
+
+### Releases y rollback
+
+```bash
+node scripts/release.js minor     # publica una versión nueva
+node scripts/rollback.js          # lista versiones; con un tag, vuelve a ella
+```
+
+Los detalles están en [RELEASES.md](RELEASES.md).
 
 ---
 

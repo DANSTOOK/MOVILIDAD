@@ -6791,8 +6791,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.Default.css" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.0/dist/leaflet.markercluster.js" crossorigin=""></script>
-  <!-- Geolib: Geolocation calculations & distance -->
-  <script src="https://cdn.jsdelivr.net/npm/geolib@3.3.4/dist/index.min.js"></script>
   <!-- Leaflet.heat: Heat map visualization -->
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   <!-- XLSX Library for Excel support -->
@@ -6803,7 +6801,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"></script>
   <!-- CountUp.js: Animated number counters -->
-  <script src="https://cdn.jsdelivr.net/npm/countup.js@2.8.0/dist/countUp.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/countup.js@2.8.0/dist/countUp.umd.js"></script>
+  <script>
+    // El bundle UMD expone countUp.CountUp; el dashboard usa el global CountUp.
+    if (window.countUp && window.countUp.CountUp) window.CountUp = window.countUp.CountUp;
+  </script>
   <!-- Tippy.js: Tooltips (requires Popper) -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
@@ -24492,7 +24494,17 @@ setInterval(function(){ if (!document.hidden) checkEquiposStatusChanges(); }, 30
 // API INTEGRATION & AUTHENTICATION
 // ════════════════════════════════════════════════════════════════
 
-var API_BASE_URL = 'https://movilidad-production.up.railway.app';
+// El backend desplegado (Railway). En localhost se ignora y se usa el local.
+var API_PROD_URL = 'https://movilidad-production.up.railway.app';
+var API_BASE_URL = (function(){
+  var h = location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]') {
+    // backend/server.js escucha en 3001 y sirve este mismo index.html.
+    // Si la página viene de otro puerto local (server-local.js), igual apunta a 3001.
+    return location.port === '3001' ? location.origin : 'http://' + h + ':3001';
+  }
+  return API_PROD_URL;
+})();
 var AUTH_TOKEN_KEY = 'oxxoAuthToken';
 var USER_INFO_KEY = 'oxxoUserInfo';
 var _useLocalMode = false;

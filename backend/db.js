@@ -1,35 +1,72 @@
-const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 
-// PostgreSQL connection pool
-if (!process.env.DATABASE_URL) {
-  console.warn('⚠ DATABASE_URL no configurado — usando localhost (solo desarrollo)');
+// ════════════════════════════════════════════════════════════════
+// DRIVER: Postgres real cuando hay DATABASE_URL (Railway/producción),
+// PGlite embebido cuando no lo hay (desarrollo local sin servidor de BD).
+// Ambos hablan el mismo dialecto, así que el resto del archivo no cambia.
+// ════════════════════════════════════════════════════════════════
+const DATABASE_URL = process.env.DATABASE_URL;
+
+// pool solo existe con Postgres real; se exporta igual para compatibilidad.
+let pool = null;
+// runQuery(sql, values) -> { rows, rowCount }
+let runQuery;
+
+if (DATABASE_URL) {
+  const { Pool } = require('pg');
+  // SSL se decide por la URL de conexión (host remoto la requiere), no por
+  // NODE_ENV, que puede no estar seteado. Solo localhost va sin SSL.
+  const _needsSsl = !/@(localhost|127\.0\.0\.1)[:/]/.test(DATABASE_URL);
+  pool = new Pool({
+    connectionString: DATABASE_URL,
+    ssl: _needsSsl ? { rejectUnauthorized: false } : false,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000, // 2s era muy poco para una BD gestionada fría
+  });
+
+  pool.on('connect', () => {
+    console.log('✓ PostgreSQL connected');
+  });
+
+  pool.on('error', (err) => {
+    console.error('✗ PostgreSQL pool error:', err);
+  });
+
+  runQuery = (sql, values) => pool.query(sql, values);
+} else {
+  // Postgres compilado a WASM: sin instalar nada, los datos persisten en
+  // backend/data/pglite (ignorado por git). La instancia se abre una sola vez.
+  const { PGlite } = require('@electric-sql/pglite');
+  const DATA_DIR = process.env.PGLITE_DIR || path.join(__dirname, 'data', 'pglite');
+  let _db = null;
+  const _ready = (async () => {
+    // PGlite hace mkdir no recursivo: el directorio padre debe existir.
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    _db = await PGlite.create({ dataDir: DATA_DIR });
+    console.log(`✓ PGlite (Postgres embebido) listo en ${DATA_DIR}`);
+    console.log('  Para usar un Postgres real, define DATABASE_URL en backend/.env');
+    return _db;
+  })();
+
+  runQuery = async (sql, values) => {
+    const db = _db || (await _ready);
+    const result = await db.query(sql, values);
+    // PGlite reporta affectedRows donde pg reporta rowCount.
+    return {
+      rows: result.rows || [],
+      rowCount: result.affectedRows != null ? result.affectedRows : (result.rows || []).length,
+    };
+  };
 }
-// SSL se decide por la URL de conexión (host remoto la requiere), no por
-// NODE_ENV, que puede no estar seteado. Solo localhost va sin SSL.
-const _dbUrl = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/oxxo_movilidad';
-const _needsSsl = !/@(localhost|127\.0\.0\.1)[:/]/.test(_dbUrl);
-const pool = new Pool({
-  connectionString: _dbUrl,
-  ssl: _needsSsl ? { rejectUnauthorized: false } : false,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000, // 2s era muy poco para una BD gestionada fría
-});
-
-pool.on('connect', () => {
-  console.log('✓ PostgreSQL connected');
-});
-
-pool.on('error', (err) => {
-  console.error('✗ PostgreSQL pool error:', err);
-});
 
 // Database query wrappers
 const dbAll = async (sql, params = []) => {
   try {
     // Convert SQLite style parameters (?) to PostgreSQL style ($1, $2, etc)
     const { query, values } = convertSqliteToPostgres(sql, params);
-    const result = await pool.query(query, values);
+    const result = await runQuery(query, values);
     return result.rows;
   } catch (err) {
     console.error('Query error:', err);
@@ -40,7 +77,7 @@ const dbAll = async (sql, params = []) => {
 const dbRun = async (sql, params = []) => {
   try {
     const { query, values } = convertSqliteToPostgres(sql, params);
-    const result = await pool.query(query, values);
+    const result = await runQuery(query, values);
     return {
       lastID: result.rows[0]?.id,
       changes: result.rowCount
@@ -54,7 +91,7 @@ const dbRun = async (sql, params = []) => {
 const dbGet = async (sql, params = []) => {
   try {
     const { query, values } = convertSqliteToPostgres(sql, params);
-    const result = await pool.query(query, values);
+    const result = await runQuery(query, values);
     return result.rows[0] || null;
   } catch (err) {
     console.error('Query error:', err);
@@ -90,7 +127,7 @@ const convertSqliteToPostgres = (sql, params) => {
 const initDB = async () => {
   try {
     // Tabla usuarios
-    await pool.query(`
+    await runQuery(`
       CREATE TABLE IF NOT EXISTS usuarios (
         id SERIAL PRIMARY KEY,
         username TEXT UNIQUE NOT NULL,
@@ -102,7 +139,7 @@ const initDB = async () => {
     `);
 
     // Tabla equipos
-    await pool.query(`
+    await runQuery(`
       CREATE TABLE IF NOT EXISTS equipos (
         id SERIAL PRIMARY KEY,
         cr TEXT UNIQUE NOT NULL,
@@ -124,7 +161,7 @@ const initDB = async () => {
     `);
 
     // Tabla comentarios
-    await pool.query(`
+    await runQuery(`
       CREATE TABLE IF NOT EXISTS comentarios (
         id SERIAL PRIMARY KEY,
         equipo_id INTEGER NOT NULL,
@@ -137,7 +174,7 @@ const initDB = async () => {
     `);
 
     // Tabla stock
-    await pool.query(`
+    await runQuery(`
       CREATE TABLE IF NOT EXISTS stock (
         id SERIAL PRIMARY KEY,
         equipo_id INTEGER NOT NULL,
@@ -149,7 +186,7 @@ const initDB = async () => {
     `);
 
     // Tabla audit_log
-    await pool.query(`
+    await runQuery(`
       CREATE TABLE IF NOT EXISTS audit_log (
         id SERIAL PRIMARY KEY,
         usuario_id INTEGER,
