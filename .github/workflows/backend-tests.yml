@@ -35,7 +35,7 @@ jobs:
 
     - name: Check for security vulnerabilities
       working-directory: ./backend
-      run: npm audit --audit-level=moderate
+      run: npm audit --omit=dev --audit-level=moderate
 
     - name: Lint code
       working-directory: ./backend

@@ -121,10 +121,16 @@ if (DRY) {
   pkg.version = version;
   fs.writeFileSync(PKG, JSON.stringify(pkg, null, 2) + '\n');
 
-  const header = '# Changelog\n\n';
-  let changelog = fs.existsSync(CHANGELOG) ? fs.readFileSync(CHANGELOG, 'utf8') : header;
+  // El CHANGELOG se guarda en CRLF y este header usaba saltos LF, así que el
+  // replace no casaba y la sección no se escribía nunca: en el primer release
+  // real solo cambió package.json. Se normaliza todo antes de insertar.
+  const nl = '\r\n';
+  const header = '# Changelog' + nl + nl;
+  let changelog = fs.existsSync(CHANGELOG)
+    ? fs.readFileSync(CHANGELOG, 'utf8').replace(/\r?\n/g, nl)
+    : header;
   if (!changelog.startsWith('# Changelog')) changelog = header + changelog;
-  changelog = changelog.replace(header, header + entry);
+  changelog = changelog.replace(header, header + entry.replace(/\r?\n/g, nl));
   fs.writeFileSync(CHANGELOG, changelog);
 }
 
@@ -141,3 +147,5 @@ if (!DRY) {
   console.log('  Railway: redespliega con el push a main.');
   console.log(`  Si sale mal: node scripts/rollback.js ${prevTag || '<tag-anterior>'}`);
 }
+
+  // El CHANGELOG está en CRLF y este header usaba saltos LF, así que el

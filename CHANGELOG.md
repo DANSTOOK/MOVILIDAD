@@ -4,7 +4,7 @@ Las versiones se lanzan con `node scripts/release.js` y se pueden deshacer con
 `node scripts/rollback.js`. Cada sección la escribe el script a partir de los
 commits desde el release anterior.
 
-## Sin publicar
+## v1.1.0 — 2026-11-02
 
 - Fase 3 de la auditoría visual: modo oscuro completo (la causa era un
   :not() evaluado sobre <body> cuando el atributo vive en <html>), barras de
