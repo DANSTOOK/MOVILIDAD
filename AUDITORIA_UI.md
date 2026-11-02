@@ -4,7 +4,7 @@ Revisión de la interfaz con el dashboard corriendo en local y 190 equipos
 cargados en las 4 plazas (Tijuana Este, Tijuana Centro, Ensenada, Playas).
 Se recorrieron las 8 pestañas en claro y oscuro, a 1440×900 y a 375×812.
 
-> **Estado:** las **Fases 1 y 2 están aplicadas** (ver sección 11). Las cifras de
+> **Estado:** las **Fases 1, 2 y 3 están aplicadas** (ver sección 11). Las cifras de
 > las secciones 1, 3 y 4 son las de **antes** de aplicarla; al final de la
 > sección 11 están las de después.
 
@@ -400,3 +400,47 @@ Sin desbordes de texto ni scroll horizontal en escritorio ni en móvil.
 
 **Pendiente para la Fase 3:** el modo oscuro, los nombres cortados en los ejes
 de las gráficas y las barras que salen todas al 100% del ancho.
+
+### Resultado de la Fase 3 (aplicada)
+
+**Modo oscuro.** La causa raíz no era que faltaran reglas, sino dos que nunca
+se desactivaban:
+
+```css
+body:not([data-theme="dark"]) { background: #f8f9fe; }  /* el atributo va en <html> */
+#results-screen { background: #f8f9fe; }                 /* sin acotar al tema */
+```
+
+El `:not()` se evaluaba sobre `<body>`, que nunca lleva el atributo, así que
+**siempre** pintaba claro. De ahí venían los "paneles claros sobre fondo
+negro". Además se enrutaron a variables los colores que estaban escritos
+dentro del HTML generado (tipo de equipo, estados, superficies blancas) y se
+oscurecieron las teselas del mapa.
+
+| En oscuro | Antes | Después |
+|---|---|---|
+| Paneles claros sobre fondo oscuro | 6 | **1** |
+| Textos bajo el mínimo de contraste | 41 | **25** |
+
+Los 25 restantes son en su mayoría etiquetas sobre el mapa, iconos y las
+iniciales del avatar sobre un degradado.
+
+**Gráficas.**
+
+- El eje de valores llegaba justo al máximo de la serie, así que con todos los
+  valores iguales **todas las barras salían al 100%** y parecía que todo estaba
+  al máximo. Ahora hay holgura: con valores de 1, el eje llega a 2.
+- Los nombres se cortaban a mitad de palabra ("Alicia Jaqueline Pi…"). Ahora
+  se cortan por palabra y el nombre completo sigue estando en el tooltip.
+- Ejes y valores suben de 10px a 11px, el suelo de la escala.
+
+**Fila de KPI.** Los cuatro conteos (Total BD, HH apagadas, TT apagadas,
+Tiendas) pasan a tarjeta plana; el anillo se queda **solo en los dos
+porcentajes de disponibilidad**, que es donde significa "parte de un total".
+El cambio se aplicó a las **dos** filas de KPI: la de Cruce y la de Resumen,
+que son marcados distintos. "Disp. HH %" pasa a "Disponibilidad HH": el valor
+ya lleva el signo.
+
+**Pendiente.** Las sombras escritas como propiedad de JavaScript
+(`this.style.boxShadow`) siguen con valores a pelo, y el ancho máximo común
+de la sección 9 no se tocó.

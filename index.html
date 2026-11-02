@@ -70,6 +70,10 @@
       --radius-pill: 999px;
       /* Texto sobre el rojo de marca: --text-light es para fondo claro */
       --text-on-brand: rgba(255,255,255,0.92);
+      /* Color por tipo de equipo; el modo oscuro los redefine abajo. */
+      --tipo-hh: #1F7A4E;  --tipo-hh-suave: #C8E6C9;  --tipo-hh-fuerte: #155724;
+      --tipo-tt: #0066CC;  --tipo-tt-suave: #E3F2FD;  --tipo-tt-fuerte: #003399;
+      --sobre-tipo: #ffffff;
       /* === SOMBRAS (4 NIVELES) === */
       --shadow-1: 0 1px 3px rgba(0,0,0,0.08);
       --shadow-2: 0 2px 8px rgba(0,0,0,0.12);
@@ -124,6 +128,9 @@
       --table-row-alt: #25222A;
       --table-head-bg: #2A2730;
       --hover-bg: rgba(255,255,255,0.04);
+      --tipo-hh: #4ADE80;  --tipo-hh-suave: rgba(74,222,128,0.12);  --tipo-hh-fuerte: #8FE9B4;
+      --tipo-tt: #5AA9FF;  --tipo-tt-suave: rgba(90,169,255,0.12);  --tipo-tt-fuerte: #A8CFFF;
+      --sobre-tipo: #0F0E11;
       color-scheme: dark;
     }
 
@@ -1896,7 +1903,7 @@
       letter-spacing: 0.02em;
       animation: trendFadeIn .5s ease-out backwards;
     }
-    .metric-trend.up   { color: #B3261E; background: rgba(179,38,30,0.10); }
+    .metric-trend.up   { color: var(--error); background: rgba(179,38,30,0.10); }
     .metric-trend.down { color: #1F7A4E; background: rgba(31,122,78,0.10); }
     .metric-trend.flat { color: var(--text-light); background: rgba(0,0,0,0.05); }
     .metric-trend svg { width: 11px; height: 11px; }
@@ -2291,7 +2298,7 @@
 
 table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .snap-cmp td, .snap-cmp th { border: 1px solid var(--border); padding: 5px 8px; }
-    .delta-pos { color: #B3261E; font-weight: 700; }
+    .delta-pos { color: var(--error); font-weight: 700; }
     .delta-neg { color: #1F7A4E; font-weight: 700; }
     .delta-zero { color: var(--text-light); }
 
@@ -5522,7 +5529,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: 1px solid var(--border);
       border-radius: 6px;
       font-size: 11px;
-      background: white;
+      background: var(--input-bg);
     }
     
     #detalle .table-wrapper tbody tr {
@@ -5596,7 +5603,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       min-width: 600px;
       border-collapse: separate;
       border-spacing: 0;
-      background: white;
+      background: var(--table-bg);
     }
     
     #stock-table-wrap thead {
@@ -6210,7 +6217,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       position: sticky;
       top: 0;
       z-index: 40;
-      background: linear-gradient(180deg, var(--bg) 0%, rgba(255,255,255,0.95) 100%);
+      background: linear-gradient(180deg, var(--bg) 0%, var(--surface) 100%);
       padding: 16px 0;
       margin: -16px 0 20px 0;
       border-bottom: 1px solid var(--border);
@@ -6729,7 +6736,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; font-size: 16px;
     }
-    .notif-item .notif-icon.critical { background: rgba(179,38,30,0.1); color: #B3261E; }
+    .notif-item .notif-icon.critical { background: rgba(179,38,30,0.1); color: var(--error); }
     .notif-item .notif-icon.warning { background: rgba(245,166,35,0.1); color: #F5A623; }
     .notif-item .notif-icon.info { background: rgba(25,118,210,0.1); color: #1976D2; }
     .notif-item .notif-icon.success { background: rgba(31,122,78,0.1); color: #1F7A4E; }
@@ -7627,7 +7634,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:20px; margin-bottom:24px; padding:0 14px;">
 
           <!-- KPI 1: Total BD -->
-          <div class="kpi-circular-widget kpi-clickable" data-kpi="total-bd" onclick="toggleKpiDetail('total-bd')" id="widget-total-bd">
+          <div class="kpi-circular-widget kpi-clickable kpi-sin-anillo" data-kpi="total-bd" onclick="toggleKpiDetail('total-bd')" id="widget-total-bd">
             <div class="kpi-circle-container">
               <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                 <!-- Background circle -->
@@ -7646,7 +7653,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           </div>
 
           <!-- KPI 2: HH Apagadas -->
-          <div class="kpi-circular-widget kpi-clickable" data-kpi="apagados-hh" onclick="toggleKpiDetail('apagados-hh')" id="widget-apagados-hh">
+          <div class="kpi-circular-widget kpi-clickable kpi-sin-anillo" data-kpi="apagados-hh" onclick="toggleKpiDetail('apagados-hh')" id="widget-apagados-hh">
             <div class="kpi-circle-container">
               <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                 <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
@@ -7662,7 +7669,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           </div>
 
           <!-- KPI 3: TT Apagadas -->
-          <div class="kpi-circular-widget kpi-clickable" data-kpi="apagados-tt" onclick="toggleKpiDetail('apagados-tt')" id="widget-apagados-tt">
+          <div class="kpi-circular-widget kpi-clickable kpi-sin-anillo" data-kpi="apagados-tt" onclick="toggleKpiDetail('apagados-tt')" id="widget-apagados-tt">
             <div class="kpi-circle-container">
               <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                 <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
@@ -7687,7 +7694,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               </svg>
               <div class="kpi-circle-content">
                 <div class="kpi-number" id="disp-hh">—</div>
-                <div class="kpi-label"><span class="kpi-status-glyph material-symbols-outlined" id="disp-hh-glyph" aria-hidden="true"></span><span id="disp-hh-status-sr" class="sr-only"></span>Disp. HH %</div>
+                <div class="kpi-label"><span class="kpi-status-glyph material-symbols-outlined" id="disp-hh-glyph" aria-hidden="true"></span><span id="disp-hh-status-sr" class="sr-only"></span>Disponibilidad HH</div>
               </div>
             </div>
             <div class="kpi-tooltip">Tiendas con HH funcionando</div>
@@ -7703,14 +7710,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               </svg>
               <div class="kpi-circle-content">
                 <div class="kpi-number" id="disp-tt">—</div>
-                <div class="kpi-label"><span class="kpi-status-glyph material-symbols-outlined" id="disp-tt-glyph" aria-hidden="true"></span><span id="disp-tt-status-sr" class="sr-only"></span>Disp. TT %</div>
+                <div class="kpi-label"><span class="kpi-status-glyph material-symbols-outlined" id="disp-tt-glyph" aria-hidden="true"></span><span id="disp-tt-status-sr" class="sr-only"></span>Disponibilidad TT</div>
               </div>
             </div>
             <div class="kpi-tooltip">Tiendas con TT funcionando</div>
           </div>
 
           <!-- KPI 6: Tiendas -->
-          <div class="kpi-circular-widget kpi-clickable" data-kpi="total-reporte" onclick="toggleKpiDetail('total-reporte')" id="widget-total-reporte">
+          <div class="kpi-circular-widget kpi-clickable kpi-sin-anillo" data-kpi="total-reporte" onclick="toggleKpiDetail('total-reporte')" id="widget-total-reporte">
             <div class="kpi-circle-container">
               <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                 <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
@@ -7783,6 +7790,21 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             justify-content: center;
             z-index: 2;
           }
+
+          /* Fase 3: un aro promete "parte de un total". Cuatro de los seis
+             KPI son conteos (equipos, tiendas), no proporciones, así que ahí
+             el aro era decoración que confundía. Pasan a tarjeta plana; el aro
+             se queda solo en los dos porcentajes de disponibilidad. */
+          .kpi-circular-widget.kpi-sin-anillo .kpi-circle-svg { display: none; }
+          .kpi-circular-widget.kpi-sin-anillo .kpi-circle-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md) !important;
+            box-shadow: var(--shadow-1);
+            width: 132px;
+            height: 104px;
+          }
+          .kpi-circular-widget.kpi-sin-anillo .kpi-circle-container::before { display: none; }
 
           .kpi-circle-svg {
             position: absolute;
@@ -8117,7 +8139,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             }
             50% {
               box-shadow: 0 12px 32px rgba(179,38,30,0.25);
-              border-color: #B3261E;
+              border-color: var(--error);
             }
           }
 
@@ -8401,7 +8423,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       left: 2px;
       width: 20px;
       height: 20px;
-      background: white;
+      background: var(--card-bg);
       border-radius: 50%;
       transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
       box-shadow: var(--shadow-1);
@@ -8504,7 +8526,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     /* DANGER chip when checked */
     .filter-chip-danger {
-      --chip-color: #B3261E;
+      --chip-color: var(--error);
     }
     .filter-chip-danger:has(input:checked) {
       background: linear-gradient(135deg, rgba(179,38,30,0.12), rgba(179,38,30,0.06));
@@ -9599,7 +9621,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     tbody#cruce-table tr.sev-extreme:hover,
     tbody#detalle-table tr.sev-extreme:hover { background: rgba(179,38,30,0.18); }
-    .days-cell.sev-extreme { color:#B3261E; }
+    .days-cell.sev-extreme { color:var(--error); }
     .days-cell.sev-extreme .days-badge,
     tbody#detalle-table tr.sev-extreme .days-extreme-badge {
       background:#B3261E; color:#fff; font-weight:800;
@@ -9810,7 +9832,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:12px;">
 
             <!-- KPI 1: Total BD -->
-            <div class="kpi-circular-widget" style="cursor:default;">
+            <div class="kpi-circular-widget kpi-sin-anillo" style="cursor:default;">
               <div class="kpi-circle-container">
                 <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                   <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
@@ -9825,7 +9847,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
 
             <!-- KPI 2: HH Apagadas -->
-            <div class="kpi-circular-widget" style="cursor:default;">
+            <div class="kpi-circular-widget kpi-sin-anillo" style="cursor:default;">
               <div class="kpi-circle-container">
                 <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                   <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
@@ -9840,7 +9862,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
 
             <!-- KPI 3: TT Apagadas -->
-            <div class="kpi-circular-widget" style="cursor:default;">
+            <div class="kpi-circular-widget kpi-sin-anillo" style="cursor:default;">
               <div class="kpi-circle-container">
                 <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                   <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
@@ -9891,7 +9913,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
 
             <!-- KPI 6: Tiendas -->
-            <div class="kpi-circular-widget" style="cursor:default;">
+            <div class="kpi-circular-widget kpi-sin-anillo" style="cursor:default;">
               <div class="kpi-circle-container">
                 <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                   <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
@@ -10092,7 +10114,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <!-- KPI: Equipos Críticos -->
               <div class="kpi-card" style="background:linear-gradient(135deg, rgba(179,38,30,0.08) 0%, transparent 100%); border:1px solid rgba(179,38,30,0.2); border-radius:12px; padding:20px; text-align:center;">
                 <div style="font-size:11px; font-weight:700; color:var(--text-light); letter-spacing:0; margin-bottom:8px;">Críticos (≥15 días)</div>
-                <div style="font-size:36px; font-weight:800; color:#B3261E; margin-bottom:4px;" id="analytics-critical">—</div>
+                <div style="font-size:36px; font-weight:800; color:var(--error); margin-bottom:4px;" id="analytics-critical">—</div>
                 <div style="font-size:11px; color:var(--text-light);">necesitan intervención</div>
               </div>
 
@@ -10398,7 +10420,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;" onclick="exportSnapshotsJSON()" title="Descargar JSON con todos los snapshots">
                 <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">download</span> Exportar JSON
               </button>
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px; border-color:#B3261E;color:#B3261E;" onclick="clearAllSnapshots()" title="Borrar todos los snapshots">
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px; border-color:var(--error);color:var(--error);" onclick="clearAllSnapshots()" title="Borrar todos los snapshots">
                 <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">delete_forever</span> Borrar todos
               </button>
             </div>
@@ -10561,11 +10583,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; position:relative; z-index:1;">
                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' style='width:40px;height:40px;'><circle cx='32' cy='32' r='28' fill='rgba(179,38,30,0.1)'/><path d='M32 12 L42 18 L42 28 Q42 38 32 44 Q22 38 22 28 L22 18 Z' fill='#B3261E' stroke='#B3261E' stroke-width='1'/><circle cx='32' cy='26' r='3' fill='white'/></svg>
                 <div>
-                  <div style="font-size:12px; font-weight:600; color:#B3261E;">ROBO</div>
+                  <div style="font-size:12px; font-weight:600; color:var(--error);">ROBO</div>
                   <div style="font-size:11px; color:var(--text-light);">Equipos reportados</div>
                 </div>
               </div>
-              <div style="font-size:28px; font-weight:700; color:#B3261E; position:relative; z-index:1;" id="count-robo">0</div>
+              <div style="font-size:28px; font-weight:700; color:var(--error); position:relative; z-index:1;" id="count-robo">0</div>
             </div>
 
             <!-- DAÑADA -->
@@ -10612,7 +10634,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <!-- FILTROS + TABLA EQUIPOS -->
           <div class="estado-table-wrap" id="estado-table-wrap" style="margin-bottom:28px;">
             <div class="estado-filters" style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap;">
-              <button class="estado-chip robo" onclick="filterGarantiaByEstado('ROBO')" style="padding:8px 14px; border:1px solid rgba(179,38,30,0.3); background:rgba(179,38,30,0.04); color:#B3261E; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">report</span>Robo</button>
+              <button class="estado-chip robo" onclick="filterGarantiaByEstado('ROBO')" style="padding:8px 14px; border:1px solid rgba(179,38,30,0.3); background:rgba(179,38,30,0.04); color:var(--error); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">report</span>Robo</button>
               <button class="estado-chip danada" onclick="filterGarantiaByEstado('DAÑADA')" style="padding:8px 14px; border:1px solid rgba(245,166,35,0.3); background:rgba(245,166,35,0.04); color:#F5A623; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">build</span>Dañada</button>
               <button class="estado-chip garantia" onclick="filterGarantiaByEstado('GARANTÍA')" style="padding:8px 14px; border:1px solid rgba(25,118,210,0.3); background:rgba(25,118,210,0.04); color:#1976D2; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">verified</span>Garantía</button>
               <button class="estado-chip apagada" onclick="filterGarantiaByEstado('APAGADA')" style="padding:8px 14px; border:1px solid rgba(95,99,104,0.3); background:rgba(95,99,104,0.04); color:#5F6368; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">power_settings_new</span>Apagada</button>
@@ -11081,13 +11103,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <span style="font-size:12px; opacity:0.6; margin-left:auto;">▼</span>
               </summary>
               <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px; padding-top:12px; border-top:1px solid rgba(179,38,30,0.1);">
-                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:#B3261E; border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="clearPersistedComments()">
+                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="clearPersistedComments()">
                   🗑️ Limpiar comentarios
                 </button>
-                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:#B3261E; border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="clearAttendedAll()">
+                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="clearAttendedAll()">
                   🗑️ Quitar "atendidos"
                 </button>
-                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:#B3261E; border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="clearPersistedNotes()">
+                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="clearPersistedNotes()">
                   🗑️ Limpiar notas
                 </button>
               </div>
@@ -11373,7 +11395,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                     <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">upload</span>
                     Cargar logo
                   </button>
-                  <button class="btn btn-secondary" onclick="clearLogo()" style="padding:6px 14px;border-color:#B3261E;color:#B3261E;">
+                  <button class="btn btn-secondary" onclick="clearLogo()" style="padding:6px 14px;border-color:var(--error);color:var(--error);">
                     <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">delete</span>
                     Quitar
                   </button>
@@ -11430,7 +11452,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
               <!-- Botones de acción -->
               <div style="display:flex; gap:8px; margin-top:12px; border-top:1px solid var(--border); padding-top:12px;">
-                <button onclick="clearAllCosts()" style="flex:1; padding:8px 12px; background:transparent; color:#B3261E; border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
+                <button onclick="clearAllCosts()" style="flex:1; padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
                   🗑️ Limpiar todos
                 </button>
                 <button onclick="saveCostConfig()" style="flex:1; padding:8px 12px; background:var(--primary); color:white; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
@@ -11572,7 +11594,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <button class="btn-modal" onclick="exportSnapshotsJSON()" title="Descargar JSON con todos los snapshots">
             <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">download</span> Exportar JSON
           </button>
-          <button class="btn-modal" onclick="clearAllSnapshots()" style="color:#B3261E;border-color:#B3261E;">
+          <button class="btn-modal" onclick="clearAllSnapshots()" style="color:var(--error);border-color:var(--error);">
             <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">delete_forever</span> Borrar todos
           </button>
           <button class="btn-modal primary" onclick="closeSnapshotsModal()">Cerrar</button>
@@ -14059,7 +14081,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var infoControl = L.control({ position: 'topright' });
       infoControl.onAdd = function(map) {
         var div = L.DomUtil.create('div', 'map-info-box');
-        div.style.cssText = 'background:white;border:1px solid var(--border);border-radius:8px;padding:12px;box-shadow:var(--shadow-2);font-size:11px;color:var(--text);max-width:160px;line-height:1.4;';
+        div.style.cssText = 'background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;box-shadow:var(--shadow-2);font-size:11px;color:var(--text);max-width:160px;line-height:1.4;';
         div.innerHTML = '<div style="font-weight:700;margin-bottom:6px;">Leyenda del Mapa</div>' +
           '<div style="margin-bottom:4px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#2A6E40;margin-right:6px;"></span>Operativo (≥98%)</div>' +
           '<div style="margin-bottom:4px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#E8B400;margin-right:6px;"></span>Atención (95–97%)</div>' +
@@ -14128,7 +14150,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             '<div style="font-size:11px; color:#888; margin-bottom:10px;">' + geo.desc + '</div>' +
             '<div style="display:flex; gap:12px; margin-bottom:8px;">' +
               '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:#333;">' + totalPlaza + '</div><div style="font-size:11px; color:#999;">Equipos</div></div>' +
-              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:#B3261E;">' + critPlaza + '</div><div style="font-size:11px; color:#999;">Offline</div></div>' +
+              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:var(--error);">' + critPlaza + '</div><div style="font-size:11px; color:#999;">Offline</div></div>' +
               '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:' + statusColor + ';">' + dispPct.toFixed(1) + '%</div><div style="font-size:11px; color:#999;">Disp.</div></div>' +
             '</div>' +
             '<div style="padding:4px 8px; background:' + statusColor + '15; border-left:3px solid ' + statusColor + '; border-radius:0 4px 4px 0; font-size:11px; font-weight:600; color:' + statusColor + ';">' +
@@ -14812,20 +14834,20 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       // === RESUMEN POR TIPO (cards interactivas mejoradas) ===
       var rows = [
-        { name: 'HH',     icon: 'inventory_2', emoji: '📱', total: s.hhTotalBD, offline: s.hhCritical, disp: s.dispHH, color: '#1F7A4E', colorLight: '#C8E6C9', colorDark: '#155724' },
-        { name: 'TABLET', icon: 'tablet', emoji: '📲', total: s.ttTotalBD, offline: s.ttCritical, disp: s.dispTT, color: '#0066CC', colorLight: '#E3F2FD', colorDark: '#003399' }
+        { name: 'HH',     icon: 'inventory_2', emoji: '📱', total: s.hhTotalBD, offline: s.hhCritical, disp: s.dispHH, color: 'var(--tipo-hh)', colorLight: 'var(--tipo-hh-suave)', colorDark: 'var(--tipo-hh-fuerte)' },
+        { name: 'TABLET', icon: 'tablet', emoji: '📲', total: s.ttTotalBD, offline: s.ttCritical, disp: s.dispTT, color: 'var(--tipo-tt)', colorLight: 'var(--tipo-tt-suave)', colorDark: 'var(--tipo-tt-fuerte)' }
       ];
       var html = '';
       rows.forEach((r, idx) => {
         var dispNum = parseFloat(r.disp);
         var offlinePct = 100 - dispNum;
         // Color dinámico según disponibilidad
-        var statusColor = dispNum >= 99 ? '#1F7A4E' : dispNum >= 97 ? '#F5A623' : '#B3261E';
+        var statusColor = dispNum >= 99 ? 'var(--success)' : dispNum >= 97 ? 'var(--warning)' : 'var(--error)';
         var statusBg = dispNum >= 99 ? 'rgba(31, 122, 78, 0.1)' : dispNum >= 97 ? 'rgba(245, 166, 35, 0.1)' : 'rgba(179, 38, 30, 0.1)';
 
         // Barra de progreso visual
         var progressPct = dispNum;
-        var progressColor = dispNum >= 99 ? '#1F7A4E' : dispNum >= 97 ? '#F5A623' : '#B3261E';
+        var progressColor = dispNum >= 99 ? 'var(--success)' : dispNum >= 97 ? 'var(--warning)' : 'var(--error)';
 
         html += `<div style="padding: 20px; background: linear-gradient(135deg, ${r.colorLight} 0%, var(--surface) 100%);
                            border: 2px solid ${r.color}; border-radius: 16px;
@@ -14847,7 +14869,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <div style="width: 48px; height: 48px; background: ${r.color}; border-radius: 12px;
                           display: flex; align-items: center; justify-content: center;
                           box-shadow: var(--shadow-2);">
-                <span class="material-symbols-outlined" style="font-size: 28px; color: white;">${r.icon}</span>
+                <span class="material-symbols-outlined" style="font-size: 28px; color: var(--sobre-tipo);">${r.icon}</span>
               </div>
               <div>
                 <div style="font-weight: 700; font-size: 18px; color: ${r.colorDark};">${r.name}</div>
@@ -14862,16 +14884,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <!-- Métricas en grid -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; z-index: 1;">
             <!-- Total -->
-            <div style="padding: 12px; background: white; border-radius: 12px; box-shadow: var(--shadow-1); text-align: center; border-left: 4px solid ${r.color};">
+            <div style="padding: 12px; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow-1); text-align: center; border-left: 4px solid ${r.color};">
               <div style="font-size: 11px; font-weight: 600; color: var(--text-light); letter-spacing:0; margin-bottom: 4px;">Total</div>
               <div style="font-size: 24px; font-weight: 800; color: ${r.color};">${r.total}</div>
               <div style="font-size: 11px; color: var(--text-light); margin-top: 4px;">en BD</div>
             </div>
             <!-- Offline -->
             <div style="padding: 12px; background: rgba(179, 38, 30, 0.08); border-radius: 12px; box-shadow: var(--shadow-1); text-align: center; border-left: 4px solid #B3261E;">
-              <div style="font-size: 11px; font-weight: 600; color: #B3261E; letter-spacing:0; margin-bottom: 4px;">Offline ≥4D</div>
-              <div style="font-size: 24px; font-weight: 800; color: #B3261E;">${r.offline}</div>
-              <div style="font-size: 11px; color: #B3261E; margin-top: 4px;">críticos</div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--error); letter-spacing:0; margin-bottom: 4px;">Offline ≥4D</div>
+              <div style="font-size: 24px; font-weight: 800; color: var(--error);">${r.offline}</div>
+              <div style="font-size: 11px; color: var(--error); margin-top: 4px;">críticos</div>
             </div>
           </div>
 
@@ -14901,7 +14923,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                       transition: background 0.15s; position: relative; z-index: 1;"
                onmouseover="this.style.background='${r.colorDark}';"
                onmouseout="this.style.background='${r.color}';">
-            <div style="font-size: 12px; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--sobre-tipo); display: flex; align-items: center; justify-content: center; gap: 6px;">
               <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
               Ver detalles
             </div>
@@ -14956,7 +14978,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var tiendas = Object.keys(uniqueStores).length;
 
       // Colores dinámicos según disponibilidad
-      function dispColor(v) { return v >= 99 ? '#1F7A4E' : v >= 97 ? '#F5A623' : '#B3261E'; }
+      function dispColor(v) { return v >= 99 ? 'var(--success)' : v >= 97 ? 'var(--warning)' : 'var(--error)'; }
       function dispBg(v)    { return v >= 99 ? 'rgba(31,122,78,0.12)' : v >= 97 ? 'rgba(245,166,35,0.12)' : 'rgba(179,38,30,0.12)'; }
       function dispGlyph(v) { return v >= 99 ? 'check_circle' : v >= 97 ? 'warning' : 'error'; }
 
@@ -14998,14 +15020,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       // --- KPI 2: HH Apagadas ---
       setText('rs-apagados-hh', hhOff);
       animCircle('rs-circle-apagados-hh', totalBD > 0 ? (hhOff / totalBD * 100) : 0);
-      setCircleColor('rs-circle-apagados-hh', hhOff > 0 ? '#B3261E' : '#999');
-      setColor('rs-apagados-hh', hhOff > 0 ? '#B3261E' : 'var(--text)');
+      setCircleColor('rs-circle-apagados-hh', hhOff > 0 ? 'var(--error)' : 'var(--text-light)');
+      setColor('rs-apagados-hh', hhOff > 0 ? 'var(--error)' : 'var(--text)');
 
       // --- KPI 3: TT Apagadas ---
       setText('rs-apagados-tt', ttOff);
       animCircle('rs-circle-apagados-tt', totalBD > 0 ? (ttOff / totalBD * 100) : 0);
-      setCircleColor('rs-circle-apagados-tt', ttOff > 0 ? '#B3261E' : '#999');
-      setColor('rs-apagados-tt', ttOff > 0 ? '#B3261E' : 'var(--text)');
+      setCircleColor('rs-circle-apagados-tt', ttOff > 0 ? 'var(--error)' : 'var(--text-light)');
+      setColor('rs-apagados-tt', ttOff > 0 ? 'var(--error)' : 'var(--text)');
 
       // --- KPI 4: Disp. HH % ---
       setText('rs-disp-hh', dispHH.toFixed(2) + '%');
@@ -16025,7 +16047,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <td style="padding:8px 12px; text-align:left; color:var(--text);">${model}</td>
           <td style="padding:8px 12px; text-align:right; color:var(--text); font-weight:600;">$${parseFloat(cost).toFixed(2)}</td>
           <td style="padding:8px 12px; text-align:center;">
-            <button onclick="deleteCostModel('${model}')" style="padding:4px 8px; background:transparent; color:#B3261E; border:1px solid #B3261E; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
+            <button onclick="deleteCostModel('${model}')" style="padding:4px 8px; background:transparent; color:var(--error); border:1px solid #B3261E; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
               ✕
             </button>
           </td>
@@ -16516,14 +16538,24 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         axisLine: { lineStyle: { color: T.axisLine } },
         axisLabel: {
           color: T.textColor,
-          fontSize: 10,
-          formatter: function(v) { return v.length > 25 ? v.substring(0, 22) + '...' : v; }
+          fontSize: 11,
+          formatter: function(v) {
+            v = String(v);
+            if (v.length <= 24) return v;
+            // Cortar por palabra: "Alicia Jaqueline Piña…" se lee mejor que
+            // "Alicia Jaqueline Pi…". El nombre completo sale en el tooltip.
+            var corte = v.lastIndexOf(' ', 23);
+            return (corte > 10 ? v.slice(0, corte) : v.slice(0, 23)) + '…';
+          }
         },
         axisTick: { show: false }
       };
       var valueAxis = {
         type: 'value',
         minInterval: 1,
+        // Sin holgura, una serie de valores iguales pinta todas las barras al
+        // 100% y parece que todo está al máximo.
+        max: function(v) { return Math.max(v.max + 1, Math.ceil(v.max * 1.15)); },
         axisLine: { show: false },
         axisLabel: {
           color: T.textColor, fontSize: 10,
@@ -16560,7 +16592,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             show: true,
             position: horizontal ? 'right' : 'top',
             color: T.textColor,
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 600,
             formatter: function(p) { return Number(p.value).toLocaleString('es-MX'); }
           },
@@ -16762,15 +16794,17 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         xAxis: {
           type: 'value',
           minInterval: 1,
+          // Misma holgura que drawBar: sin ella, totales iguales llenan la barra.
+          max: function(v) { return Math.max(v.max + 1, Math.ceil(v.max * 1.15)); },
           axisLine: { show: false },
-          axisLabel: { color: T.textColor, fontSize: 10 },
+          axisLabel: { color: T.textColor, fontSize: 11 },
           splitLine: { lineStyle: { color: T.splitLine } }
         },
         yAxis: {
           type: 'category',
           data: truncatedLabels,
           axisLine: { lineStyle: { color: T.axisLine } },
-          axisLabel: { color: T.textColor, fontSize: 10 },
+          axisLabel: { color: T.textColor, fontSize: 11 },
           axisTick: { show: false },
           inverse: true
         },
@@ -19515,7 +19549,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             plazaBreakdown += '<tr style="background:' + bg + ';">' +
               '<td style="border:1px solid #E0E0E0; padding:4px 6px;">' + escHTML(plaza) + '</td>' +
               '<td style="border:1px solid #E0E0E0; padding:4px 6px; text-align:right;">' + p.total + '</td>' +
-              '<td style="border:1px solid #E0E0E0; padding:4px 6px; text-align:right; color:#B3261E; font-weight:600;">' + p.critical + '</td>' +
+              '<td style="border:1px solid #E0E0E0; padding:4px 6px; text-align:right; color:var(--error); font-weight:600;">' + p.critical + '</td>' +
               '<td style="border:1px solid #E0E0E0; padding:4px 6px; text-align:right;">' + pctCrit + '%</td>' +
               '</tr>';
           });
@@ -19533,7 +19567,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           '<table style="width:100%; border-collapse:collapse; font-size:12px;">' +
             '<tr><td style="padding:6px 0; font-weight:600;">Total tiendas en universo:</td><td style="text-align:right;">' + stats.totalBD + '</td></tr>' +
             '<tr><td style="padding:6px 0; font-weight:600;">Equipos en reporte (válidos):</td><td style="text-align:right;">' + stats.totalReport + '</td></tr>' +
-            '<tr><td style="padding:6px 0; font-weight:600; color:#B3261E;">Equipos apagados ≥4 días:</td><td style="text-align:right; color:#B3261E; font-weight:700;">' + stats.totalCritical + '</td></tr>' +
+            '<tr><td style="padding:6px 0; font-weight:600; color:var(--error);">Equipos apagados ≥4 días:</td><td style="text-align:right; color:var(--error); font-weight:700;">' + stats.totalCritical + '</td></tr>' +
             '<tr><td style="padding:6px 0; font-weight:600;">% Offline HH:</td><td style="text-align:right;">' + stats.hhPct + '%</td></tr>' +
             '<tr><td style="padding:6px 0; font-weight:600;">% Offline TT:</td><td style="text-align:right;">' + stats.ttPct + '%</td></tr>' +
           '</table>' +
@@ -19563,11 +19597,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             + '</tr></thead><tbody>';
       html += '<tr style="background:white;"><td style="border:1px solid #E0E0E0; padding:6px 8px;">HH</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">' + stats.hhTotalBD + '</td>'
-            + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right; color:#B3261E; font-weight:700;">' + stats.hhCritical + '</td>'
+            + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right; color:var(--error); font-weight:700;">' + stats.hhCritical + '</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">' + stats.hhPct + '%</td></tr>';
       html += '<tr style="background:#FAFAFA;"><td style="border:1px solid #E0E0E0; padding:6px 8px;">TABLET</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">' + stats.ttTotalBD + '</td>'
-            + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right; color:#B3261E; font-weight:700;">' + stats.ttCritical + '</td>'
+            + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right; color:var(--error); font-weight:700;">' + stats.ttCritical + '</td>'
             + '<td style="border:1px solid #E0E0E0; padding:6px 8px; text-align:right;">' + stats.ttPct + '%</td></tr>';
       html += '</tbody></table>';
       return html;
@@ -22640,9 +22674,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.95);
+      background: var(--card-bg);
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow-2);
       cursor: pointer;
       display: flex;
@@ -23452,8 +23486,23 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     --text: #32325d;        /* slate Argon */
     --text-light: #5c6b82;  /* muted Argon, oscurecido: el #8898aa original daba 2.8-3.0:1 */
   }
-  body:not([data-theme="dark"]) { background: #f8f9fe; }
-  #results-screen { background: #f8f9fe; }
+  /* El atributo data-theme vive en <html>, no en <body>: escrito sobre body,
+     el :not() NUNCA se desactivaba y pintaba la app en claro incluso en modo
+     oscuro. Y #results-screen no estaba acotado en absoluto. De ahí venían los
+     "paneles claros sobre fondo negro". */
+  :root:not([data-theme="dark"]) body,
+  :root:not([data-theme="dark"]) #results-screen { background: #f8f9fe; }
+  /* El mapa trae teselas claras: en modo oscuro quedaba un rectángulo blanco
+     enorme en medio del panel. Se invierten las teselas (técnica habitual en
+     Leaflet) y el lienzo pasa a la superficie oscura. Los marcadores quedan
+     fuera del filtro para que conserven su color de estado. */
+  [data-theme="dark"] .leaflet-container { background: var(--surface); }
+  [data-theme="dark"] .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.95); }
+  [data-theme="dark"] .leaflet-control-attribution { background: rgba(0,0,0,0.6); color: var(--text-light); }
+  [data-theme="dark"] .leaflet-control-attribution a { color: var(--text-light); }
+
+  [data-theme="dark"] body,
+  [data-theme="dark"] #results-screen { background: var(--bg); }
 
   /* Sombra suave difusa Argon en los contenedores principales */
   .metric-card, .table-wrapper, .estado-card, .export-card, .config-section,

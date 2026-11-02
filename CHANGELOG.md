@@ -6,6 +6,11 @@ commits desde el release anterior.
 
 ## Sin publicar
 
+- Fase 3 de la auditoría visual: modo oscuro completo (la causa era un
+  :not() evaluado sobre <body> cuando el atributo vive en <html>), barras de
+  gráfica con holgura en el eje, nombres cortados por palabra y anillo de KPI
+  solo en los porcentajes.
+
 - Fase 2 de la auditoría visual: fuera las MAYÚSCULAS de títulos y etiquetas,
   las dos barras de cabecera pasan a ser una, el hueco del logo deja de
   parecer un placeholder y el rojo se reserva a marca y a crítico.
