@@ -52,12 +52,24 @@
       --space-xl: 24px;
       --space-2xl: 28px;
       --space-3xl: 32px;
+      /* === ESCALA TIPOGRÁFICA (Fase 1 de AUDITORIA_UI.md) ===
+         Siete pasos. Nada por debajo de 11px: antes había texto de 7, 8, 9
+         y 10px, ilegible en un panel que se consulta de lejos. */
+      --fs-micro: 11px;   /* unidades, pies de tarjeta */
+      --fs-label: 12px;   /* etiquetas secundarias */
+      --fs-sm:    13px;   /* texto denso de tabla */
+      --fs-body:  14px;   /* texto normal */
+      --fs-title: 16px;   /* título de tarjeta o sección */
+      --fs-h2:    20px;   /* título de pantalla */
+      --fs-kpi:   28px;   /* número grande de KPI */
       /* === BORDER RADIUS === */
       --radius-xs: 6px;
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
       --radius-pill: 999px;
+      /* Texto sobre el rojo de marca: --text-light es para fondo claro */
+      --text-on-brand: rgba(255,255,255,0.92);
       /* === SOMBRAS (4 NIVELES) === */
       --shadow-1: 0 1px 3px rgba(0,0,0,0.08);
       --shadow-2: 0 2px 8px rgba(0,0,0,0.12);
@@ -350,7 +362,7 @@
 
     .sidebar-content::-webkit-scrollbar-thumb {
       background: rgba(226,0,26,0.25);
-      border-radius: 3px;
+      border-radius: 6px;
     }
 
     .sidebar-content::-webkit-scrollbar-thumb:hover {
@@ -393,7 +405,7 @@
       height: 1.5px;
       background: linear-gradient(to right, rgba(226,0,26,0.2), rgba(226,0,26,0.05), transparent);
       margin-left: 10px;
-      border-radius: 1px;
+      border-radius: 6px;
     }
 
     /* Reset list items animation - already animated by section */
@@ -619,7 +631,7 @@
     .app-bar-logo.has-img {
       padding: 2px;
       background: rgba(255,255,255,0.92);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+      box-shadow: var(--shadow-2);
     }
     .app-bar-logo.has-img img {
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
@@ -649,7 +661,7 @@
       content: "";
       width: 18px; height: 18px;
       border: 1.5px dashed var(--primary);
-      border-radius: 4px;
+      border-radius: 6px;
       display: inline-block;
     }
 
@@ -658,14 +670,14 @@
       min-width: 0;
     }
     .app-bar-title h1 {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       margin: 0;
       letter-spacing: -0.01em;
       line-height: 1.2;
     }
     .app-bar-title p {
-      font-size: 11.5px;
+      font-size: 12px;
       opacity: 0.85;
       margin: 2px 0 0 0;
     }
@@ -698,7 +710,7 @@
       position: absolute; top: -3px; right: -3px;
       background: #FBBF24;
       color: #1C1B1F;
-      font-size: 10px; font-weight: 700;
+      font-size: 11px; font-weight: 700;
       min-width: 16px; height: 16px;
       border-radius: 999px;
       padding: 0 4px;
@@ -759,14 +771,15 @@
     }
     .app-bar-stat {
       display: inline-flex; align-items: center; gap: 6px;
-      font-size: 11.5px;
+      font-size: 12px;
       color: rgba(255,255,255,0.9);
       white-space: nowrap;
     }
     .app-bar-stat .material-symbols-outlined { font-size: 16px; opacity: 0.85; }
     .app-bar-stat strong { font-weight: 700; color: #fff; }
-    .app-bar-stat.warn { color: #FBBF24; }
-    .app-bar-stat.warn strong { color: #FBBF24; }
+    .app-bar-stat.warn { color: var(--text-on-brand); }
+    .app-bar-stat.warn strong { color: #fff; }
+    .app-bar-stat.warn .material-symbols-outlined { color: #FFD166; opacity: 1; }
 
     /* CONTAINER */
     .container {
@@ -783,11 +796,11 @@
       background: rgba(255,255,255,0.7);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(226,0,26,0.1);
-      border-radius: 20px;
+      border-radius: 16px;
       padding: 6px;
       margin: 16px auto;
       max-width: fit-content;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: var(--shadow-2);
       flex-wrap: wrap;
       animation: slideInUp 0.15s ease-out;
     }
@@ -1001,7 +1014,7 @@
       width: 60px;
       height: 3px;
       background: currentColor;
-      border-radius: 2px;
+      border-radius: 6px;
       transition: background 0.15s ease;
       animation: lineGlow 1.8s ease-in-out infinite;
     }
@@ -1045,7 +1058,7 @@
       width: 60px;
       height: 3px;
       background: #F5A623;
-      border-radius: 2px;
+      border-radius: 6px;
       transition: background 0.15s ease;
       animation: lineGlow 1.8s ease-in-out infinite;
     }
@@ -1125,7 +1138,7 @@
 
     .metric-card:hover {
       transform: translateY(-6px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      box-shadow: var(--shadow-4);
     }
 
     [data-kpi="disp-hh"]:hover,
@@ -1135,7 +1148,7 @@
 
     .metric-card:active {
       transform: translateY(-3px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow-3);
     }
 
     .metric-card::after {
@@ -1280,7 +1293,7 @@
 
     /* === IMPROVED TYPOGRAPHY === */
     h2 {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
@@ -1357,7 +1370,7 @@
     }
     
     h2 {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
@@ -1402,7 +1415,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
       margin-bottom: 10px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-1);
     }
     .filter-toolbar label.toggle {
       display: inline-flex;
@@ -1421,7 +1434,7 @@
       width: 18px;
       height: 18px;
       border: 2px solid var(--border);
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
       background: var(--card-bg);
       transition: all 0.2s ease;
@@ -1524,7 +1537,7 @@
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-top: 3px solid var(--primary);   /* acento rojo arriba siempre visible */
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 20px;
       cursor: pointer;
       transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -1533,7 +1546,7 @@
       position: relative;
       overflow: hidden;
       /* Sombra base más marcada para que resalten sobre el fondo */
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-2), 0 1px 4px rgba(0,0,0,0.04);
     }
 
     /* Brillo diagonal de fondo — da sensación premium sin tocar el contenido */
@@ -1593,7 +1606,7 @@
       font-size: 12px;
       margin-top: 8px;
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: 6px;
       display: inline-block;
       animation: slideUp 0.15s ease-out;
     }
@@ -1633,9 +1646,9 @@
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-top: 3px solid var(--primary);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 18px 18px 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-2), 0 1px 4px rgba(0,0,0,0.04);
       display: flex;
       flex-direction: column;
       min-height: 260px;
@@ -1726,7 +1739,7 @@
 
     .dashboard-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.10), 0 4px 10px rgba(226,0,26,0.08);
+      box-shadow: var(--shadow-4), 0 4px 10px rgba(226,0,26,0.08);
       border-color: rgba(226,0,26,0.25);
     }
     .dashboard-card:hover::before { opacity: 1; transform: scaleX(1); }
@@ -1793,7 +1806,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-xs);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: var(--shadow-2);
       z-index: 20;
       min-width: 140px;
       display: none;
@@ -1822,7 +1835,7 @@
     }
     .dashboard-card h3 {
       margin: 0 0 4px 0;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--text);
       text-transform: uppercase;
@@ -1841,7 +1854,7 @@
       border-radius: 8px;
       background: rgba(226,0,26,0.10);
       color: var(--primary);
-      font-size: 17px !important;
+      font-size: 16px !important;
       transition: background .3s ease, transform .3s ease;
     }
     .dashboard-card:hover h3 .material-symbols-outlined {
@@ -1917,7 +1930,7 @@
       border-radius: 50%;
       background: var(--error);
       color: #fff;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 0 0 0 rgba(179,38,30,0.50);
@@ -1931,7 +1944,7 @@
     }
     /* "Last updated" timestamp */
     .metric-updated {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--text-light);
       margin-top: 4px;
       opacity: 0.7;
@@ -1981,7 +1994,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.08em;
       color: #1F7A4E;
@@ -2021,7 +2034,7 @@
       align-items: center;
       justify-content: center;
       color: var(--text-light);
-      font-size: 12.5px;
+      font-size: 12px;
       font-style: normal;
       text-align: center;
       padding: 24px;
@@ -2093,8 +2106,8 @@
     #chart-modal.open { display: flex; }
     #chart-modal .chart-modal-box {
       background: var(--card-bg);
-      border-radius: 14px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+      border-radius: 16px;
+      box-shadow: var(--shadow-4);
       width: min(1100px, 95vw);
       height: min(80vh, 760px);
       display: flex; flex-direction: column;
@@ -2104,7 +2117,7 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 18px; border-bottom: 1px solid var(--border);
     }
-    #chart-modal .chart-modal-head h3 { margin: 0; font-size: 15px; color: var(--text); }
+    #chart-modal .chart-modal-head h3 { margin: 0; font-size: 14px; color: var(--text); }
     #chart-modal .chart-modal-close {
       background: none; border: none; cursor: pointer; color: var(--text-light);
       display: flex; align-items: center; padding: 4px; border-radius: 6px;
@@ -2133,7 +2146,7 @@
     }
 
     [data-theme="dark"] .dashboard-card:hover {
-      box-shadow: 0 12px 28px rgba(0,0,0,0.45), 0 4px 10px rgba(255,59,92,0.12);
+      box-shadow: var(--shadow-4), 0 4px 10px rgba(255,59,92,0.12);
       border-color: rgba(255,59,92,0.32);
     }
     [data-theme="dark"] .dashboard-card::after {
@@ -2225,7 +2238,7 @@
       top: 60px;
       z-index: 50;
       background: var(--table-head-bg);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow-1);
     }
     /* Fondo propio en cada th para que el sticky no deje ver filas por debajo */
     table thead th {
@@ -2236,7 +2249,7 @@
     :focus-visible {
       outline: 2px solid var(--primary);
       outline-offset: 2px;
-      border-radius: 4px;
+      border-radius: 6px;
     }
     /* No mostrar el anillo en clicks de ratón, solo en teclado */
     :focus:not(:focus-visible) { outline: none; }
@@ -2317,7 +2330,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       gap: 10px;
       padding: 12px 14px;
       border: 2px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       background: var(--card-bg);
       align-items: center;
       transition: all 0.2s;
@@ -2469,7 +2482,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: var(--shadow-4);
     }
     .modal-head {
       padding: 14px 18px;
@@ -2478,7 +2491,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       align-items: center;
       justify-content: space-between;
     }
-    .modal-head h3 { margin: 0; font-size: 15px; font-weight: 700; }
+    .modal-head h3 { margin: 0; font-size: 14px; font-weight: 700; }
     .modal-head .modal-actions { display: flex; gap: 8px; }
     .modal-body {
       flex: 1;
@@ -2704,7 +2717,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
       overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      box-shadow: var(--shadow-1);
     }
 
     /* === TABLAS RESPONSIVE EN MÓVIL ===
@@ -2814,7 +2827,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       gap: 7px;
       padding: 5px 11px 5px 9px;
       border-radius: 999px;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.02em;
       white-space: nowrap;
@@ -3186,13 +3199,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: 1.5px solid transparent;
       background-clip: padding-box;
       padding: 28px 18px 26px;
-      border-radius: 20px;
+      border-radius: 16px;
       text-align: center;
       transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, border-color .3s ease;
       overflow: hidden;
       margin-bottom: 12px;
       box-shadow:
-        0 1px 2px rgba(0,0,0,0.04),
+        var(--shadow-1),
         0 4px 16px rgba(226,0,26,0.06),
         inset 0 0 0 1.5px rgba(226,0,26,0.18);
     }
@@ -3236,7 +3249,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .dropzone-v2:hover {
       transform: translateY(-2px);
       box-shadow:
-        0 2px 4px rgba(0,0,0,0.05),
+        var(--shadow-1),
         0 8px 24px rgba(226,0,26,0.12),
         inset 0 0 0 1.5px rgba(226,0,26,0.28);
     }
@@ -3256,7 +3269,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     /* Title with gradient accent */
     .dropzone-v2 .dz-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--text);
       margin-top: 8px;
@@ -3316,7 +3329,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .dropzone-v2 .dz-title::after { display: none; }  /* divider replaces accent */
     .dropzone-v2 .dz-desc {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--text-light);
       margin: 0 0 14px;
       line-height: 1.4;
@@ -3345,7 +3358,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text);
       background: rgba(255,255,255,0.85);
@@ -3355,7 +3368,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 5px 10px;
       border-radius: 999px;
       letter-spacing: 0.04em;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-1);
       transition: transform .2s ease, border-color .2s ease;
     }
     .dropzone-v2 .dz-chip svg { color: var(--primary); flex-shrink: 0; }
@@ -3478,7 +3491,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       position: absolute;
       top: 50%; left: 50%;
       width: 8px; height: 8px;
-      border-radius: 2px;
+      border-radius: 6px;
       opacity: 0;
       transform-origin: center;
     }
@@ -3511,7 +3524,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .dropzone-v2.success .dz-success-mark { opacity: 1; transform: scale(1) rotate(0); }
 
     .upload-header { text-align: center; margin-bottom: 14px; }
-    .upload-header h1 { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+    .upload-header h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
     .upload-header p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-light); margin-bottom: 0; }
 
     /* Dark mode */
@@ -3528,7 +3541,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     .dropzone {
       border: 2.5px dashed rgba(226,0,26,0.5);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 32px 16px;
       text-align: center;
       cursor: pointer;
@@ -3737,7 +3750,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 14px 20px;
       border: none;
       border-radius: 8px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -3970,7 +3983,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       .app-bar-row1 { padding: 10px 14px; gap: 10px; flex-wrap: wrap; }
       .app-bar-row2 { padding: 8px 14px; gap: 8px; }
       .app-bar-title h1 { font-size: 14px; }
-      .app-bar-title p { font-size: 10.5px; }
+      .app-bar-title p { font-size: 11px; }
       .app-bar-logo { min-width: 84px; height: 36px; padding: 4px 10px; }
       .app-bar-logo img, .app-bar-logo svg { max-height: 22px; }
       .app-bar-actions { gap: 6px; }
@@ -3986,7 +3999,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         inset: -6px;
       }
       .app-bar-stats { gap: 10px; width: 100%; margin-left: 0; justify-content: flex-start; }
-      .app-bar-stat { font-size: 10.5px; }
+      .app-bar-stat { font-size: 11px; }
 
       .container {
         padding: 16px;
@@ -4026,7 +4039,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       }
 
       .metric-subtitle {
-        font-size: 10px;
+        font-size: 11px;
       }
 
       table {
@@ -4231,7 +4244,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       position: absolute;
       width: 20px;
       height: 20px;
-      border-radius: 10px;
+      border-radius: 12px;
       background: var(--card-bg);
       top: 2px;
       left: 2px;
@@ -4362,7 +4375,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       cursor: pointer;
       min-width: 230px;
       position: relative;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-1);
       user-select: none;
     }
     .plaza-pill:hover {
@@ -4398,7 +4411,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       text-align: center;
     }
     .plaza-pill-label .top {
-      font-size: 9.5px;
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -4474,7 +4487,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     @keyframes plazaFlash {
       0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(226,0,26,0.45); }
       40%  { transform: scale(1.03); box-shadow: 0 0 0 8px rgba(226,0,26,0); }
-      100% { transform: scale(1); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+      100% { transform: scale(1); box-shadow: var(--shadow-1); }
     }
     .plaza-pill.flash .plaza-pill-label .value { animation: plazaValueSwap 0.15s ease; }
     @keyframes plazaValueSwap {
@@ -4482,7 +4495,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       100% { opacity: 1; transform: translateY(0); }
     }
     .plaza-pill.disabled { opacity: 0.85; cursor: not-allowed; }
-    .plaza-pill.disabled:hover { transform: none; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .plaza-pill.disabled:hover { transform: none; box-shadow: var(--shadow-1); }
     .plaza-pill.disabled .plaza-pill-badge { animation: none; }
     [data-theme="dark"] .plaza-pill { border-color: rgba(255,59,92,0.35); }
     [data-theme="dark"] .plaza-pill.has-value { background: linear-gradient(135deg, rgba(255,59,92,0.10), rgba(255,59,92,0.16)); }
@@ -4504,7 +4517,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: linear-gradient(135deg, rgba(226,0,26,0.06), rgba(226,0,26,0.10));
       border: 1px solid rgba(226,0,26,0.18);
       border-left: 4px solid var(--primary);
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 13px;
       color: var(--text);
       position: relative;
@@ -4577,13 +4590,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .estado-card > * { position: relative; z-index: 1; }
     .estado-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.10);
+      box-shadow: var(--shadow-3);
     }
     .estado-card:hover::after { transform: scale(1.2); opacity: 0.12; }
 
     .estado-card-label {
       display: inline-flex; align-items: center; gap: 6px;
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.10em;
       text-transform: uppercase;
@@ -4604,7 +4617,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       transition: transform .35s cubic-bezier(.34,1.56,.64,1);
     }
     .estado-card-sub {
-      font-size: 10.5px;
+      font-size: 11px;
       color: var(--text-light);
       margin-top: auto;
       opacity: 0.85;
@@ -4617,7 +4630,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 18px 20px; margin: 4px 14px 18px;
       background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.03));
       border: 1px solid rgba(245,166,35,0.25);
-      border-radius: 14px;
+      border-radius: 16px;
     }
     .incon-header-icon {
       width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
@@ -4625,22 +4638,22 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: linear-gradient(135deg, #F5A623, #E2001A); color: #fff;
       box-shadow: 0 4px 14px rgba(226,0,26,0.25);
     }
-    .incon-header-icon .material-symbols-outlined { font-size: 26px; }
-    .incon-header h2 { margin: 0 0 2px; font-size: 19px; font-weight: 700; color: var(--text); }
-    .incon-header p { margin: 0; font-size: 12.5px; color: var(--text-light); }
+    .incon-header-icon .material-symbols-outlined { font-size: 24px; }
+    .incon-header h2 { margin: 0 0 2px; font-size: 20px; font-weight: 700; color: var(--text); }
+    .incon-header p { margin: 0; font-size: 12px; color: var(--text-light); }
     .incon-badge {
       margin-left: auto; text-align: center; min-width: 64px;
       background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
-      padding: 8px 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 8px 14px; box-shadow: var(--shadow-2);
     }
     .incon-badge span { display: block; font-size: 24px; font-weight: 800; color: #E2001A; line-height: 1; font-variant-numeric: tabular-nums; }
-    .incon-badge small { font-size: 9.5px; color: var(--text-light); text-transform: uppercase; letter-spacing: .06em; }
+    .incon-badge small { font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: .06em; }
     .incon-badge.zero span { color: #1F7A4E; }
 
     .incon-card {
       margin: 0 14px 18px; background: var(--card-bg);
-      border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+      box-shadow: var(--shadow-2);
       animation: sectionFromRight .3s ease;
     }
     .incon-card-head {
@@ -4648,21 +4661,21 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 14px 18px; border-bottom: 1px solid var(--border);
       background: linear-gradient(135deg, rgba(226,0,26,0.05), transparent);
     }
-    .incon-card-head .material-symbols-outlined { font-size: 22px; color: #E2001A; }
+    .incon-card-head .material-symbols-outlined { font-size: 20px; color: #E2001A; }
     .incon-card-head h3 { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--text); }
-    .incon-card-head p { margin: 2px 0 0; font-size: 11.5px; color: var(--text-light); }
+    .incon-card-head p { margin: 2px 0 0; font-size: 12px; color: var(--text-light); }
     .incon-card thead th {
       text-align: left; padding: 10px 14px; font-size: 12px; font-weight: 700;
       color: var(--text); background: var(--table-head-bg);
       border-bottom: 2px solid var(--border);
     }
-    .incon-card tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+    .incon-card tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12px; }
     .incon-card tbody tr { transition: background .15s ease; }
     .incon-card tbody tr:hover { background: var(--hover-bg); }
 
     /* Estado vacío con check animado */
     .incon-empty { padding: 56px 20px; text-align: center; }
-    .incon-empty h2 { margin: 18px 0 8px; font-size: 22px; font-weight: 700; color: var(--text); }
+    .incon-empty h2 { margin: 18px 0 8px; font-size: 20px; font-weight: 700; color: var(--text); }
     .incon-empty p { font-size: 14px; color: var(--text-light); margin: 0 auto; max-width: 460px; line-height: 1.5; }
     .incon-empty-check svg { width: 84px; height: 84px; }
     .incon-empty-check .ic-circle { stroke: #1F7A4E; stroke-width: 3; stroke-dasharray: 151; stroke-dashoffset: 151; animation: icCircle .6s cubic-bezier(.65,0,.45,1) forwards; }
@@ -4727,7 +4740,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 7px 14px;
       border-radius: 999px;
       border: 1.5px solid;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.02em;
       cursor: pointer;
@@ -4747,7 +4760,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .estado-chip:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow-2);
     }
     .estado-chip.active {
       background: var(--ec-accent);
@@ -4787,7 +4800,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       text-align: center;
       padding: 28px 12px;
       color: var(--text-light);
-      font-size: 12.5px;
+      font-size: 12px;
       display: flex; flex-direction: column; align-items: center; gap: 8px;
     }
     .estado-table-empty .material-symbols-outlined {
@@ -4807,7 +4820,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: 1px solid var(--border);
       border-radius: 12px;
       margin-bottom: 22px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-1);
     }
     .stock-card-header {
       display: flex; align-items: center; gap: 10px;
@@ -4823,7 +4836,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .stock-card-header h2 {
       margin: 0;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       letter-spacing: 0.02em;
       color: var(--text);
@@ -4840,7 +4853,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-size: 13px;
       margin-bottom: 14px;
       background: var(--card-bg);
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
       border: 1px solid var(--border);
     }
@@ -4851,7 +4864,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .stock-table thead th {
       padding: 11px 12px;
       text-align: left;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -4989,7 +5002,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .kpi-detail-close {
       background: transparent; border: none; cursor: pointer;
-      color: var(--text-light, #5f6368); padding: 4px; border-radius: 4px;
+      color: var(--text-light, #5f6368); padding: 4px; border-radius: 6px;
     }
     .kpi-detail-close:hover { background: var(--border, #eee); color: var(--text, #1C1B1F); }
     .kpi-detail-grid {
@@ -5001,7 +5014,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: 1px solid var(--border, #eee); border-radius: 6px;
     }
     .kpi-detail-cell .kdc-label {
-      font-size: 10px; color: var(--text-light, #5f6368);
+      font-size: 11px; color: var(--text-light, #5f6368);
       text-transform: uppercase; letter-spacing: 0.3px;
       margin-bottom: 3px;
     }
@@ -5012,12 +5025,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-size: 13px; color: var(--text, #1C1B1F);
       padding: 10px 12px; background: rgba(226, 0, 26, 0.04);
       border-left: 3px solid var(--primary, #E2001A);
-      border-radius: 4px; margin-bottom: 10px;
+      border-radius: 6px; margin-bottom: 10px;
     }
     .kpi-detail-formula code {
       font-family: 'JetBrains Mono', Consolas, monospace;
       font-size: 12px; padding: 2px 6px;
-      background: rgba(0,0,0,0.06); border-radius: 3px;
+      background: rgba(0,0,0,0.06); border-radius: 6px;
     }
     .kpi-detail-note {
       font-size: 12px; color: var(--text-light, #5f6368);
@@ -5265,7 +5278,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       position: relative;
       background: linear-gradient(135deg, var(--surface), var(--card-bg));
       border: 1.5px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px;
       display: flex;
       flex-direction: column;
@@ -5349,7 +5362,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-variant-numeric: tabular-nums;
     }
     .summary-card-sub {
-      font-size: 9px;
+      font-size: 11px;
       color: var(--text-light);
       text-transform: uppercase;
       letter-spacing: 0.2px;
@@ -5419,7 +5432,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       color: white;
       padding: 12px 16px;
       border-radius: 8px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      box-shadow: var(--shadow-3);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -5489,7 +5502,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     
     #detalle .table-wrapper thead th span {
       margin-left: 4px;
-      font-size: 10px;
+      font-size: 11px;
       opacity: 0.7;
     }
     
@@ -5506,7 +5519,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       width: 100%;
       padding: 7px 8px;
       border: 1px solid var(--border);
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: 11px;
       background: white;
     }
@@ -6205,7 +6218,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
 
     .filters-bar.scrolled {
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow-2);
     }
 
     /* === RICH TOOLTIPS === */
@@ -6215,7 +6228,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      box-shadow: var(--shadow-3);
       font-size: 12px;
       z-index: 1000;
       pointer-events: none;
@@ -6300,7 +6313,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .skeleton-line {
       height: 12px;
       background: var(--border);
-      border-radius: 4px;
+      border-radius: 6px;
       animation: skeletonPulse 1.4s ease-in-out infinite;
     }
     @keyframes skeletonPulse {
@@ -6335,7 +6348,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       background: rgba(255,255,255,0.92) !important;
       border: 1px solid rgba(255,255,255,0.3);
-      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      box-shadow: var(--shadow-4);
     }
     body.dark-mode .modal {
       background: rgba(28,27,31,0.92) !important;
@@ -6489,7 +6502,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: 1px solid rgba(255,255,255,0.25);
       border-radius: 28px;
       box-shadow:
-        0 20px 60px rgba(0,0,0,0.4),
+        var(--shadow-4),
         inset 0 1px 1px rgba(255,255,255,0.4);
       display: flex;
       flex-direction: column;
@@ -6631,12 +6644,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-size: 12px;
       font-weight: 600;
       color: var(--text);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: var(--shadow-2);
       transition: all 0.2s ease;
     }
     .sound-toggle:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+      box-shadow: var(--shadow-3);
     }
     .sound-toggle.on { background: var(--primary); color: white; border-color: var(--primary); }
     
@@ -6683,12 +6696,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     #notif-panel {
       background: #ffffff;
       border: 1px solid rgba(0,0,0,0.10);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12);
+      box-shadow: var(--shadow-4), 0 2px 8px rgba(0,0,0,0.12);
     }
     [data-theme="dark"] #notif-panel {
       background: #1f1d23;
       border-color: rgba(255,255,255,0.12);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+      box-shadow: var(--shadow-4), 0 2px 8px rgba(0,0,0,0.4);
     }
     /* Acento superior rojo OXXO en el encabezado del panel */
     #notif-panel > div:first-child {
@@ -6742,20 +6755,20 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-left: 4px solid var(--chip-color, #999);
       transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
     }
-    .map-plaza-chip:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+    .map-plaza-chip:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
     .map-plaza-chip:active { transform: translateY(-1px); }
     .mpc-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--chip-color, #999); box-shadow: 0 0 0 3px rgba(128,128,128,0.22); }
     .mpc-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .mpc-pct { font-size: 15px; font-weight: 800; color: var(--chip-color, #333); font-variant-numeric: tabular-nums; grid-row: 1 / 3; }
-    .mpc-meta { grid-column: 1 / 3; font-size: 10px; color: var(--text-light); }
+    .mpc-pct { font-size: 14px; font-weight: 800; color: var(--chip-color, #333); font-variant-numeric: tabular-nums; grid-row: 1 / 3; }
+    .mpc-meta { grid-column: 1 / 3; font-size: 11px; color: var(--text-light); }
     .ref-tooltip {
       background: rgba(255,255,255,0.9) !important;
       border: 1px solid #ddd !important;
-      border-radius: 4px !important;
+      border-radius: 6px !important;
       padding: 2px 6px !important;
-      font-size: 10px !important;
+      font-size: 11px !important;
       color: #666 !important;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;
+      box-shadow: var(--shadow-1) !important;
       font-weight: 500 !important;
     }
     .ref-tooltip::before { display: none !important; }
@@ -6778,8 +6791,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     /* Leaflet popup customization */
     .leaflet-popup-content-wrapper {
-      border-radius: 10px !important;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+      border-radius: 12px !important;
+      box-shadow: var(--shadow-2) !important;
     }
     .leaflet-popup-content { margin: 12px 14px !important; }
 
@@ -6851,7 +6864,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     scrollbar-width: thin;
   }
   .table-wrapper::-webkit-scrollbar { height: 6px; }
-  .table-wrapper::-webkit-scrollbar-thumb { background: rgba(226,0,26,.35); border-radius: 3px; }
+  .table-wrapper::-webkit-scrollbar-thumb { background: rgba(226,0,26,.35); border-radius: 6px; }
 
   /* ---------- TABLETS (≤ 1024px) ---------- */
   @media (max-width: 1024px) {
@@ -6885,7 +6898,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   /* ---------- CELULARES PEQUEÑOS (≤ 480px) ---------- */
   @media (max-width: 480px) {
     h1 { font-size: 20px !important; }
-    h2 { font-size: 15px !important; }
+    h2 { font-size: 14px !important; }
     .upload-card { padding: 18px 14px !important; }
     /* Botón flotante de descarga del resumen un poco más chico */
     #export-resumen-btn { width: 34px !important; height: 34px !important; }
@@ -6909,8 +6922,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .kpi-circular-widget { padding: 8px 4px !important; gap: 4px !important; }
     .kpi-circle-container { width: 92px !important; height: 92px !important; }
-    .kpi-number { font-size: 17px !important; }
-    .kpi-label { font-size: 10px !important; letter-spacing: .2px !important; }
+    .kpi-number { font-size: 16px !important; }
+    .kpi-label { font-size: 11px !important; letter-spacing: .2px !important; }
 
     /* FLUIDEZ: cortar animaciones infinitas en móvil (repintado continuo) */
     .kpi-circular-widget .kpi-circle-container { animation: none !important; }
@@ -6926,7 +6939,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     /* En pantallas muy chicas, el título de marca estorba: ocultarlo y dejar el LOGO */
     .app-bar-title { display: none !important; }
     .kpi-circle-container { width: 84px !important; height: 84px !important; }
-    .kpi-number { font-size: 15px !important; }
+    .kpi-number { font-size: 14px !important; }
   }
 
   /* ════════════════════════════════════════════════════════════════
@@ -6977,7 +6990,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   .dashboards-grid {
     background: #eceef5 !important;
     border: 0 !important;
-    border-radius: 18px !important;
+    border-radius: 16px !important;
     padding: 20px !important;
     gap: 22px !important;
   }
@@ -7001,13 +7014,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
   /* HEADER de card estilo Argon: título + subtítulo + línea divisoria antes de la gráfica */
   .dashboard-card h3 {
-    font-size: 17px !important;
+    font-size: 16px !important;
     font-weight: 700 !important;
     color: #32325d !important;
     margin: 0 0 4px 0 !important;
   }
   .dashboard-card .dash-sub {
-    color: #8898aa !important;
+    color: var(--text-light) !important;
     font-size: 11px !important;
     font-weight: 600 !important;
     letter-spacing: .3px !important;
@@ -7118,7 +7131,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     <span class="splash-particle"></span>
     <div class="splash-content">
       <div class="splash-logo-card">
-        <img id="splash-logo-img" alt="Logo" style="display:none; max-height:110px; max-width:230px; width:auto; object-fit:contain; background:#ffffff; padding:14px 18px; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.30);">
+        <img id="splash-logo-img" alt="Logo" style="display:none; max-height:110px; max-width:230px; width:auto; object-fit:contain; background:#ffffff; padding:14px 18px; border-radius:16px; box-shadow:var(--shadow-4);">
         <div class="splash-logo" id="splash-logo-text">OXXO</div>
         <div class="splash-tagline" id="splash-tagline">Movilidad</div>
       </div>
@@ -7284,13 +7297,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <span class="badge" id="hdr-notif-count" style="display:none;">0</span>
           </button>
           <!-- Panel de notificaciones dropdown -->
-          <div id="notif-panel" style="display:none; position:absolute; top:48px; right:0; width:380px; max-height:480px; border-radius:14px; z-index:9999; overflow:hidden;">
+          <div id="notif-panel" style="display:none; position:absolute; top:48px; right:0; width:380px; max-height:480px; border-radius:16px; z-index:9999; overflow:hidden;">
             <div style="padding:14px 16px; border-bottom:1px solid var(--border, #e0e0e0); display:flex; align-items:center; justify-content:space-between;">
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary, #E2001A);">notifications_active</span>
                 <strong style="font-size:14px; color:var(--text, #1c1b1f);">Notificaciones</strong>
               </div>
-              <span id="notif-panel-count" style="font-size:11px; background:var(--primary, #E2001A); color:white; padding:2px 8px; border-radius:10px; font-weight:700;">0</span>
+              <span id="notif-panel-count" style="font-size:11px; background:var(--primary, #E2001A); color:white; padding:2px 8px; border-radius:12px; font-weight:700;">0</span>
             </div>
             <div id="notif-panel-body" style="max-height:400px; overflow-y:auto; padding:8px;">
               <div style="text-align:center; padding:24px 16px; color:var(--text-light, #666);">
@@ -7300,14 +7313,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
             <div style="padding:10px 14px; border-top:1px solid var(--border, #e0e0e0); display:flex; justify-content:flex-end; background:var(--surface, #fafafa);">
               <button onclick="markNotifsRead()" style="display:inline-flex; align-items:center; gap:5px; background:none; border:none; color:var(--primary, #E2001A); font-size:12px; font-weight:700; cursor:pointer; padding:4px 6px; border-radius:6px;">
-                <span class="material-symbols-outlined" style="font-size:15px;">done_all</span>Marcar como leídas
+                <span class="material-symbols-outlined" style="font-size:14px;">done_all</span>Marcar como leídas
               </button>
             </div>
           </div>
         </div>
         <div style="position:relative;">
           <button class="app-bar-avatar" id="hdr-avatar" title="Usuario" onclick="toggleUserMenu()" style="background:none; border:none; cursor:pointer; padding:0;">JM</button>
-          <div id="user-menu" style="display:none; position:absolute; top:48px; right:0; background:white; border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:9999; min-width:180px; overflow:hidden;">
+          <div id="user-menu" style="display:none; position:absolute; top:48px; right:0; background:white; border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow-2); z-index:9999; min-width:180px; overflow:hidden;">
             <div style="padding:12px 16px; border-bottom:1px solid var(--border);">
               <div style="font-size:11px; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Usuario</div>
               <div style="font-size:13px; font-weight:600; color:#1C1B1F;" id="user-menu-name">Admin</div>
@@ -7518,16 +7531,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         <div style="margin:8px 0 10px; display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
           <button type="button" onclick="openAirWatchPortal()" title="Abrir el portal AirWatch en una pestaña nueva"
             style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; cursor:pointer;
-                   background:#fff; color:#E2001A; border:1.5px solid #E2001A; border-radius:20px;
-                   font-weight:700; font-size:11.5px; transition:all .2s;"
+                   background:#fff; color:#E2001A; border:1.5px solid #E2001A; border-radius:16px;
+                   font-weight:700; font-size:12px; transition:all .2s;"
             onmouseover="this.style.background='#E2001A';this.style.color='#fff';"
             onmouseout="this.style.background='#fff';this.style.color='#E2001A';">
-            <span class="material-symbols-outlined" style="font-size:15px;">cloud_download</span>
+            <span class="material-symbols-outlined" style="font-size:14px;">cloud_download</span>
             Descargar de AirWatch
             <span class="material-symbols-outlined" style="font-size:13px;">open_in_new</span>
           </button>
           <a href="#" onclick="openAirWatchExports(); return false;" title="Reportes programados / Exports"
-             style="font-size:10.5px; color:#999; text-decoration:none; font-weight:600;">Reportes programados →</a>
+             style="font-size:11px; color:var(--text-light); text-decoration:none; font-weight:600;">Reportes programados →</a>
         </div>
 
         <!-- STATUS INLINE -->
@@ -7536,8 +7549,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span>
           </span>
           <div class="file-status-text">
-            <span class="file-status-label" style="font-size: 10px;">✓ Archivo:</span>
-            <span class="file-status-name" id="report-name" style="font-size: 9px;"></span>
+            <span class="file-status-label" style="font-size: 11px;">✓ Archivo:</span>
+            <span class="file-status-name" id="report-name" style="font-size: 11px;"></span>
           </div>
         </div>
 
@@ -7723,7 +7736,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             padding: 18px 12px 14px;
             background: transparent;
             border: none;
-            border-radius: 22px;
+            border-radius: 16px;
             box-shadow: none;
             transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
             cursor: pointer;
@@ -7740,7 +7753,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           [data-theme="dark"] .kpi-circular-widget {
             background: linear-gradient(135deg, rgba(50,50,65,0.65) 0%, rgba(35,35,50,0.45) 100%);
             border: 1px solid rgba(255,255,255,0.12);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
+            box-shadow: var(--shadow-3), inset 0 1px 1px rgba(255,255,255,0.1);
           }
 
           [data-theme="dark"] .kpi-circular-widget::before {
@@ -7803,7 +7816,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           }
 
           .kpi-number {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             line-height: 1.1;
             color: #333333;
@@ -7819,7 +7832,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             height: 2px;
             background-color: currentColor;
             margin: 3px auto 0;
-            border-radius: 1px;
+            border-radius: 6px;
             transition: all 0.15s ease;
           }
 
@@ -7902,7 +7915,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             opacity: 0.45;
           }
           .empty-state-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--text);
           }
@@ -7932,9 +7945,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
           /* Refinamientos de contraste en modo oscuro para los componentes nuevos */
           [data-theme="dark"] .empty-state-icon { opacity: 0.6; }
-          [data-theme="dark"] .bulk-action-bar { box-shadow: 0 12px 40px rgba(0,0,0,0.55); }
+          [data-theme="dark"] .bulk-action-bar { box-shadow: var(--shadow-4); }
           [data-theme="dark"] .kpi-status-glyph { filter: brightness(1.15); }
-          [data-theme="dark"] table thead { box-shadow: 0 2px 6px rgba(0,0,0,0.35); }
+          [data-theme="dark"] table thead { box-shadow: var(--shadow-1); }
 
           /* Barra flotante de acciones masivas */
           .bulk-action-bar {
@@ -7948,8 +7961,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             padding: 12px 18px;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+            border-radius: 16px;
+            box-shadow: var(--shadow-4);
             z-index: 900;
             opacity: 0;
             pointer-events: none;
@@ -7976,7 +7989,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             border: 1px solid var(--border);
             background: var(--surface);
             color: var(--text);
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.18s ease;
@@ -8011,7 +8024,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           }
 
           .kpi-tooltip {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-light);
             font-weight: 500;
             text-align: center;
@@ -8120,13 +8133,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     /* ============ EXPORT TAB - Premium Polish ============ */
     #exportacion .export-card {
       padding: 24px !important;
-      border-radius: 20px !important;
+      border-radius: 16px !important;
       border-width: 1.5px !important;
       transition:
         transform 0.15s cubic-bezier(0.34,1.56,0.64,1),
         box-shadow 0.15s ease,
         border-color 0.15s ease !important;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.04), inset 0 1px 1px rgba(255,255,255,0.7) !important;
+      box-shadow: var(--shadow-2), inset 0 1px 1px rgba(255,255,255,0.7) !important;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       opacity: 0;
@@ -8145,7 +8158,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     #exportacion .export-card:hover {
       transform: translateY(-8px) scale(1.025) !important;
       box-shadow:
-        0 24px 48px rgba(0,0,0,0.12),
+        var(--shadow-4),
         inset 0 1px 1px rgba(255,255,255,1) !important;
     }
 
@@ -8153,7 +8166,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       content: '';
       position: absolute;
       inset: 0;
-      border-radius: 20px;
+      border-radius: 16px;
       background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.4), transparent 60%);
       opacity: 0.6;
       pointer-events: none;
@@ -8175,7 +8188,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     #exportacion .export-card button:hover {
       transform: translateY(-2px) !important;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.18) !important;
+      box-shadow: var(--shadow-3) !important;
       filter: brightness(1.08);
     }
     #exportacion .export-card button:active {
@@ -8217,7 +8230,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     /* Section group header */
     #configuracion .config-container > div[style*="border-left"] {
       background: linear-gradient(135deg, rgba(226,0,26,0.08) 0%, rgba(226,0,26,0.02) 100%) !important;
-      border-radius: 14px !important;
+      border-radius: 16px !important;
       border: 1px solid rgba(226,0,26,0.15) !important;
       border-left: 4px solid var(--primary) !important;
       padding: 14px 18px !important;
@@ -8226,7 +8239,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       box-shadow: 0 2px 8px rgba(226,0,26,0.04);
     }
     #configuracion .config-container > div[style*="border-left"] h3 {
-      font-size: 15px !important;
+      font-size: 14px !important;
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
@@ -8241,7 +8254,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     #configuracion #cfg-search {
       padding: 10px 14px !important;
-      border-radius: 10px !important;
+      border-radius: 12px !important;
       font-size: 13px !important;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
@@ -8304,7 +8317,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       transform: rotate(90deg);
     }
     #configuracion .config-summary strong {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--text);
       display: inline-flex;
       align-items: center;
@@ -8337,7 +8350,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     #configuracion .config-hint {
       display: block;
-      font-size: 11.5px !important;
+      font-size: 12px !important;
       color: var(--text-light) !important;
       margin: 3px 0 8px !important;
       line-height: 1.4;
@@ -8391,7 +8404,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: white;
       border-radius: 50%;
       transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: var(--shadow-1);
     }
     #configuracion .config-toggle input[type="checkbox"]:checked {
       background: var(--primary);
@@ -8449,7 +8462,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       gap: 8px;
       padding: 8px 14px;
       border-radius: 999px;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
       user-select: none;
@@ -8468,7 +8481,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .filter-chip:hover {
       transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow-3);
     }
     .filter-chip:active {
       transform: translateY(0) scale(0.97);
@@ -8632,7 +8645,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: linear-gradient(135deg, rgba(226,0,26,0.08), rgba(226,0,26,0.04));
       border: 1.5px solid rgba(226,0,26,0.25);
       color: var(--primary);
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
       letter-spacing: 0.3px;
@@ -8754,8 +8767,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       -webkit-backdrop-filter: blur(18px) saturate(180%);
       border: 1px solid rgba(0,0,0,0.06);
       border-left: 4px solid var(--primary, #E2001A);
-      border-radius: 14px;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.06);
+      border-radius: 16px;
+      box-shadow: var(--shadow-4), 0 2px 6px rgba(0,0,0,0.06);
       padding: 14px 44px 14px 16px;
       min-width: 280px;
       font-size: 13px;
@@ -8840,7 +8853,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       background: rgba(255,255,255,0.85) !important;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      box-shadow: var(--shadow-3);
     }
     [data-theme="dark"] .app-bar.scrolled {
       background: rgba(28,27,31,0.85) !important;
@@ -8978,7 +8991,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       z-index: 99999;
       max-width: 280px;
       line-height: 1.45;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      box-shadow: var(--shadow-3);
     }
     .premium-tooltip.show {
       opacity: 1;
@@ -9011,7 +9024,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       min-height: 28px;
     }
     .kpi-delta {
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.5px;
       padding: 2px 8px;
@@ -9052,7 +9065,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       backdrop-filter: blur(20px) saturate(180%);
       border: 1px solid rgba(0,0,0,0.08);
       border-radius: 16px;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+      box-shadow: var(--shadow-4);
       width: 560px;
       max-width: 92vw;
       overflow: hidden;
@@ -9117,9 +9130,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .kbd {
       padding: 2px 6px;
       background: rgba(0,0,0,0.06);
-      border-radius: 4px;
+      border-radius: 6px;
       font-family: monospace;
-      font-size: 10.5px;
+      font-size: 11px;
     }
     [data-theme="dark"] .kbd { background: rgba(255,255,255,0.1); }
 
@@ -9140,7 +9153,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       gap: 6px;
       z-index: 8000;
       backdrop-filter: blur(8px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow-2);
     }
     .privacy-pill::before {
       content: '🔒';
@@ -9172,7 +9185,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: #ffffff;
       padding: 8px 12px;
       border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+      box-shadow: var(--shadow-3);
     }
 
     /* --- Anomaly badge in dashboards --- */
@@ -9182,7 +9195,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 3px 8px;
       background: linear-gradient(135deg, #DC2626, #B91C1C);
       color: white;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       border-radius: 999px;
       display: flex;
@@ -9218,7 +9231,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       width: 32px; height: 32px;
       background: linear-gradient(135deg, #3B82F6, #6366F1);
       color: white;
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       font-size: 16px;
     }
@@ -9258,7 +9271,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       backdrop-filter: blur(20px);
       border: 1px solid rgba(0,0,0,0.08);
       border-radius: 12px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+      box-shadow: var(--shadow-4);
       min-width: 280px;
       padding: 8px;
       z-index: 9000;
@@ -9274,11 +9287,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 8px 12px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 12.5px;
+      font-size: 12px;
       transition: background 0.2s ease;
     }
     .file-history-item:hover { background: rgba(226,0,26,0.06); }
-    .file-history-item .fh-meta { color: var(--text-light); font-size: 10.5px; }
+    .file-history-item .fh-meta { color: var(--text-light); font-size: 11px; }
 
     /* --- Health gauge in sidebar --- */
     .health-gauge {
@@ -9302,7 +9315,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .health-gauge.warning .health-gauge-num { color: #F5A623; }
     .health-gauge.critical .health-gauge-num { color: #DC2626; }
     .health-gauge-label {
-      font-size: 10.5px;
+      font-size: 11px;
       letter-spacing: 0.5px;
       text-transform: uppercase;
       color: var(--text-light);
@@ -9311,14 +9324,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .health-gauge-bar {
       height: 4px;
       background: rgba(0,0,0,0.06);
-      border-radius: 2px;
+      border-radius: 6px;
       margin-top: 8px;
       overflow: hidden;
     }
     .health-gauge-bar-fill {
       height: 100%;
       background: linear-gradient(90deg, #16A34A, #4ADE80);
-      border-radius: 2px;
+      border-radius: 6px;
       transition: width 0.15s cubic-bezier(0.34,1.56,0.64,1);
     }
     .health-gauge.warning .health-gauge-bar-fill { background: linear-gradient(90deg, #F5A623, #FBBF24); }
@@ -9538,7 +9551,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     /* ===== Logo cargable en el header ===== */
     .app-bar-logo { position: relative; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
-    .app-bar-logo:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+    .app-bar-logo:hover { transform: translateY(-1px); box-shadow: var(--shadow-2); }
     .app-bar-logo:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     #logo-remove-btn { align-items: center; }
 
@@ -9571,7 +9584,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .days-cell.sev-warning { color: #C77700; }
     .days-cell.sev-critical { color: #C62828; }
     .days-cell .days-badge {
-      display: inline-block; min-width: 26px; padding: 2px 8px; border-radius: 10px;
+      display: inline-block; min-width: 26px; padding: 2px 8px; border-radius: 12px;
       font-size: 12px; font-weight: 800; text-align: center;
     }
     .days-cell.sev-warning .days-badge { background: rgba(245,166,35,0.18); color: #B35F00; }
@@ -9591,7 +9604,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .days-cell.sev-extreme .days-badge,
     tbody#detalle-table tr.sev-extreme .days-extreme-badge {
       background:#B3261E; color:#fff; font-weight:800;
-      padding:2px 8px; border-radius:10px; display:inline-block;
+      padding:2px 8px; border-radius:12px; display:inline-block;
     }
     [data-theme="dark"] tbody#cruce-table tr.sev-extreme,
     [data-theme="dark"] tbody#detalle-table tr.sev-extreme { background: rgba(179,38,30,0.18); }
@@ -9671,7 +9684,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       /* Modales casi a pantalla completa en móvil */
       .modal-content, .email-modal-content {
         width: 96vw !important; max-width: 96vw !important;
-        max-height: 92vh !important; border-radius: 14px !important;
+        max-height: 92vh !important; border-radius: 16px !important;
       }
     }
 </style>
@@ -9769,7 +9782,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       <div id="resumen" class="section" style="position:relative;">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; padding:0 12px;">
           <span class="material-symbols-outlined" style="font-size:24px; color:var(--primary);">summarize</span>
-          <h2 style="font-size:17px; font-weight:700; margin:0; color:var(--text);">Resumen Ejecutivo</h2>
+          <h2 style="font-size:16px; font-weight:700; margin:0; color:var(--text);">Resumen Ejecutivo</h2>
         </div>
 
 <!-- Botón flotante compacto en la esquina superior derecha (no estorba) -->
@@ -9778,16 +9791,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='';">
           <span class="material-symbols-outlined" style="font-size:20px;">download</span>
         </button>
-        <div id="export-menu" style="display:none; position:absolute; right:12px; top:44px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:1000; min-width:140px;">
+        <div id="export-menu" style="display:none; position:absolute; right:12px; top:44px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow-2); z-index:1000; min-width:140px;">
           <button onclick="exportResumenAsPNG()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; cursor:pointer; color:var(--text); font-size:12px; border-bottom:1px solid var(--border); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">
-            <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">image</span> Descargar PNG
+            <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">image</span> Descargar PNG
           </button>
           <button onclick="exportResumenAsPDF()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; cursor:pointer; color:var(--text); font-size:12px; transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">
-            <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">picture_as_pdf</span> Descargar PDF
+            <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">picture_as_pdf</span> Descargar PDF
           </button>
         </div>
         <!-- DASHBOARD EJECUTIVO UNIFICADO: KPIs + Resumen por Tipo en un solo bloque -->
-        <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:14px; box-shadow:var(--shadow-2);">
 
           <!-- ZONA SUPERIOR: Círculos KPI -->
           <div style="padding: 16px 20px 14px 20px; background: linear-gradient(135deg, rgba(226,0,26,0.04) 0%, transparent 60%);">
@@ -9899,9 +9912,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <!-- DIVISOR con etiqueta -->
           <div style="display:flex; align-items:center; gap:10px; padding:0 20px; margin: 0;">
             <div style="flex:1; height:1px; background:var(--border);"></div>
-            <div style="display:flex; align-items:center; gap:6px; padding:6px 12px; background:var(--surface); border:1px solid var(--border); border-radius:20px; white-space:nowrap;">
+            <div style="display:flex; align-items:center; gap:6px; padding:6px 12px; background:var(--surface); border:1px solid var(--border); border-radius:16px; white-space:nowrap;">
               <span class="material-symbols-outlined" style="font-size:14px; color:var(--primary);">summarize</span>
-              <span style="font-size:10px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.4px;">Resumen por Tipo</span>
+              <span style="font-size:11px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.4px;">Resumen por Tipo</span>
             </div>
             <div style="flex:1; height:1px; background:var(--border);"></div>
           </div>
@@ -9916,7 +9929,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         <!-- DASHBOARD EJECUTIVO - TODOS LOS GRÁFICOS (Grid automático) -->
         <!-- Wrapper con header de sección y fondo sutil para que el bloque resalte -->
-        <div class="dash-hero-wrap" style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:8px;">
+        <div class="dash-hero-wrap" style="background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow-2); margin-bottom:8px;">
           <!-- Header del bloque de gráficas -->
           <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px 0 20px;">
             <div style="display:flex; align-items:center; gap:8px;">
@@ -10060,7 +10073,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         </div><!-- /wrapper dashboards analíticos -->
 
         <!-- ANALYTICS CHARTS SECTION (integrado en RESUMEN) -->
-        <div class="analytics-section" style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:8px;">
+        <div class="analytics-section" style="background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow-2); margin-bottom:8px;">
           <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px 0 20px;">
             <div style="display:flex; align-items:center; gap:8px;">
               <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">trending_up</span>
@@ -10074,21 +10087,21 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <div class="kpi-card" style="background:linear-gradient(135deg, rgba(31,122,78,0.08) 0%, transparent 100%); border:1px solid rgba(31,122,78,0.2); border-radius:12px; padding:20px; text-align:center;">
                 <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px;">Disponibilidad Global</div>
                 <div style="font-size:36px; font-weight:800; color:#1F7A4E; margin-bottom:4px;" id="analytics-avg-avail">—</div>
-                <div style="font-size:10px; color:var(--text-light);">promedio del parque</div>
+                <div style="font-size:11px; color:var(--text-light);">promedio del parque</div>
               </div>
 
               <!-- KPI: Equipos Críticos -->
               <div class="kpi-card" style="background:linear-gradient(135deg, rgba(179,38,30,0.08) 0%, transparent 100%); border:1px solid rgba(179,38,30,0.2); border-radius:12px; padding:20px; text-align:center;">
                 <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px;">Críticos (≥15 días)</div>
                 <div style="font-size:36px; font-weight:800; color:#B3261E; margin-bottom:4px;" id="analytics-critical">—</div>
-                <div style="font-size:10px; color:var(--text-light);">necesitan intervención</div>
+                <div style="font-size:11px; color:var(--text-light);">necesitan intervención</div>
               </div>
 
               <!-- KPI: Equipos Online -->
               <div class="kpi-card" style="background:linear-gradient(135deg, rgba(0,100,200,0.08) 0%, transparent 100%); border:1px solid rgba(0,100,200,0.2); border-radius:12px; padding:20px; text-align:center;">
                 <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px;">Operativos</div>
                 <div style="font-size:36px; font-weight:800; color:#0066CC; margin-bottom:4px;" id="analytics-online">—</div>
-                <div style="font-size:10px; color:var(--text-light);">equipos activos ahora</div>
+                <div style="font-size:11px; color:var(--text-light);">equipos activos ahora</div>
               </div>
 
             </div>
@@ -10096,12 +10109,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         </div>
 
         <!-- HEATMAP: Horarios de Caídas (REDESIGNED) -->
-        <div class="analytics-heatmap-section" style="background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.08); margin-bottom:16px;">
+        <div class="analytics-heatmap-section" style="background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow-2); margin-bottom:16px;">
           <!-- HEADER PREMIUM -->
           <div style="padding:20px 24px; background:linear-gradient(135deg, rgba(25,118,210,0.08) 0%, rgba(25,118,210,0.03) 100%); border-bottom:2px solid var(--border);">
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-              <span class="material-symbols-outlined" style="font-size:22px; color:var(--primary);">schedule</span>
-              <h3 style="margin:0; font-size:15px; font-weight:700; color:var(--text); letter-spacing:-0.3px;">Horarios de Desconexión por Hora</h3>
+              <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">schedule</span>
+              <h3 style="margin:0; font-size:14px; font-weight:700; color:var(--text); letter-spacing:-0.3px;">Horarios de Desconexión por Hora</h3>
             </div>
             <div style="font-size:12px; color:var(--text-light); margin-left:32px; font-weight:500;">
               Mapa de calor: Distribución temporal de equipos offline durante la semana • Identifica patrones y horas pico
@@ -10117,29 +10130,29 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <div style="padding:16px 24px; background:var(--surface); border-top:1px solid var(--border); display:grid; grid-template-columns:2fr 1fr; gap:20px;">
             <!-- Left: Color legend -->
             <div>
-              <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Escala de Intensidad</div>
+              <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Escala de Intensidad</div>
               <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                 <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="display:inline-block; width:16px; height:16px; background:#F0F7FF; border:1px solid var(--border); border-radius:3px;"></span>
+                  <span style="display:inline-block; width:16px; height:16px; background:#F0F7FF; border:1px solid var(--border); border-radius:6px;"></span>
                   <span style="font-size:11px; color:var(--text-light);">Sin problemas</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="display:inline-block; width:16px; height:16px; background:#0288D1; border:1px solid var(--border); border-radius:3px;"></span>
+                  <span style="display:inline-block; width:16px; height:16px; background:#0288D1; border:1px solid var(--border); border-radius:6px;"></span>
                   <span style="font-size:11px; color:var(--text-light);">Moderado</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="display:inline-block; width:16px; height:16px; background:#01579B; border:1px solid var(--border); border-radius:3px;"></span>
+                  <span style="display:inline-block; width:16px; height:16px; background:#01579B; border:1px solid var(--border); border-radius:6px;"></span>
                   <span style="font-size:11px; color:var(--text-light);">Alto</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="display:inline-block; width:16px; height:16px; background:#8B0000; border:1px solid var(--border); border-radius:3px;"></span>
+                  <span style="display:inline-block; width:16px; height:16px; background:#8B0000; border:1px solid var(--border); border-radius:6px;"></span>
                   <span style="font-size:11px; color:var(--text-light);">Crítico</span>
                 </div>
               </div>
             </div>
             <!-- Right: Key insight -->
             <div style="background:rgba(25,118,210,0.08); padding:12px; border-radius:8px; border-left:3px solid var(--primary);">
-              <div style="font-size:10px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:4px; letter-spacing:0.5px;">💡 Insight</div>
+              <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:4px; letter-spacing:0.5px;">💡 Insight</div>
               <div style="font-size:11px; color:var(--text); line-height:1.5;">Hover sobre las celdas para ver detalles. Las áreas oscuras indican mayor concentración de desconexiones.</div>
             </div>
           </div>
@@ -10152,13 +10165,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- SEARCH INPUT COMPACTO -->
             <div style="position:relative;">
               <div style="position:relative; background:linear-gradient(135deg, white 0%, rgba(25,118,210,0.02) 100%);
-                          border:2px solid var(--border); border-radius:14px; transition:all 0.15s ease;
-                          box-shadow: 0 4px 16px rgba(0,0,0,0.08);"
+                          border:2px solid var(--border); border-radius:16px; transition:all 0.15s ease;
+                          box-shadow: var(--shadow-2);"
                    id="search-wrapper"
                    onmouseover="document.getElementById('search-wrapper').style.borderColor='var(--primary)'; document.getElementById('search-wrapper').style.boxShadow='0 6px 24px rgba(25,118,210,0.12)';"
                    onmouseout="document.getElementById('search-wrapper').style.borderColor='var(--border)'; document.getElementById('search-wrapper').style.boxShadow='0 4px 16px rgba(0,0,0,0.08)';">
                 <div style="display:flex; align-items:center; padding:4px;">
-                  <span class="material-symbols-outlined" style="color:var(--primary); font-size:22px; padding:10px 12px 10px 14px;">location_on</span>
+                  <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px; padding:10px 12px 10px 14px;">location_on</span>
                   <input type="text" id="oxxo-search-input" placeholder="🔍 Buscar tienda en el mapa (Maples, Centro, Playas...)"
                     style="flex:1; border:none; background:transparent; color:var(--text); font-size:13px; padding:10px 12px 10px 6px;
                            outline:none; font-weight:500;"
@@ -10173,7 +10186,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <!-- GRID DE RESULTADOS (aparece debajo del input) -->
               <div id="search-results-container" style="display:none; position:absolute; top:100%; left:0; right:0; z-index:1000;
                                                         background:white; border:1px solid var(--border); border-top:none;
-                                                        border-radius:0 0 14px 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+                                                        border-radius:0 0 14px 14px; box-shadow: var(--shadow-3);
                                                         max-height:320px; overflow-y:auto; padding:12px;">
                 <div style="margin-bottom:8px; font-size:11px; font-weight:600; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px;">
                   <span id="results-count">0</span> Resultados encontrados
@@ -10186,14 +10199,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
           <!-- 📊 PANEL DE DETALLES COMPACTO -->
           <div id="oxxo-details-panel" style="display:none; margin-bottom:12px; background:linear-gradient(135deg, #FFFFFF 0%, rgba(25,118,210,0.02) 100%);
-                                               border:1px solid rgba(0,0,0,0.08); border-radius:14px; padding:12px;
-                                               box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                                               border:1px solid rgba(0,0,0,0.08); border-radius:16px; padding:12px;
+                                               box-shadow: var(--shadow-2);">
 
             <!-- HEADER COMPACTO -->
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
               <div style="flex:1;">
                 <h3 id="oxxo-details-name" style="margin:0; font-size:14px; font-weight:700; color:var(--primary);">Oxxo</h3>
-                <div id="oxxo-location-label" style="font-size:10px; color:var(--text-light); margin-top:2px;">📍 Ubicación</div>
+                <div id="oxxo-location-label" style="font-size:11px; color:var(--text-light); margin-top:2px;">📍 Ubicación</div>
               </div>
               <button onclick="closeOxxoDetails()" style="background:none; border:none; color:var(--text-light); cursor:pointer; font-size:18px;
                                                           width:28px; height:28px; border-radius:50%; transition:all 0.2s;
@@ -10204,34 +10217,34 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- COORDENADAS COMPACTAS -->
             <div style="background:linear-gradient(135deg, rgba(25,118,210,0.08) 0%, rgba(25,118,210,0.03) 100%); padding:8px 10px; border-radius:8px; margin-bottom:10px;
                         border-left:3px solid var(--primary);">
-              <div style="font-size:8px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:2px; letter-spacing:0.5px;">📍 Coord</div>
-              <div id="oxxo-coords" style="font-size:10px; font-weight:600; color:var(--primary); font-family:'Courier New', monospace;">—</div>
+              <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; margin-bottom:2px; letter-spacing:0.5px;">📍 Coord</div>
+              <div id="oxxo-coords" style="font-size:11px; font-weight:600; color:var(--primary); font-family:'Courier New', monospace;">—</div>
             </div>
 
             <!-- ESTADÍSTICAS EN GRID COMPACTO 1x4 -->
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px; margin-bottom:10px;">
               <div style="background:linear-gradient(135deg, var(--primary) 0%, #1565C0 100%); color:white; padding:8px 6px; border-radius:8px; text-align:center;">
-                <div style="font-size:7px; font-weight:700; text-transform:uppercase; opacity:0.85; margin-bottom:2px;">Total</div>
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; opacity:0.85; margin-bottom:2px;">Total</div>
                 <div id="oxxo-total-count" style="font-size:14px; font-weight:700;">—</div>
               </div>
               <div style="background:rgba(31,122,78,0.1); padding:8px 6px; border-radius:8px; border:1px solid rgba(31,122,78,0.2); text-align:center;">
-                <div style="font-size:7px; font-weight:700; color:#1F7A4E; text-transform:uppercase; margin-bottom:2px;">On</div>
+                <div style="font-size:11px; font-weight:700; color:#1F7A4E; text-transform:uppercase; margin-bottom:2px;">On</div>
                 <div id="oxxo-online-count" style="font-size:14px; font-weight:700; color:#1F7A4E;">—</div>
               </div>
               <div style="background:rgba(226,0,26,0.1); padding:8px 6px; border-radius:8px; border:1px solid rgba(226,0,26,0.15); text-align:center;">
-                <div style="font-size:7px; font-weight:700; color:#E2001A; text-transform:uppercase; margin-bottom:2px;">1-3d</div>
+                <div style="font-size:11px; font-weight:700; color:#E2001A; text-transform:uppercase; margin-bottom:2px;">1-3d</div>
                 <div id="oxxo-offline-count" style="font-size:14px; font-weight:700; color:#E2001A;">—</div>
               </div>
               <div style="background:rgba(139,0,0,0.1); padding:8px 6px; border-radius:8px; border:1px solid rgba(139,0,0,0.2); text-align:center;">
-                <div style="font-size:7px; font-weight:700; color:#8B0000; text-transform:uppercase; margin-bottom:2px;">4+d</div>
+                <div style="font-size:11px; font-weight:700; color:#8B0000; text-transform:uppercase; margin-bottom:2px;">4+d</div>
                 <div id="oxxo-critical-count" style="font-size:14px; font-weight:700; color:#8B0000;">—</div>
               </div>
             </div>
 
             <!-- LISTADO DE EQUIPOS COMPACTO -->
             <div style="background:rgba(0,0,0,0.02); padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06);">
-              <div style="font-size:9px; font-weight:700; color:var(--text); text-transform:uppercase; margin-bottom:4px; letter-spacing:0.5px;">📋 Equipos</div>
-              <div id="oxxo-equipment-list" style="font-size:10px; max-height:100px; overflow-y:auto; line-height:1.3;">—</div>
+              <div style="font-size:11px; font-weight:700; color:var(--text); text-transform:uppercase; margin-bottom:4px; letter-spacing:0.5px;">📋 Equipos</div>
+              <div id="oxxo-equipment-list" style="font-size:11px; max-height:100px; overflow-y:auto; line-height:1.3;">—</div>
             </div>
           </div>
 
@@ -10436,7 +10449,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
           <!-- BOTÓN LIMPIAR -->
           <button onclick="clearAsesorFilters()" style="display:inline-flex; align-items:center; gap:4px; padding: 8px 10px; background: rgba(226,0,26,0.1); color: var(--primary); border: 1px solid rgba(226,0,26,0.25); border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 700;" title="Limpiar todos los filtros">
-            <span class="material-symbols-outlined" style="font-size:15px;">close</span> Limpiar
+            <span class="material-symbols-outlined" style="font-size:14px;">close</span> Limpiar
           </button>
 
           <!-- CONTADOR -->
@@ -10600,11 +10613,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <!-- FILTROS + TABLA EQUIPOS -->
           <div class="estado-table-wrap" id="estado-table-wrap" style="margin-bottom:28px;">
             <div class="estado-filters" style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap;">
-              <button class="estado-chip robo" onclick="filterGarantiaByEstado('ROBO')" style="padding:8px 14px; border:1px solid rgba(179,38,30,0.3); background:rgba(179,38,30,0.04); color:#B3261E; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">report</span>Robo</button>
-              <button class="estado-chip danada" onclick="filterGarantiaByEstado('DAÑADA')" style="padding:8px 14px; border:1px solid rgba(245,166,35,0.3); background:rgba(245,166,35,0.04); color:#F5A623; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">build</span>Dañada</button>
-              <button class="estado-chip garantia" onclick="filterGarantiaByEstado('GARANTÍA')" style="padding:8px 14px; border:1px solid rgba(25,118,210,0.3); background:rgba(25,118,210,0.04); color:#1976D2; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">verified</span>Garantía</button>
-              <button class="estado-chip apagada" onclick="filterGarantiaByEstado('APAGADA')" style="padding:8px 14px; border:1px solid rgba(95,99,104,0.3); background:rgba(95,99,104,0.04); color:#5F6368; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">power_settings_new</span>Apagada</button>
-              <button class="estado-chip all" onclick="filterGarantiaByEstado('')" style="padding:8px 14px; border:1px solid var(--primary); background:transparent; color:var(--primary); border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">👁️ Ver todos</button>
+              <button class="estado-chip robo" onclick="filterGarantiaByEstado('ROBO')" style="padding:8px 14px; border:1px solid rgba(179,38,30,0.3); background:rgba(179,38,30,0.04); color:#B3261E; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">report</span>Robo</button>
+              <button class="estado-chip danada" onclick="filterGarantiaByEstado('DAÑADA')" style="padding:8px 14px; border:1px solid rgba(245,166,35,0.3); background:rgba(245,166,35,0.04); color:#F5A623; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">build</span>Dañada</button>
+              <button class="estado-chip garantia" onclick="filterGarantiaByEstado('GARANTÍA')" style="padding:8px 14px; border:1px solid rgba(25,118,210,0.3); background:rgba(25,118,210,0.04); color:#1976D2; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">verified</span>Garantía</button>
+              <button class="estado-chip apagada" onclick="filterGarantiaByEstado('APAGADA')" style="padding:8px 14px; border:1px solid rgba(95,99,104,0.3); background:rgba(95,99,104,0.04); color:#5F6368; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">power_settings_new</span>Apagada</button>
+              <button class="estado-chip all" onclick="filterGarantiaByEstado('')" style="padding:8px 14px; border:1px solid var(--primary); background:transparent; color:var(--primary); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">👁️ Ver todos</button>
             </div>
             <div id="garantia-estados-table" style="min-height:120px; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow-x:auto; width:100%; max-width:100%;">
               <div class="estado-table-empty" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:40px 20px; color:var(--text-light); text-align:center;">
@@ -10633,23 +10646,23 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
               <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:12px;">
                 <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">Plaza</label>
+                  <label style="display:block; font-size:11px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">Plaza</label>
                   <input type="text" id="stock-plaza-input" placeholder="Ej: Tijuana Este" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg);">
                 </div>
                 <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">📱 HH</label>
+                  <label style="display:block; font-size:11px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">📱 HH</label>
                   <input type="number" id="stock-hh" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
                 </div>
                 <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">📱 TT</label>
+                  <label style="display:block; font-size:11px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">📱 TT</label>
                   <input type="number" id="stock-tt" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
                 </div>
                 <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">🖨️ Impresoras</label>
+                  <label style="display:block; font-size:11px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">🖨️ Impresoras</label>
                   <input type="number" id="stock-imp" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
                 </div>
                 <div>
-                  <label style="display:block; font-size:10px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">🔌 Cargadores</label>
+                  <label style="display:block; font-size:11px; font-weight:600; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">🔌 Cargadores</label>
                   <input type="number" id="stock-cargadores" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
                 </div>
               </div>
@@ -10676,7 +10689,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                   <div style="font-size:32px; font-weight:800; color:#0D47A1; margin-bottom:8px;">
                     <span id="stock-kpi-hh-total">0</span>
                   </div>
-                  <div id="stock-hh-gauge" style="width:100%; height:6px; background:rgba(25,118,210,0.2); border-radius:3px; overflow:hidden;">
+                  <div id="stock-hh-gauge" style="width:100%; height:6px; background:rgba(25,118,210,0.2); border-radius:6px; overflow:hidden;">
                     <div style="width:0%; height:100%; background:linear-gradient(90deg, #1976D2, #42A5F5); transition:width 0.15s ease;"></div>
                   </div>
                 </div>
@@ -10690,7 +10703,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                   <div style="font-size:32px; font-weight:800; color:#4A148C; margin-bottom:8px;">
                     <span id="stock-kpi-tt-total">0</span>
                   </div>
-                  <div id="stock-tt-gauge" style="width:100%; height:6px; background:rgba(123,31,162,0.2); border-radius:3px; overflow:hidden;">
+                  <div id="stock-tt-gauge" style="width:100%; height:6px; background:rgba(123,31,162,0.2); border-radius:6px; overflow:hidden;">
                     <div style="width:0%; height:100%; background:linear-gradient(90deg, #7B1FA2, #BA68C8); transition:width 0.15s ease;"></div>
                   </div>
                 </div>
@@ -10704,7 +10717,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                   <div style="font-size:32px; font-weight:800; color:#BF360C; margin-bottom:8px;">
                     <span id="stock-kpi-imp-total">0</span>
                   </div>
-                  <div id="stock-imp-gauge" style="width:100%; height:6px; background:rgba(245,124,0,0.2); border-radius:3px; overflow:hidden;">
+                  <div id="stock-imp-gauge" style="width:100%; height:6px; background:rgba(245,124,0,0.2); border-radius:6px; overflow:hidden;">
                     <div style="width:0%; height:100%; background:linear-gradient(90deg, #F57C00, #FFB74D); transition:width 0.15s ease;"></div>
                   </div>
                 </div>
@@ -10718,7 +10731,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                   <div style="font-size:32px; font-weight:800; color:#1B5E20; margin-bottom:8px;">
                     <span id="stock-kpi-carg-total">0</span>
                   </div>
-                  <div id="stock-carg-gauge" style="width:100%; height:6px; background:rgba(56,142,60,0.2); border-radius:3px; overflow:hidden;">
+                  <div id="stock-carg-gauge" style="width:100%; height:6px; background:rgba(56,142,60,0.2); border-radius:6px; overflow:hidden;">
                     <div style="width:0%; height:100%; background:linear-gradient(90deg, #388E3C, #81C784); transition:width 0.15s ease;"></div>
                   </div>
                 </div>
@@ -10732,7 +10745,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                   <div style="font-size:24px; font-weight:800; color:#880E4F; margin-bottom:8px;">
                     $<span id="stock-kpi-inv-total">0.00</span>
                   </div>
-                  <p style="font-size:9px; color:var(--text-light); margin:0;">Costo total estimado</p>
+                  <p style="font-size:11px; color:var(--text-light); margin:0;">Costo total estimado</p>
                 </div>
               </div>
             </div>
@@ -10872,7 +10885,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
           <!-- Control: exportar solo lo filtrado -->
           <label style="display:flex; align-items:center; gap:10px; margin-bottom:18px; padding:12px 16px;
-                        background:rgba(226,0,26,0.04); border:1px solid rgba(226,0,26,0.15); border-radius:10px; cursor:pointer;">
+                        background:rgba(226,0,26,0.04); border:1px solid rgba(226,0,26,0.15); border-radius:12px; cursor:pointer;">
             <input type="checkbox" id="export-only-filtered" checked
                    style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;">
             <span style="font-size:13px; color:var(--text);">
@@ -10887,18 +10900,18 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- ═══════════ CARD 1: CORREO ═══════════ -->
             <div style="background:var(--card-bg); border:1.5px solid var(--border); border-top:4px solid #E2001A;
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
-                        box-shadow:0 4px 20px rgba(0,0,0,0.07); transition:all 0.25s ease;
+                        box-shadow:var(--shadow-2); transition:all 0.25s ease;
                         cursor:default; min-height:520px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(226,0,26,0.14)';"
                  onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)';">
               <!-- Icono + título -->
               <div style="display:flex; align-items:center; gap:14px;">
-                <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#E2001A,#B80018);
+                <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#E2001A,#B80018);
                             display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(226,0,26,0.35);">
-                  <span class="material-symbols-outlined" style="font-size:26px;color:white;">mail</span>
+                  <span class="material-symbols-outlined" style="font-size:24px;color:white;">mail</span>
                 </div>
                 <div>
-                  <div style="font-size:17px;font-weight:700;color:var(--text);">Correo</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--text);">Correo</div>
                   <div style="font-size:11px;color:var(--text-light);margin-top:1px;">.eml · Outlook &amp; Gmail</div>
                 </div>
               </div>
@@ -10909,17 +10922,17 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               </p>
               <!-- Tags de lo que incluye (altura mínima) -->
               <div style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px;">
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:20px;border:1px solid rgba(226,0,26,0.2);">📊 KPIs</span>
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:20px;border:1px solid rgba(226,0,26,0.2);">📋 Tabla críticos</span>
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:20px;border:1px solid rgba(226,0,26,0.2);">📁 Excel adjunto</span>
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:20px;border:1px solid rgba(226,0,26,0.2);">📄 PDF adjunto</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📊 KPIs</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📋 Tabla críticos</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📁 Excel adjunto</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📄 PDF adjunto</span>
               </div>
               <!-- Espaciador flexible -->
               <div style="flex-grow:1;"></div>
               <!-- Botón principal -->
               <button onclick="downloadEMLForOutlook()"
                 style="padding:14px 20px;background:linear-gradient(135deg,#E2001A,#B80018);color:white;
-                       border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;
+                       border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;
                        display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
                        box-shadow:0 4px 14px rgba(226,0,26,0.35);transition:all 0.2s;"
                 onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 6px 20px rgba(226,0,26,0.45)';"
@@ -10951,16 +10964,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- ═══════════ CARD 2: EXCEL / CSV ═══════════ -->
             <div style="background:var(--card-bg); border:1.5px solid var(--border); border-top:4px solid #217346;
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
-                        box-shadow:0 4px 20px rgba(0,0,0,0.07); transition:all 0.25s ease; cursor:default; min-height:520px;"
+                        box-shadow:var(--shadow-2); transition:all 0.25s ease; cursor:default; min-height:520px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(33,115,70,0.14)';"
                  onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)';">
               <div style="display:flex; align-items:center; gap:14px;">
-                <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#217346,#0E5C36);
+                <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#217346,#0E5C36);
                             display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(33,115,70,0.35);">
-                  <span class="material-symbols-outlined" style="font-size:26px;color:white;">table_chart</span>
+                  <span class="material-symbols-outlined" style="font-size:24px;color:white;">table_chart</span>
                 </div>
                 <div>
-                  <div style="font-size:17px;font-weight:700;color:var(--text);">Excel / CSV</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--text);">Excel / CSV</div>
                   <div style="font-size:11px;color:var(--text-light);margin-top:1px;">.xlsx · .csv · Datos completos</div>
                 </div>
               </div>
@@ -10969,16 +10982,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <span style="color:var(--text);font-weight:600;">Resumen, Críticos ≥4D y Detalle en un archivo.</span>
               </p>
               <div style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px;">
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(33,115,70,0.08);color:#217346;border-radius:20px;border:1px solid rgba(33,115,70,0.2);">3 hojas</span>
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(33,115,70,0.08);color:#217346;border-radius:20px;border:1px solid rgba(33,115,70,0.2);">Todos los campos</span>
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(33,115,70,0.08);color:#217346;border-radius:20px;border:1px solid rgba(33,115,70,0.2);">Filtro de plaza</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(33,115,70,0.08);color:#217346;border-radius:16px;border:1px solid rgba(33,115,70,0.2);">3 hojas</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(33,115,70,0.08);color:#217346;border-radius:16px;border:1px solid rgba(33,115,70,0.2);">Todos los campos</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(33,115,70,0.08);color:#217346;border-radius:16px;border:1px solid rgba(33,115,70,0.2);">Filtro de plaza</span>
               </div>
               <!-- Espaciador flexible -->
               <div style="flex-grow:1;"></div>
               <!-- Botón principal -->
               <button onclick="exportDataByFormat('xlsx')"
                 style="padding:14px 20px;background:linear-gradient(135deg,#217346,#0E5C36);color:white;
-                       border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;
+                       border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;
                        display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
                        box-shadow:0 4px 14px rgba(33,115,70,0.35);transition:all 0.2s;"
                 onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 6px 20px rgba(33,115,70,0.45)';"
@@ -11010,16 +11023,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- ═══════════ CARD 3: PDF ═══════════ -->
             <div style="background:var(--card-bg); border:1.5px solid var(--border); border-top:4px solid #CC3300;
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
-                        box-shadow:0 4px 20px rgba(0,0,0,0.07); transition:all 0.25s ease; cursor:default; min-height:520px;"
+                        box-shadow:var(--shadow-2); transition:all 0.25s ease; cursor:default; min-height:520px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(204,51,0,0.14)';"
                  onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)';">
               <div style="display:flex; align-items:center; gap:14px;">
-                <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#CC3300,#991F00);
+                <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#CC3300,#991F00);
                             display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(204,51,0,0.35);">
-                  <span class="material-symbols-outlined" style="font-size:26px;color:white;">picture_as_pdf</span>
+                  <span class="material-symbols-outlined" style="font-size:24px;color:white;">picture_as_pdf</span>
                 </div>
                 <div>
-                  <div style="font-size:17px;font-weight:700;color:var(--text);">PDF</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--text);">PDF</div>
                   <div style="font-size:11px;color:var(--text-light);margin-top:1px;">.pdf · Reporte ejecutivo</div>
                 </div>
               </div>
@@ -11028,16 +11041,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <span style="color:var(--text);font-weight:600;">Ideal para presentaciones ejecutivas.</span>
               </p>
               <div style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px;">
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:20px;border:1px solid rgba(204,51,0,0.2);">Portada</span>
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:20px;border:1px solid rgba(204,51,0,0.2);">Resumen ejecutivo</span>
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:20px;border:1px solid rgba(204,51,0,0.2);">Dashboards</span>
-                <span style="font-size:10px;font-weight:600;padding:3px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:20px;border:1px solid rgba(204,51,0,0.2);">Top críticos</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Portada</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Resumen ejecutivo</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Dashboards</span>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Top críticos</span>
               </div>
               <!-- Espaciador flexible -->
               <div style="flex-grow:1;"></div>
               <button onclick="exportReportByFormat('pdf')"
                 style="padding:14px 20px;background:linear-gradient(135deg,#CC3300,#991F00);color:white;
-                       border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;
+                       border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;
                        display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
                        box-shadow:0 4px 14px rgba(204,51,0,0.35);transition:all 0.2s;"
                 onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 6px 20px rgba(204,51,0,0.45)';"
@@ -11405,24 +11418,24 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <div style="display:flex; gap:8px; align-items:flex-end;">
                 <div style="flex:1;">
                   <label style="display:block; font-size:11px; color:var(--text-light); margin-bottom:4px;">Nuevo Modelo</label>
-                  <input type="text" id="new-cost-model" placeholder="ej: iPhone XR, Samsung J6+" style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:4px; background:var(--input-bg); color:var(--text);">
+                  <input type="text" id="new-cost-model" placeholder="ej: iPhone XR, Samsung J6+" style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--input-bg); color:var(--text);">
                 </div>
                 <div style="flex:1;">
                   <label style="display:block; font-size:11px; color:var(--text-light); margin-bottom:4px;">Costo (USD)</label>
-                  <input type="number" id="new-cost-amount" placeholder="0.00" min="0" step="0.01" style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:4px; background:var(--input-bg); color:var(--text);">
+                  <input type="number" id="new-cost-amount" placeholder="0.00" min="0" step="0.01" style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--input-bg); color:var(--text);">
                 </div>
-                <button onclick="addCostModel()" style="padding:6px 14px; background:var(--primary); color:white; border:none; border-radius:4px; font-size:12px; font-weight:600; cursor:pointer;">
+                <button onclick="addCostModel()" style="padding:6px 14px; background:var(--primary); color:white; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
                   Agregar
                 </button>
               </div>
 
               <!-- Botones de acción -->
               <div style="display:flex; gap:8px; margin-top:12px; border-top:1px solid var(--border); padding-top:12px;">
-                <button onclick="clearAllCosts()" style="flex:1; padding:8px 12px; background:transparent; color:#B3261E; border:1px solid rgba(179,38,30,0.3); border-radius:4px; font-size:12px; font-weight:600; cursor:pointer;">
+                <button onclick="clearAllCosts()" style="flex:1; padding:8px 12px; background:transparent; color:#B3261E; border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
                   🗑️ Limpiar todos
                 </button>
-                <button onclick="saveCostConfig()" style="flex:1; padding:8px 12px; background:var(--primary); color:white; border:none; border-radius:4px; font-size:12px; font-weight:600; cursor:pointer;">
-                  <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle;">save</span> Guardar Costos
+                <button onclick="saveCostConfig()" style="flex:1; padding:8px 12px; background:var(--primary); color:white; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
+                  <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">save</span> Guardar Costos
                 </button>
               </div>
             </div>
@@ -11591,7 +11604,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <strong>Los nombres de tienda se auto-completan automáticamente.</strong>
           Solo necesitas seleccionar la plaza correcta:
         </p>
-        <div style="margin:0 0 16px 0; padding:10px 12px; background:rgba(31,122,78,0.1); border-left:3px solid var(--success); border-radius:4px; font-size:12px; color:var(--text-light);">
+        <div style="margin:0 0 16px 0; padding:10px 12px; background:rgba(31,122,78,0.1); border-left:3px solid var(--success); border-radius:6px; font-size:12px; color:var(--text-light);">
           <strong>✓ Automático:</strong> Se agregará automáticamente <strong>"TIJ"</strong> a las tiendas que lo necesiten.
           Solo completa la plaza.
         </div>
@@ -12546,23 +12559,23 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       problematic.forEach((d, idx) => {
         var key = d['Friendly Name'] || d.CR || idx;
         var issue = !d._plazaOk ? ' ⚠️ Plaza no identificada' : ' ⚠️ Tienda vacía';
-        html += '<div style="padding:12px; background:var(--surface); border-left:4px solid var(--warning); border-radius:4px;">' +
+        html += '<div style="padding:12px; background:var(--surface); border-left:4px solid var(--warning); border-radius:6px;">' +
           '<div style="margin-bottom:8px; font-size:12px; color:var(--text-light);">' + issue + '</div>' +
           '<div style="margin-bottom:8px;"><strong style="font-size:12px;">Friendly Name:</strong> ' + (d['Friendly Name'] || '—') + '</div>' +
-          '<div style="margin-bottom:12px;"><strong style="font-size:12px;">Last Name (raw):</strong> <code style="background:rgba(0,0,0,0.05); padding:2px 4px; border-radius:2px; font-size:11px;">' + (d['Last Name'] || '—') + '</code></div>' +
+          '<div style="margin-bottom:12px;"><strong style="font-size:12px;">Last Name (raw):</strong> <code style="background:rgba(0,0,0,0.05); padding:2px 4px; border-radius:6px; font-size:11px;">' + (d['Last Name'] || '—') + '</code></div>' +
           '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">' +
             '<div>' +
               '<label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Tienda (Auto-completada):</label>' +
               '<input type="text" id="store-input-' + idx + '" value="' + (d.TIENDA || '') + '" ' +
               'oninput="validateStoreInput(' + idx + ')" ' +
-              'style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:4px; background:var(--input-bg); color:var(--text); font-size:12px;" ' +
+              'style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--input-bg); color:var(--text); font-size:12px;" ' +
               'placeholder="Se auto-completa con TIJ">' +
               '<div id="store-validation-' + idx + '" style="font-size:11px; margin-top:4px; min-height:16px; color:var(--success);">✓ Auto-completado</div>' +
             '</div>' +
             '<div>' +
               '<label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Plaza:</label>' +
               '<select id="plaza-input-' + idx + '" ' +
-              'style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:4px; background:var(--input-bg); color:var(--text); font-size:12px;">' +
+              'style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--input-bg); color:var(--text); font-size:12px;">' +
               '<option value="">— Sin asignar —</option>' +
               '<option value="Tijuana Este"' + (d.PLAZA === 'Tijuana Este' ? ' selected' : '') + '>Tijuana Este</option>' +
               '<option value="Ensenada"' + (d.PLAZA === 'Ensenada' ? ' selected' : '') + '>Ensenada</option>' +
@@ -13216,7 +13229,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             (item.stats.critical > 0 ? '⚠️' : item.stats.offline > 0 ? '⚡' : '✅') + ' ' + healthStatus +
             '</div>' +
             '</div>' +
-            '<div style="background:' + healthColor + '; color:white; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:700; white-space:nowrap; text-align:center; min-width:52px;">' +
+            '<div style="background:' + healthColor + '; color:white; padding:6px 10px; border-radius:6px; font-size:11px; font-weight:700; white-space:nowrap; text-align:center; min-width:52px;">' +
             item.stats.count + 'eq' +
             '</div>' +
             '</div>' +
@@ -13225,28 +13238,28 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:10px;">' +
             '<div style="background:rgba(31,122,78,0.08); padding:8px; border-radius:8px; border:1px solid rgba(31,122,78,0.15); text-align:center;">' +
             '<div style="font-size:12px; font-weight:700; color:#1F7A4E;">' + item.stats.online + '</div>' +
-            '<div style="font-size:9px; color:var(--text-light); margin-top:2px;">Online</div>' +
+            '<div style="font-size:11px; color:var(--text-light); margin-top:2px;">Online</div>' +
             '</div>' +
             '<div style="background:rgba(226,0,26,0.08); padding:8px; border-radius:8px; border:1px solid rgba(226,0,26,0.15); text-align:center;">' +
             '<div style="font-size:12px; font-weight:700; color:#E2001A;">' + item.stats.offline + '</div>' +
-            '<div style="font-size:9px; color:var(--text-light); margin-top:2px;">1-3d</div>' +
+            '<div style="font-size:11px; color:var(--text-light); margin-top:2px;">1-3d</div>' +
             '</div>' +
             '<div style="background:rgba(139,0,0,0.08); padding:8px; border-radius:8px; border:1px solid rgba(139,0,0,0.15); text-align:center;">' +
             '<div style="font-size:12px; font-weight:700; color:#8B0000;">' + item.stats.critical + '</div>' +
-            '<div style="font-size:9px; color:var(--text-light); margin-top:2px;">4+d</div>' +
+            '<div style="font-size:11px; color:var(--text-light); margin-top:2px;">4+d</div>' +
             '</div>' +
             '</div>' +
 
             // Health bar compacto
             '<div style="display:flex; align-items:center; gap:8px;">' +
             '<div style="flex:1;">' +
-            '<div style="background:rgba(0,0,0,0.05); height:6px; border-radius:3px; overflow:hidden;">' +
+            '<div style="background:rgba(0,0,0,0.05); height:6px; border-radius:6px; overflow:hidden;">' +
             '<div style="height:100%; background:linear-gradient(90deg, #1F7A4E 0%, #FFD54F 50%, #E2001A 100%);' +
             'width:' + healthPercentage + '%;' +
             'transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);"></div>' +
             '</div>' +
             '</div>' +
-            '<div style="font-size:10px; font-weight:600; color:var(--text-light); min-width:28px; text-align:right;">' + healthPercentage + '%</div>' +
+            '<div style="font-size:11px; font-weight:600; color:var(--text-light); min-width:28px; text-align:right;">' + healthPercentage + '%</div>' +
             '</div>' +
 
             '</div>';
@@ -13985,7 +13998,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         // Marker principal de la plaza
         var markerIcon = L.divIcon({
           className: 'plaza-map-marker',
-          html: '<div style="width:20px;height:20px;border-radius:50%;background:' + geo.color + ';border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>',
+          html: '<div style="width:20px;height:20px;border-radius:50%;background:' + geo.color + ';border:3px solid white;box-shadow:var(--shadow-2);"></div>',
           iconSize: [20, 20],
           iconAnchor: [10, 10]
         });
@@ -14008,7 +14021,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         geo.refs.forEach(function(ref) {
           var refIcon = L.divIcon({
             className: 'ref-map-marker',
-            html: '<div style="width:8px;height:8px;border-radius:50%;background:#666;border:1.5px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>',
+            html: '<div style="width:8px;height:8px;border-radius:50%;background:#666;border:1.5px solid white;box-shadow:var(--shadow-1);"></div>',
             iconSize: [8, 8],
             iconAnchor: [4, 4]
           });
@@ -14034,7 +14047,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       // Frontera EUA label
       var borderIcon = L.divIcon({
         className: 'border-label',
-        html: '<div style="font-size:10px; color:#888; letter-spacing:2px; font-weight:600; text-shadow:0 0 3px white;">── FRONTERA EUA ──</div>',
+        html: '<div style="font-size:11px; color:#888; letter-spacing:2px; font-weight:600; text-shadow:0 0 3px white;">── FRONTERA EUA ──</div>',
         iconSize: [160, 14],
         iconAnchor: [80, 7]
       });
@@ -14047,7 +14060,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var infoControl = L.control({ position: 'topright' });
       infoControl.onAdd = function(map) {
         var div = L.DomUtil.create('div', 'map-info-box');
-        div.style.cssText = 'background:white;border:1px solid var(--border);border-radius:8px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);font-size:11px;color:var(--text);max-width:160px;line-height:1.4;';
+        div.style.cssText = 'background:white;border:1px solid var(--border);border-radius:8px;padding:12px;box-shadow:var(--shadow-2);font-size:11px;color:var(--text);max-width:160px;line-height:1.4;';
         div.innerHTML = '<div style="font-weight:700;margin-bottom:6px;">Leyenda del Mapa</div>' +
           '<div style="margin-bottom:4px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#2A6E40;margin-right:6px;"></span>Operativo (≥98%)</div>' +
           '<div style="margin-bottom:4px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#E8B400;margin-right:6px;"></span>Atención (95–97%)</div>' +
@@ -14104,7 +14117,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           var pulseAnim = dispPct < 95 ? 'animation:plazaPulseCSS 2s ease-in-out infinite;' : '';
           marker.setIcon(L.divIcon({
             className: 'plaza-map-marker',
-            html: '<div style="width:22px;height:22px;border-radius:50%;background:' + statusColor + ';border:3px solid white;box-shadow:0 2px 10px rgba(0,0,0,0.35);' + pulseAnim + '"></div>',
+            html: '<div style="width:22px;height:22px;border-radius:50%;background:' + statusColor + ';border:3px solid white;box-shadow:var(--shadow-2);' + pulseAnim + '"></div>',
             iconSize: [22, 22],
             iconAnchor: [11, 11]
           }));
@@ -14112,12 +14125,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           // Actualizar popup content
           var popupHtml =
             '<div style="font-family:Segoe UI,Arial,sans-serif; min-width:200px;">' +
-            '<div style="font-size:15px; font-weight:700; color:' + statusColor + '; margin-bottom:2px;">' + geo.label + '</div>' +
+            '<div style="font-size:14px; font-weight:700; color:' + statusColor + '; margin-bottom:2px;">' + geo.label + '</div>' +
             '<div style="font-size:11px; color:#888; margin-bottom:10px;">' + geo.desc + '</div>' +
             '<div style="display:flex; gap:12px; margin-bottom:8px;">' +
-              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:#333;">' + totalPlaza + '</div><div style="font-size:9px; color:#999;">Equipos</div></div>' +
-              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:#B3261E;">' + critPlaza + '</div><div style="font-size:9px; color:#999;">Offline</div></div>' +
-              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:' + statusColor + ';">' + dispPct.toFixed(1) + '%</div><div style="font-size:9px; color:#999;">Disp.</div></div>' +
+              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:#333;">' + totalPlaza + '</div><div style="font-size:11px; color:#999;">Equipos</div></div>' +
+              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:#B3261E;">' + critPlaza + '</div><div style="font-size:11px; color:#999;">Offline</div></div>' +
+              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:' + statusColor + ';">' + dispPct.toFixed(1) + '%</div><div style="font-size:11px; color:#999;">Disp.</div></div>' +
             '</div>' +
             '<div style="padding:4px 8px; background:' + statusColor + '15; border-left:3px solid ' + statusColor + '; border-radius:0 4px 4px 0; font-size:11px; font-weight:600; color:' + statusColor + ';">' +
               statusLabel +
@@ -14816,9 +14829,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var progressColor = dispNum >= 99 ? '#1F7A4E' : dispNum >= 97 ? '#F5A623' : '#B3261E';
 
         html += `<div style="padding: 20px; background: linear-gradient(135deg, ${r.colorLight} 0%, var(--surface) 100%);
-                           border: 2px solid ${r.color}; border-radius: 14px;
+                           border: 2px solid ${r.color}; border-radius: 16px;
                            cursor: pointer; transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-                           box-shadow: 0 4px 12px rgba(0,0,0,0.08); animation: slideUp 0.15s ease-out;
+                           box-shadow: var(--shadow-2); animation: slideUp 0.15s ease-out;
                            display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden;"
              onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.12)';"
              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';"
@@ -14832,9 +14845,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <!-- Header con nombre e icono -->
           <div style="display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1;">
             <div style="display: flex; align-items: center; gap: 12px;">
-              <div style="width: 48px; height: 48px; background: ${r.color}; border-radius: 10px;
+              <div style="width: 48px; height: 48px; background: ${r.color}; border-radius: 12px;
                           display: flex; align-items: center; justify-content: center;
-                          box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                          box-shadow: var(--shadow-2);">
                 <span class="material-symbols-outlined" style="font-size: 28px; color: white;">${r.icon}</span>
               </div>
               <div>
@@ -14850,16 +14863,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <!-- Métricas en grid -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; z-index: 1;">
             <!-- Total -->
-            <div style="padding: 12px; background: white; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid ${r.color};">
+            <div style="padding: 12px; background: white; border-radius: 12px; box-shadow: var(--shadow-1); text-align: center; border-left: 4px solid ${r.color};">
               <div style="font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px;">Total</div>
-              <div style="font-size: 26px; font-weight: 800; color: ${r.color};">${r.total}</div>
-              <div style="font-size: 10px; color: var(--text-light); margin-top: 4px;">en BD</div>
+              <div style="font-size: 24px; font-weight: 800; color: ${r.color};">${r.total}</div>
+              <div style="font-size: 11px; color: var(--text-light); margin-top: 4px;">en BD</div>
             </div>
             <!-- Offline -->
-            <div style="padding: 12px; background: rgba(179, 38, 30, 0.08); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; border-left: 4px solid #B3261E;">
+            <div style="padding: 12px; background: rgba(179, 38, 30, 0.08); border-radius: 12px; box-shadow: var(--shadow-1); text-align: center; border-left: 4px solid #B3261E;">
               <div style="font-size: 11px; font-weight: 600; color: #B3261E; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px;">Offline ≥4D</div>
-              <div style="font-size: 26px; font-weight: 800; color: #B3261E;">${r.offline}</div>
-              <div style="font-size: 10px; color: #B3261E; margin-top: 4px;">críticos</div>
+              <div style="font-size: 24px; font-weight: 800; color: #B3261E;">${r.offline}</div>
+              <div style="font-size: 11px; color: #B3261E; margin-top: 4px;">críticos</div>
             </div>
           </div>
 
@@ -14869,16 +14882,16 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <div style="font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px;">Disponibilidad</div>
               <div style="font-size: 18px; font-weight: 800; color: ${progressColor};">${r.disp}%</div>
             </div>
-            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden;">
+            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
               <div style="width: ${progressPct}%; height: 100%; background: linear-gradient(90deg, ${progressColor} 0%, ${progressColor}dd 100%);
-                          border-radius: 10px; transition: width 0.15s ease-out; box-shadow: 0 0 8px ${progressColor}40;"></div>
+                          border-radius: 12px; transition: width 0.15s ease-out; box-shadow: 0 0 8px ${progressColor}40;"></div>
             </div>
           </div>
 
           <!-- Badge de estado -->
           <div style="display: flex; gap: 8px; position: relative; z-index: 1;">
             <div style="flex: 1; padding: 8px 12px; background: ${statusBg}; border-radius: 8px; border: 1px solid ${statusColor}; text-align: center;">
-              <div style="font-size: 10px; font-weight: 600; color: ${statusColor}; text-transform: uppercase; letter-spacing: 0.2px;">
+              <div style="font-size: 11px; font-weight: 600; color: ${statusColor}; text-transform: uppercase; letter-spacing: 0.2px;">
                 ${dispNum >= 99 ? '✓ Excelente' : dispNum >= 97 ? '⚠ Bueno' : '⛔ Crítico'}
               </div>
             </div>
@@ -15546,11 +15559,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       var div = document.createElement('div');
       div.id = 'drill-banner';
-      div.style.cssText = 'display:flex;gap:14px;align-items:center;padding:10px 14px;margin:0 0 12px 0;border-radius:8px;font-size:12.5px;background:rgba(245,166,35,0.10);border:1px solid rgba(245,166,35,0.35);color:#7a4a00;';
+      div.style.cssText = 'display:flex;gap:14px;align-items:center;padding:10px 14px;margin:0 0 12px 0;border-radius:8px;font-size:12px;background:rgba(245,166,35,0.10);border:1px solid rgba(245,166,35,0.35);color:#7a4a00;';
       div.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">filter_alt</span>' +
         '<span><strong>Filtro activo desde dashboard:</strong> ' + parts.join(' · ') + '</span>' +
         '<span style="flex:1"></span>' +
-        '<button onclick="clearCruceFilters(); document.getElementById(\'drill-banner\').remove();" style="background:none;border:none;color:inherit;cursor:pointer;font-weight:600;text-decoration:underline;font-size:12.5px;">Quitar filtro</button>';
+        '<button onclick="clearCruceFilters(); document.getElementById(\'drill-banner\').remove();" style="background:none;border:none;color:inherit;cursor:pointer;font-weight:600;text-decoration:underline;font-size:12px;">Quitar filtro</button>';
 
       var anchor = document.querySelector('#cruce .filter-toolbar');
       if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(div, anchor);
@@ -15921,7 +15934,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           row.innerHTML = `
             <td style="padding:6px 8px; border-bottom:1px solid var(--border); text-align:center; color:var(--text); font-weight:600; width:50px;">${data.count}</td>
             <td style="padding:6px 8px; border-bottom:1px solid var(--border); color:var(--text); flex:1;">${typeKey}</td>
-            <td style="padding:6px 8px; border-bottom:1px solid var(--border); text-align:right; color:var(--text-light); font-size:10px; width:90px;">$${data.cost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td style="padding:6px 8px; border-bottom:1px solid var(--border); text-align:right; color:var(--text-light); font-size:11px; width:90px;">$${data.cost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
             <td style="padding:6px 8px; border-bottom:1px solid var(--border); text-align:right; color:var(--primary); font-weight:600; width:90px;">$${rowCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
           `;
           tbody.appendChild(row);
@@ -16003,7 +16016,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <td style="padding:8px 12px; text-align:left; color:var(--text);">${model}</td>
           <td style="padding:8px 12px; text-align:right; color:var(--text); font-weight:600;">$${parseFloat(cost).toFixed(2)}</td>
           <td style="padding:8px 12px; text-align:center;">
-            <button onclick="deleteCostModel('${model}')" style="padding:4px 8px; background:transparent; color:#B3261E; border:1px solid #B3261E; border-radius:3px; font-size:11px; font-weight:600; cursor:pointer;">
+            <button onclick="deleteCostModel('${model}')" style="padding:4px 8px; background:transparent; color:#B3261E; border:1px solid #B3261E; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
               ✕
             </button>
           </td>
@@ -16521,7 +16534,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           padding: [8, 12],
           formatter: function(params) {
             var p = params[0];
-            var extra = onDrill ? '<br/><span style="color:#999;font-size:10px">👆 Click para filtrar CRUCE</span>' : '';
+            var extra = onDrill ? '<br/><span style="color:#999;font-size:11px">👆 Click para filtrar CRUCE</span>' : '';
             return '<strong>' + p.name + '</strong><br/>' + label + ': <strong>' + p.value + '</strong>' + extra;
           }
         },
@@ -17539,7 +17552,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           + '<td>' + buildCommentSelect(d) + '</td>'
           + '<td>' + buildNoteInput(d) + '</td>'
           + '<td style="text-align:center;" class="detalle-history-cell" data-equipo-cr="' + escHTML(d.CR || '') + '">'
-            + '<button class="detalle-history-btn" style="background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:4px; color:#E2001A; font-weight:600; transition:all 0.2s;" title="Ver historial de seguimiento">'
+            + '<button class="detalle-history-btn" style="background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:6px; color:#E2001A; font-weight:600; transition:all 0.2s;" title="Ver historial de seguimiento">'
               + '<span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle;">history</span>'
             + '</button>'
           + '</td>';
@@ -17586,11 +17599,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       var html = '';
       if (currentPage > 0) {
-        html += '<button onclick="prevDetallePage()" style="padding:6px 12px; border:1px solid var(--border); border-radius:4px; cursor:pointer;">← Anterior</button>';
+        html += '<button onclick="prevDetallePage()" style="padding:6px 12px; border:1px solid var(--border); border-radius:6px; cursor:pointer;">← Anterior</button>';
       }
       html += '<span style="padding:0 8px; font-size:12px; color:var(--text-light);">Página ' + (currentPage + 1) + ' de ' + totalPages + '</span>';
       if (currentPage < totalPages - 1) {
-        html += '<button onclick="nextDetallePage()" style="padding:6px 12px; border:1px solid var(--border); border-radius:4px; cursor:pointer;">Siguiente →</button>';
+        html += '<button onclick="nextDetallePage()" style="padding:6px 12px; border:1px solid var(--border); border-radius:6px; cursor:pointer;">Siguiente →</button>';
       }
       paginationContainer.innerHTML = html;
     }
@@ -17652,7 +17665,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <td style="padding: 8px; border-bottom: 1px solid var(--border);">${d['Last Name'] || '—'}</td>
           <td style="padding: 8px; border-bottom: 1px solid var(--border);">${d.TIENDA || '—'}</td>
           <td style="padding: 8px; border-bottom: 1px solid var(--border);">
-            <select onchange="savePlazaOverride('${key.replace(/'/g, "\\'")}', this.value); renderAll();" style="padding: 4px; border: 1px solid var(--border); border-radius: 4px;">
+            <select onchange="savePlazaOverride('${key.replace(/'/g, "\\'")}', this.value); renderAll();" style="padding: 4px; border: 1px solid var(--border); border-radius: 6px;">
               <option value="">— sin asignar —</option>
               <option value="Tijuana Este" ${overriddenPlaza === 'Tijuana Este' ? 'selected' : ''}>Tijuana Este</option>
               <option value="Ensenada" ${overriddenPlaza === 'Ensenada' ? 'selected' : ''}>Ensenada</option>
@@ -18935,7 +18948,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         html += '<div style="background:' + criticalRed + '; padding:10px 16px;">';
         html += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr>';
         html += '<td style="color:white; font-size:13px; font-weight:700;">EQUIPOS APAGADOS SIN NOTIFICACIÓN</td>';
-        html += '<td style="text-align:right;"><span style="color:white; font-size:12px; background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:10px;">' + criticos.length + ' equipos</span></td>';
+        html += '<td style="text-align:right;"><span style="color:white; font-size:12px; background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:12px;">' + criticos.length + ' equipos</span></td>';
         html += '</tr></table>';
         html += '</div>';
         html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
@@ -19417,7 +19430,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var bgColor = type === 'success' ? '#1F7A4E' : type === 'error' ? '#B3261E' : '#424242';
       toast.style.cssText = 'position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); ' +
         'background:' + bgColor + '; color:white; padding:12px 24px; border-radius:8px; font-size:13px; font-weight:600; ' +
-        'box-shadow:0 4px 16px rgba(0,0,0,0.2); z-index:100000; opacity:0; transition:all 0.15s ease; ' +
+        'box-shadow:var(--shadow-2); z-index:100000; opacity:0; transition:all 0.15s ease; ' +
         'font-family:Segoe UI,Arial,sans-serif; max-width:500px; text-align:center;';
       toast.textContent = message;
       document.body.appendChild(toast);
@@ -19517,7 +19530,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           '</table>' +
           plazaBreakdown +
         '</div>' +
-        '<div style="position:absolute; bottom:48px; left:56px; right:56px; text-align:center; font-size:10px; color:#9aa0a6;">Generado automáticamente desde el dashboard OXXO Movilidad</div>';
+        '<div style="position:absolute; bottom:48px; left:56px; right:56px; text-align:center; font-size:11px; color:#9aa0a6;">Generado automáticamente desde el dashboard OXXO Movilidad</div>';
       return div;
     }
 
@@ -19525,8 +19538,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var div = document.createElement('div');
       div.style.cssText = 'width:794px; padding:28px 40px; font-family:Roboto,Arial,sans-serif; color:#1C1B1F; box-sizing:border-box; background:white;';
       div.innerHTML =
-        '<h2 style="font-size:15px; color:#E2001A; border-bottom:2px solid #E2001A; padding-bottom:5px; margin:0 0 12px 0; font-weight:700;">' + escHTML(title) + '</h2>' +
-        '<div style="font-size:10px; line-height:1.4;">' + contentHTML + '</div>';
+        '<h2 style="font-size:14px; color:#E2001A; border-bottom:2px solid #E2001A; padding-bottom:5px; margin:0 0 12px 0; font-weight:700;">' + escHTML(title) + '</h2>' +
+        '<div style="font-size:11px; line-height:1.4;">' + contentHTML + '</div>';
       return div;
     }
 
@@ -19553,10 +19566,10 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     function buildTableSectionHTML(rows, columns) {
       if (!rows.length) return '<p style="color:#1F7A4E"><em>Sin registros que mostrar.</em></p>';
-      var html = '<table style="width:100%; border-collapse:collapse; font-size:9px;">';
+      var html = '<table style="width:100%; border-collapse:collapse; font-size:11px;">';
       html += '<thead><tr style="background:#F8F1F5;">';
       columns.forEach(c => {
-        html += '<th style="border:1px solid #E0E0E0; padding:6px 5px; text-align:left; font-size:9px; font-weight:600; word-wrap:break-word;">' + escHTML(c.label) + '</th>';
+        html += '<th style="border:1px solid #E0E0E0; padding:6px 5px; text-align:left; font-size:11px; font-weight:600; word-wrap:break-word;">' + escHTML(c.label) + '</th>';
       });
       html += '</tr></thead><tbody>';
       rows.forEach((r, idx) => {
@@ -20514,7 +20527,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       Object.keys(estados).forEach(function(estado){
         var equipos = estados[estado];
-        var html = '<table style="width:100%; border-collapse:collapse; font-size:11.5px; margin-bottom:6px;">';
+        var html = '<table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:6px;">';
         html += '<thead><tr style="background:#f3f4f6;">';
         html += '<th style="padding:6px; border:1px solid #d1d5db; text-align:left;">Tienda</th>';
         html += '<th style="padding:6px; border:1px solid #d1d5db; text-align:center;">CR</th>';
@@ -20536,7 +20549,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             html += '<td style="padding:5px 7px; border:1px solid #d1d5db;">' + escHTML(d.ASESOR || '—') + '</td>';
             html += '<td style="padding:5px 7px; border:1px solid #d1d5db;">' + escHTML(formatSerialNumber(d['Serial Number'])) + '</td>';
             html += '<td style="padding:5px 7px; border:1px solid #d1d5db; text-align:center;"><strong>' + (d.days_ago || '—') + '</strong></td>';
-            html += '<td style="padding:5px 7px; border:1px solid #d1d5db; font-size:10px; color:var(--text-light);">' + escHTML(comentario) + '</td>';
+            html += '<td style="padding:5px 7px; border:1px solid #d1d5db; font-size:11px; color:var(--text-light);">' + escHTML(comentario) + '</td>';
             html += '</tr>';
           });
         }
@@ -20631,7 +20644,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;">' + cellVal(p.hh) + '</td>';
         html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;">' + cellVal(p.tt) + '</td>';
         html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;">' + cellVal(p.imp) + '</td>';
-        html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;"><button onclick="removeStockRow(' + i + ')" style="background:#B3261E;color:white;border:none;padding:4px 10px;border-radius:3px;cursor:pointer;font-size:11px;">Eliminar</button></td>';
+        html += '<td style="padding:7px; border:1px solid var(--border); text-align:center;"><button onclick="removeStockRow(' + i + ')" style="background:#B3261E;color:white;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;">Eliminar</button></td>';
         html += '</tr>';
       });
       html += '</tbody></table>';
@@ -20737,13 +20750,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         return;
       }
       var fecha = new Date(data.fecha).toLocaleString('es-MX');
-      var html = '<div style="padding: 10px 14px; background: rgba(226,0,26,0.04); border-left: 4px solid var(--primary); border-radius: 4px;">';
+      var html = '<div style="padding: 10px 14px; background: rgba(226,0,26,0.04); border-left: 4px solid var(--primary); border-radius: 6px;">';
       html += '<div style="font-weight:600; margin-bottom:8px;">📅 ' + escHTML(fecha) + ' &nbsp; · &nbsp; Plaza: <strong>' + escHTML(data.plaza || 'Todas') + '</strong></div>';
       html += '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; font-size: 12px;">';
       ['garantia','robo','danada','apagada'].forEach(function(k){
         var v = (data.estatus && data.estatus[k]) || { hh:0, tt:0, imp:0 };
         var label = { garantia:'Garantía', robo:'Robo', danada:'Dañada', apagada:'Apagada' }[k];
-        html += '<div style="background:#fff;border:1px solid var(--border);padding:6px 8px;border-radius:4px;">';
+        html += '<div style="background:#fff;border:1px solid var(--border);padding:6px 8px;border-radius:6px;">';
         html += '<strong>' + label + ':</strong><br>HH=' + v.hh + ' · TT=' + v.tt + ' · IMP=' + v.imp;
         html += '</div>';
       });
@@ -20903,7 +20916,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         html = '<p style="text-align:center; color:var(--text-light); padding:16px; font-size:13px;">✓ Sin equipos pendientes en este estado</p>';
       } else {
         html += '<div style="overflow-x:auto; border-radius:6px; border:1px solid var(--border);">';
-        html += '<table style="width:100%; border-collapse:collapse; font-size:11.5px;">';
+        html += '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
         html += '<thead><tr style="background:var(--table-head-bg); border-bottom:1px solid var(--border);">';
         html += '<th style="padding:8px; text-align:left;">Tienda</th>';
         html += '<th style="padding:8px; text-align:center;">CR</th>';
@@ -20923,9 +20936,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
           html += '<tr style="background:' + rowBg + '; border-bottom:1px solid var(--border); transition:background 0.2s;">';
           html += '<td style="padding:8px;">' + escHTML(d.TIENDA || '-') + '</td>';
-          html += '<td style="padding:8px; text-align:center; font-weight:600; font-size:10px;">' + escHTML(d.CR || '-') + '</td>';
+          html += '<td style="padding:8px; text-align:center; font-weight:600; font-size:11px;">' + escHTML(d.CR || '-') + '</td>';
           html += '<td style="padding:8px; text-align:center;">' + (d.equipo_type === 'HH' ? '📱' : d.equipo_type === 'TABLET' ? '📱' : '🖨️') + '</td>';
-          html += '<td style="padding:8px; font-size:10px;">' + escHTML(d.ASESOR || '-') + '</td>';
+          html += '<td style="padding:8px; font-size:11px;">' + escHTML(d.ASESOR || '-') + '</td>';
           html += '<td style="padding:8px; text-align:center; font-weight:700; color:' + dayColor + ';">' + days + 'd</td>';
           html += '<td style="padding:8px; color:' + estadoColor + '; font-weight:600;">' + estadoEmoji + ' ' + escHTML(estado) + '</td>';
           html += '</tr>';
@@ -22094,7 +22107,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         btn.className = 'chart-expand-btn';
         btn.title = 'Ver en pantalla completa';
         btn.setAttribute('aria-label', 'Ampliar gráfico: ' + title);
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:17px">fullscreen</span>';
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">fullscreen</span>';
         btn.onclick = function(ev){ ev.stopPropagation(); expandChart(inner.id, title); };
         card.appendChild(btn);
       });
@@ -22141,7 +22154,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .tabs { position: relative; }
     .tab-slider {
       position: absolute; bottom: 0; left: 0; width: 0; height: 3px;
-      background: var(--primary); border-radius: 3px 3px 0 0;
+      background: var(--primary); border-radius: 6px 3px 0 0;
       transition: left .25s cubic-bezier(.4,0,.2,1), width .25s cubic-bezier(.4,0,.2,1);
       pointer-events: none; z-index: 1;
       will-change: left, width;  /* GPU optimization para transiciones smooth */
@@ -22616,7 +22629,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: rgba(255,255,255,0.95);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(0,0,0,0.08);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      box-shadow: var(--shadow-2);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -22816,7 +22829,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       c.style.cssText = `
         position:fixed; top:30%; left:${50 + (Math.random()-0.5)*60}vw;
         width:8px; height:14px; background:${colors[i%colors.length]};
-        z-index:99998; pointer-events:none; border-radius:2px;
+        z-index:99998; pointer-events:none; border-radius:6px;
         transform:rotate(${Math.random()*360}deg);
         transition:all 2.5s cubic-bezier(0.5,1.5,0.5,1);
       `;
@@ -23295,7 +23308,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       if (!appBar) return;
       const pill = document.createElement('span');
       pill.id = 'data-load-ago';
-      pill.style.cssText = 'font-size:11px;color:var(--text-light);margin-left:12px;padding:3px 10px;background:rgba(0,0,0,0.05);border-radius:999px;display:none;';
+      pill.style.cssText = 'font-size:11px;color:var(--text-on-brand);margin-left:12px;padding:3px 10px;background:rgba(255,255,255,0.16);border-radius:999px;display:none;';
       appBar.appendChild(pill);
     }
     const pill = document.getElementById('data-load-ago');
@@ -23423,7 +23436,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     --surface: #ffffff;
     --border: #e9ecef;
     --text: #32325d;        /* slate Argon */
-    --text-light: #8898aa;  /* muted Argon */
+    --text-light: #5c6b82;  /* muted Argon, oscurecido: el #8898aa original daba 2.8-3.0:1 */
   }
   body:not([data-theme="dark"]) { background: #f8f9fe; }
   #results-screen { background: #f8f9fe; }
@@ -23438,7 +23451,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   /* ---------- TABLAS estilo Argon ---------- */
   .table-wrapper table th {
     background: #f6f9fc !important;
-    color: #67748e !important; /* antes #8898aa: contraste 2.7:1, ilegible p/texto 11px */
+    color: var(--text-light) !important; /* 5.12:1 sobre #f6f9fc */
     text-transform: uppercase;
     font-size: 11px !important;
     font-weight: 700 !important;
@@ -23488,7 +23501,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   .btn:active, .bulk-btn:active { transform: translateY(0); }
 
   /* ---------- BADGES pill Argon ---------- */
-  .badge { border-radius: 9999px !important; font-weight: 600; }
+  .badge { border-radius: 999px !important; font-weight: 600; }
 
   /* ════════════════════════════════════════════════════════════════
      ESTADO BADGES — Mejorados con iconos, colores vibrantes, animaciones
@@ -23503,7 +23516,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     border-radius: 12px !important;
     border: 1px solid currentColor;
     border-opacity: 0.2;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-2);
     transition: all .3s ease;
   }
 
@@ -23555,7 +23568,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   /* Hover: feedback interactivo */
   .status-badge:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    box-shadow: var(--shadow-2) !important;
   }
 
   /* ---------- FIX: encabezado sticky tapaba los selects de "Asignar plaza" ----------
@@ -23573,7 +23586,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     color: #ffffff !important;
     border-radius: 12px !important;
     padding: 9px !important;
-    font-size: 22px !important;
+    font-size: 20px !important;
     box-shadow: 0 6px 14px rgba(226,0,26,0.30) !important;
     line-height: 1 !important;
   }
@@ -23600,7 +23613,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   .dash-hero-wrap {
     background: #ffffff !important;
     border: 1px solid #eef0f4 !important;
-    border-radius: 18px !important;
+    border-radius: 16px !important;
     box-shadow: 0 0 2rem 0 rgba(136,152,170,0.16) !important;
   }
   /* Header del panel: barra superior con título + línea divisoria sutil */
@@ -23612,14 +23625,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   .dash-hero-wrap > div:first-child span { color: #32325d !important; }
   .dash-hero-wrap > div:first-child .material-symbols-outlined {
     background: linear-gradient(135deg,#E2001A,#B80018) !important; color: #fff !important;
-    border-radius: 9px; padding: 7px; font-size: 18px !important;
+    border-radius: 8px; padding: 7px; font-size: 18px !important;
     box-shadow: 0 4px 10px rgba(226,0,26,0.28);
   }
   /* Grid sobre lienzo gris claro Argon → las cards blancas se distinguen sin dureza */
   .dash-hero-wrap .dashboards-grid {
     background: #f6f7fb !important;
     border: 0 !important;
-    border-radius: 14px !important;
+    border-radius: 16px !important;
     padding: 18px !important;
   }
   [data-theme="dark"] .dash-hero-wrap { background: var(--card-bg) !important; border-color: rgba(255,255,255,0.06) !important; }
@@ -23729,7 +23742,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .login-btn.loading { animation:spin 0.15s linear infinite; pointer-events:none; }
   </style>
 
-  <div class="login-card" style="background:linear-gradient(to bottom, #ffffff 0%, #f8f9fe 100%); border-radius:16px; width:90%; max-width:420px; padding:40px 32px; box-shadow:0 20px 60px rgba(0,0,0,0.15), 0 0 1px rgba(226,0,26,0.3); position:relative; overflow:hidden;">
+  <div class="login-card" style="background:linear-gradient(to bottom, #ffffff 0%, #f8f9fe 100%); border-radius:16px; width:90%; max-width:420px; padding:40px 32px; box-shadow:var(--shadow-4), 0 0 1px rgba(226,0,26,0.3); position:relative; overflow:hidden;">
 
     <!-- Gradient border effect -->
     <div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg, transparent, #E2001A, transparent);"></div>
@@ -23774,7 +23787,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       </div>
 
       <!-- Local Mode Checkbox with enhanced styling -->
-      <div style="margin-top:8px; padding:14px; background:linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%); border:2px solid #66BB6A; border-radius:10px; transition:all 0.15s ease; cursor:pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(102,187,106,0.2)';" onmouseout="this.style.boxShadow='none';">
+      <div style="margin-top:8px; padding:14px; background:linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%); border:2px solid #66BB6A; border-radius:12px; transition:all 0.15s ease; cursor:pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(102,187,106,0.2)';" onmouseout="this.style.boxShadow='none';">
         <label style="display:flex; align-items:flex-start; gap:12px; font-size:13px; cursor:pointer;">
           <input type="checkbox" id="login-local-mode" style="margin-top:3px; cursor:pointer; width:18px; height:18px; accent-color:#66BB6A;">
           <span>
@@ -23786,7 +23799,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
       <!-- Submit Button with loading state -->
       <button type="submit" class="login-btn" id="login-submit-btn"
-              style="background:linear-gradient(135deg, #E2001A 0%, #B8001A 100%); color:white; border:none; padding:13px 20px; border-radius:8px; font-weight:700; cursor:pointer; font-size:15px; transition:all 0.15s ease; position:relative; overflow:hidden; text-transform:uppercase; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(226,0,26,0.3);"
+              style="background:linear-gradient(135deg, #E2001A 0%, #B8001A 100%); color:white; border:none; padding:13px 20px; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.15s ease; position:relative; overflow:hidden; text-transform:uppercase; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(226,0,26,0.3);"
               onmouseover="if(!this.classList.contains('loading')) { this.style.boxShadow='0 8px 25px rgba(226,0,26,0.4)'; this.style.transform='translateY(-2px)'; }"
               onmouseout="if(!this.classList.contains('loading')) { this.style.boxShadow='0 4px 15px rgba(226,0,26,0.3)'; this.style.transform='translateY(0)'; }">
         <span id="login-btn-text">Conectar</span>
@@ -23809,7 +23822,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
 <!-- Follow-up Notes Timeline Modal -->
 <div id="notes-timeline-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
-  <div style="background:white; border-radius:12px; width:90%; max-width:500px; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.3); overflow:hidden;">
+  <div style="background:white; border-radius:12px; width:90%; max-width:500px; max-height:80vh; display:flex; flex-direction:column; box-shadow:var(--shadow-3); overflow:hidden;">
     <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e0e0e0;">
       <div>
         <h3 style="margin:0 0 4px 0; color:#1C1B1F; font-size:18px; font-weight:700;">Historial de Seguimiento</h3>
@@ -23847,13 +23860,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
 <!-- PDF Preview Modal -->
 <div id="pdf-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
-  <div style="background:white; border-radius:12px; width:90%; max-width:800px; height:90%; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+  <div style="background:white; border-radius:12px; width:90%; max-width:800px; height:90%; display:flex; flex-direction:column; box-shadow:var(--shadow-3);">
     <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e0e0e0;">
       <h3 style="margin:0; color:#1C1B1F; font-size:18px; font-weight:700;">Vista Previa PDF</h3>
       <button onclick="closePDFPreview()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">×</button>
     </div>
     <div style="flex:1; overflow-y:auto; padding:16px; background:#f5f5f5;">
-      <canvas id="pdf-preview-canvas" style="max-width:100%; margin:0 auto; background:white; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-radius:4px;"></canvas>
+      <canvas id="pdf-preview-canvas" style="max-width:100%; margin:0 auto; background:white; box-shadow:var(--shadow-2); border-radius:6px;"></canvas>
     </div>
     <div style="display:flex; gap:8px; justify-content:center; padding:16px; border-top:1px solid #e0e0e0;">
       <button onclick="downloadReportPDF()" style="background:#E2001A; color:white; border:none; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:6px;">
@@ -23866,7 +23879,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
 <!-- Email Preview Modal -->
 <div id="email-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
-  <div style="background:white; border-radius:12px; width:90%; max-width:900px; height:90%; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+  <div style="background:white; border-radius:12px; width:90%; max-width:900px; height:90%; display:flex; flex-direction:column; box-shadow:var(--shadow-3);">
     <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e0e0e0;">
       <h3 style="margin:0; color:#1C1B1F; font-size:18px; font-weight:700;">Vista Previa Correo Electrónico</h3>
       <button onclick="closeEmailPreview()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">×</button>
@@ -23883,7 +23896,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
 <!-- Excel Preview Modal -->
 <div id="excel-preview-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
-  <div style="background:white; border-radius:12px; width:90%; max-width:900px; height:90%; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+  <div style="background:white; border-radius:12px; width:90%; max-width:900px; height:90%; display:flex; flex-direction:column; box-shadow:var(--shadow-3);">
     <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e0e0e0;">
       <h3 style="margin:0; color:#1C1B1F; font-size:18px; font-weight:700;">Vista Previa Excel</h3>
       <button onclick="closeExcelPreview()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">×</button>
@@ -23902,7 +23915,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
 <!-- QR Code Modal -->
 <div id="qrcode-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
-  <div style="background:white; border-radius:12px; padding:20px; box-shadow:0 8px 32px rgba(0,0,0,0.2); max-width:400px; text-align:center;">
+  <div style="background:white; border-radius:12px; padding:20px; box-shadow:var(--shadow-3); max-width:400px; text-align:center;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="margin:0; color:#1C1B1F; font-size:18px; font-weight:700;">Código QR del Equipo</h3>
       <button onclick="closeQRModal()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">×</button>
@@ -24376,9 +24389,9 @@ function renderNotesTimeline(equipoKey) {
       '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">' +
         '<div>' +
           '<div style="font-weight:600; color:#1C1B1F; font-size:12px;">' + note.user + '</div>' +
-          '<div style="font-size:10px; color:#999; margin-top:2px;">' + dateStr + ' • ' + timeStr + '</div>' +
+          '<div style="font-size:11px; color:#999; margin-top:2px;">' + dateStr + ' • ' + timeStr + '</div>' +
         '</div>' +
-        '<span style="background:' + statusColor + '; color:white; padding:2px 8px; border-radius:4px; font-size:9px; font-weight:700;">' + note.status + '</span>' +
+        '<span style="background:' + statusColor + '; color:white; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700;">' + note.status + '</span>' +
       '</div>' +
       '<div style="color:#333; font-size:12px; line-height:1.5;">' + String(note.text).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>' +
       '<button onclick="deleteFollowupNote(\'' + equipoKey.replace(/'/g, "\\'") + '\', ' + idx + ')" ' +
@@ -24439,7 +24452,7 @@ function showAlert(message, type, duration) {
 
   var alertDiv = document.createElement('div');
   alertDiv.id = id;
-  alertDiv.style.cssText = 'animation:slideInAlertUp 0.15s ease; margin-bottom:12px; padding:12px 16px; background:' + bgColor + '; color:white; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); display:flex; align-items:center; gap:10px; font-size:12px; line-height:1.4;';
+  alertDiv.style.cssText = 'animation:slideInAlertUp 0.15s ease; margin-bottom:12px; padding:12px 16px; background:' + bgColor + '; color:white; border-radius:8px; box-shadow:var(--shadow-2); display:flex; align-items:center; gap:10px; font-size:12px; line-height:1.4;';
   alertDiv.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px; flex-shrink:0;">' + icon + '</span>' +
                        '<span style="flex:1;">' + message + '</span>' +
                        '<button onclick="document.getElementById(\'' + id + '\').remove();" style="background:none; border:none; color:white; cursor:pointer; padding:0; font-size:18px; line-height:1;">×</button>';
@@ -24962,7 +24975,7 @@ function renderOSVersionTable(data) {
       '<td style="padding:12px 14px;"><strong>' + escHTML(item.os) + '</strong></td>' +
       '<td style="padding:12px 14px; text-align:right;"><span style="background:' + color + '; color:white; padding:4px 8px; border-radius:6px; font-weight:700; display:inline-block;">' + item.count + '</span></td>' +
       '<td style="padding:12px 14px; text-align:right; font-weight:700; color:var(--text);">' + pct + '%</td>' +
-      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:4px; height:8px; width:150px;"><div style="background:' + color + '; height:100%; width:' + pct + '%; border-radius:4px;"></div></div></td>' +
+      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:6px; height:8px; width:150px;"><div style="background:' + color + '; height:100%; width:' + pct + '%; border-radius:6px;"></div></div></td>' +
       '</tr>';
   }
 
@@ -25034,7 +25047,7 @@ function renderModelsTable(data) {
       '<td style="padding:12px 14px;"><strong>' + escHTML(item.model) + '</strong></td>' +
       '<td style="padding:12px 14px; text-align:right;"><span style="background:' + color + '; color:white; padding:4px 8px; border-radius:6px; font-weight:700;">' + item.count + '</span></td>' +
       '<td style="padding:12px 14px; text-align:right; font-weight:700; color:var(--text);">' + pct + '%</td>' +
-      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:4px; height:6px; width:120px; overflow:hidden;"><div style="background:' + color + '; height:100%; width:' + pct + '%;"></div></div></td>' +
+      '<td style="padding:12px 14px;"><div style="background:var(--surface); border-radius:6px; height:6px; width:120px; overflow:hidden;"><div style="background:' + color + '; height:100%; width:' + pct + '%;"></div></div></td>' +
       '</tr>';
   }
 

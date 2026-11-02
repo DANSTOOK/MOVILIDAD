@@ -4,6 +4,10 @@ Revisión de la interfaz con el dashboard corriendo en local y 190 equipos
 cargados en las 4 plazas (Tijuana Este, Tijuana Centro, Ensenada, Playas).
 Se recorrieron las 8 pestañas en claro y oscuro, a 1440×900 y a 375×812.
 
+> **Estado:** la **Fase 1 está aplicada** (ver sección 11). Las cifras de
+> las secciones 1, 3 y 4 son las de **antes** de aplicarla; al final de la
+> sección 11 están las de después.
+
 **Alcance: solo lo visual.** Nada de lo que está aquí cambia cálculos, filtros,
 exportaciones ni la lógica de la aplicación. Se trata de capas, estructura y
 homologación.
@@ -340,3 +344,29 @@ Ordenado por relación entre lo que se ve y lo que cuesta. Todo es visual.
 
 Cada fase puede ir en su propio release con `node scripts/release.js minor`, y
 si algo se ve peor de lo que estaba, `node scripts/rollback.js` lo devuelve.
+
+### Resultado de la Fase 1 (aplicada)
+
+Medido en la pestaña Resumen con los mismos 190 equipos:
+
+| | Antes | Después |
+|---|---|---|
+| Tamaños de letra distintos | 18 | **8** |
+| Textos por debajo de 11px | 7, 8, 9, 10 y 10.5px | **ninguno** |
+| Radios de esquina distintos | 20 | **7** |
+| Sombras distintas | 31 | **12** |
+| Colores de texto distintos | 23 | **11** |
+| Textos bajo el mínimo de contraste (claro) | 25 | **0** reales |
+| Textos bajo el mínimo de contraste (oscuro) | 41 | 28 |
+| Paneles claros sobre fondo oscuro | 6 | 2 |
+
+En claro quedan 3 avisos y los tres son falsos positivos de la medición
+(iniciales del avatar sobre un degradado y dos iconos). Sin desbordes de texto
+ni scroll horizontal, en escritorio ni en móvil.
+
+El modo oscuro mejora pero **sigue incompleto a propósito**: completarlo es la
+Fase 3, porque depende de que los colores de las tarjetas salgan de variables.
+
+Lo que la Fase 1 **no** tocó: las sombras escritas como propiedad de JavaScript
+(`this.style.boxShadow = '...'` en los `onmouseover`), que siguen con valores
+a pelo, y los 139 glows de color, que son intencionados.

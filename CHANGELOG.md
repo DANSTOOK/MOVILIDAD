@@ -6,6 +6,10 @@ commits desde el release anterior.
 
 ## Sin publicar
 
+- Fase 1 de la auditoría visual: homologados tamaños de letra, radios y
+  sombras a la escala que ya declaraba `:root`, y arreglado el gris secundario
+  ilegible. 368 valores sueltos normalizados.
+
 - Proyecto revivido: el backend arranca en local sin servidor de Postgres
   (PGlite embebido) y el frontend apunta al API local cuando se abre en
   localhost, en lugar del despliegue de Railway que ya no existe.
