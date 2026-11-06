@@ -1,5 +1,9 @@
 # Auditoría visual — OXXO Movilidad
 
+> Hay una segunda pasada, más fina, en
+> [AUDITORIA_COHERENCIA.md](AUDITORIA_COHERENCIA.md): color, texto, componentes,
+> espacio y movimiento.
+
 Revisión de la interfaz con el dashboard corriendo en local y 190 equipos
 cargados en las 4 plazas (Tijuana Este, Tijuana Centro, Ensenada, Playas).
 Se recorrieron las 8 pestañas en claro y oscuro, a 1440×900 y a 375×812.
