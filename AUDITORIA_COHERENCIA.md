@@ -23,8 +23,8 @@ Lo que todavía no habla un mismo idioma, por orden de impacto:
 | Capítulo | Medida | Veredicto |
 |---|---|---|
 | **Movimiento** | 8 duraciones, 9 curvas, 29 `transition: all`, 4 animaciones infinitas | ~~REHACER~~ **hecho** |
-| **Botones** | 12 variantes y **8 alturas distintas** para 39 botones | **REHACER** |
-| **Espacio** | 11 valores de padding, 10 de gap, sin escala | **REHACER** |
+| **Botones** | 12 variantes y **8 alturas distintas** para 39 botones | ~~REHACER~~ **hecho** |
+| **Espacio** | 11 valores de padding, 10 de gap, sin escala | ~~REHACER~~ **hecho** |
 | **Color** | 16 colores de texto, 2 verdes y 3 ámbares para lo mismo | **MEJORAR** |
 | **Colocación del texto** | 4 formas de alinear, 7 interlineados, tabla que parte todo | **MEJORAR** |
 | **Adornos** | aurora de fondo, pulsos infinitos, robot animado | **ELIMINAR** |
@@ -365,3 +365,47 @@ Medido en la aplicación corriendo, con 190 equipos:
 curvas `ease` que siguen apareciendo vienen del CSS de Leaflet, que es de
 terceros. Y las partículas de confeti mantienen su transición aleatoria: son
 un efecto puntual que se destruye solo, no parte del sistema.
+---
+
+## Resultado: capítulos 2 y 3 aplicados
+
+### Botones
+
+Al medirlos de cerca, las 8 alturas no eran ocho tipos de botón: eran
+**botones de icono con cinco tamaños por accidente** (30, 36, 38, 40 y 44px),
+más los de texto en dos (34 y 48) y las pestañas en un tercero (34).
+
+| | Antes | Después |
+|---|---|---|
+| Alturas distintas | 8 | **5** |
+| Botones de icono | 30 / 36 / 38 / 40 / 44 | **36px, los 23** |
+| Botones de texto y pestañas | 34 / 48 | **40px, los 8** |
+
+Las tres alturas que quedan no son botones por naturaleza: el chip de
+estadística de la cabecera (19px), el hueco del logo (38px) y la tarjeta de
+plaza del mapa (63px). Forzarlas al sistema sería peor que dejarlas.
+
+En pantalla táctil todo sube a 44px de área activa mediante un `::after`
+invisible, así que el aspecto no cambia y el dedo sí acierta.
+
+**Una regresión que hubo que corregir:** al subir las pestañas a 40px, la barra
+se iba a dos líneas. Ahora no se parte: si no cabe, se desplaza, igual que ya
+hacía en móvil.
+
+### Espacio
+
+| | Antes | Después |
+|---|---|---|
+| Valores de padding | 11 | **7** (4, 6, 8, 12, 16, 20, 24) |
+| Valores de gap | 10 | **8** (2, 4, 6, 8, 12, 16, 20, 24) |
+
+Se normalizaron **415 valores sueltos** a la escala de 4. Los 5, 10, 14, 18 y
+22px eran el rastro de ajustar a ojo hasta que cuadrara.
+
+**Una decisión que se aparta de la propuesta original.** La auditoría pedía una
+escala estricta de 4, pero el 6px aparece en **112 sitios** y casi siempre es el
+hueco entre un icono y su texto. Ahí no es un descuido: es un paso real, y
+forzarlo a 8 habría cambiado la densidad de media interfaz para ganar pureza en
+un documento. Se queda, declarado como `--space-icono`.
+
+Sin desbordes de texto ni scroll horizontal en claro, oscuro y móvil.

@@ -2,6 +2,10 @@
 
 ## Sin publicar
 
+- Sistema de botón y escala de espaciado: los de icono a un solo tamaño, los
+  de texto y pestañas a otro, mínimo táctil de 44px, y 415 valores de
+  espacio normalizados a la escala de 4.
+
 - Sistema de movimiento: tres duraciones y dos curvas, fuera `transition: all`
   y las animaciones en bucle decorativas. La vista queda quieta en 200 ms.
 
