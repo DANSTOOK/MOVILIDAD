@@ -4,7 +4,7 @@ Revisión de la interfaz con el dashboard corriendo en local y 190 equipos
 cargados en las 4 plazas (Tijuana Este, Tijuana Centro, Ensenada, Playas).
 Se recorrieron las 8 pestañas en claro y oscuro, a 1440×900 y a 375×812.
 
-> **Estado:** las **Fases 1, 2 y 3 están aplicadas** (ver sección 11). Las cifras de
+> **Estado:** las **cuatro fases están aplicadas** (ver sección 11). Las cifras de
 > las secciones 1, 3 y 4 son las de **antes** de aplicarla; al final de la
 > sección 11 están las de después.
 
@@ -435,8 +435,9 @@ iniciales del avatar sobre un degradado.
 - Ejes y valores suben de 10px a 11px, el suelo de la escala.
 
 **Fila de KPI.** Los cuatro conteos (Total BD, HH apagadas, TT apagadas,
-Tiendas) pasan a tarjeta plana; el anillo se queda **solo en los dos
-porcentajes de disponibilidad**, que es donde significa "parte de un total".
+Tiendas) pasan a tarjeta plana y el anillo se queda solo en los dos
+porcentajes. (Este paso quedó a medias y se rehízo después: ver
+"Corrección: la fila de KPI, rehecha" al final.)
 El cambio se aplicó a las **dos** filas de KPI: la de Cruce y la de Resumen,
 que son marcados distintos. "Disp. HH %" pasa a "Disponibilidad HH": el valor
 ya lleva el signo.
@@ -444,3 +445,68 @@ ya lleva el signo.
 **Pendiente.** Las sombras escritas como propiedad de JavaScript
 (`this.style.boxShadow`) siguen con valores a pelo, y el ancho máximo común
 de la sección 9 no se tocó.
+### Resultado de la Fase 4 (aplicada)
+
+Con esto se cierran los 13 puntos del plan y los pendientes que habían quedado
+anotados al final de cada fase.
+
+**Repaso de estructura.**
+
+- **Pestañas** alineadas a la izquierda y a lo ancho del contenido, en vez de
+  una píldora centrada flotando suelta. El **hover** pasa de rojo a gris: se
+  pintaba igual que la pestaña seleccionada y a simple vista parecían dos
+  activas.
+- **Título duplicado** en Configuración resuelto: "Configuración del Sistema"
+  salía dos veces seguidas. Se queda el encabezado de pantalla y el buscador
+  conserva su sitio.
+- **Botón flotante de sonido**: se acerca al borde y el contenido reserva su
+  espacio en pantallas estrechas, donde antes lo tapaba.
+
+**Las últimas sombras sueltas.** Quedaban 32 escritas como propiedad de
+JavaScript (`this.style.boxShadow = '…'` en los `onmouseover`), fuera del
+alcance de la Fase 1, que solo tocó las declaradas como CSS. Las 8 neutras
+pasan a `var(--shadow-N)`; las 17 de color (rojo de marca, verde y azul de
+estado) se quedan, porque son intencionadas, igual que los anillos de foco.
+
+**Contraste.** Dos arreglos reales:
+
+- La **barra de marca** usaba `--primary`, que en oscuro se aclara a `#FF3B5C`
+  para leerse *sobre* superficies oscuras. Pero como **fondo**, el blanco
+  encima caía a 3.48:1. Se separa en un token propio `--brand-bar`, fijo al
+  rojo de marca en los dos temas: 4.94:1 y la identidad intacta.
+- El **número del KPI** usaba `#00C853` y `#FF9100`, que sobre blanco dan
+  2.2:1. Pasa a tokens por tema (`--kpi-ok`, `--kpi-aviso`). El aro sigue
+  brillante a propósito: es un gráfico, y el glow es lo que lo hace resaltar.
+
+**Las dos cosas que estaban a medias.**
+
+- Los contadores `— equipos` y `— offline` de la cabecera ya muestran datos.
+  `updateHeaderStats()` leía `reportData`, una variable que no existe en la
+  aplicación; el array de equipos se llama `D`.
+- La etiqueta `Total / en BD` de las tarjetas HH y TABLET pasa a
+  `Tiendas con HH / deben tener uno`. El número no cambia: seguía siendo
+  correcto, pero bajo un título "HH" se leía como "tenemos 174 handhelds".
+
+**Medición final** (pestaña Cruce, 190 equipos, con la página ya estabilizada):
+
+| | Claro | Oscuro |
+|---|---|---|
+| Paneles claros sobre fondo oscuro | — | **0** |
+| Textos bajo el mínimo de contraste | **6** | **4** |
+| Textos recortados por su caja | **0** | **0** |
+| Tamaños de letra distintos | **7** | **7** |
+| Radios de esquina distintos | **4** | **4** |
+| Sombras distintas | **11** | **11** |
+
+Los avisos que quedan son iconos (que como gráficos piden 3:1, no 4.5:1) y las
+iniciales del avatar sobre un degradado, que el medidor no sabe resolver.
+Comparado con el punto de partida: 18 tamaños de letra, 20 radios, 31 sombras
+y 25 textos ilegibles en claro / 41 en oscuro.
+
+**Una nota sobre cómo medir esto.** Varias lecturas intermedias dieron números
+alarmantes (35 fallos, 14 "paneles claros") que al comprobarlos resultaron ser
+estados transitorios: la aplicación anima la entrada de cada sección y
+re-renderiza las tablas, así que medir antes de que todo se asiente devuelve
+colores a medio camino. Lo mismo pasa con el menú lateral: está fuera de
+pantalla y `getComputedStyle` devuelve valores congelados — abierto se lee
+perfectamente. Conviene esperar a que la vista esté quieta antes de medir.

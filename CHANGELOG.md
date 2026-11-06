@@ -1,5 +1,15 @@
 # Changelog
 
+## Sin publicar
+
+- Fila de KPI rehecha como una sola familia de tarjetas: fuera los aros con
+  halo, etiqueta arriba, y barra de proporción en los dos porcentajes.
+
+- Fase 4 de la auditoría visual: pestañas a la izquierda con hover gris,
+  título duplicado y botón flotante resueltos, las últimas sombras sueltas a
+  tokens, la barra de marca con su propio color y los contadores de cabecera
+  mostrando datos de verdad.
+
 Las versiones se lanzan con `node scripts/release.js` y se pueden deshacer con
 `node scripts/rollback.js`. Cada sección la escribe el script a partir de los
 commits desde el release anterior.

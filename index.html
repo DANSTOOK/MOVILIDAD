@@ -70,6 +70,12 @@
       --radius-pill: 999px;
       /* Texto sobre el rojo de marca: --text-light es para fondo claro */
       --text-on-brand: rgba(255,255,255,0.92);
+      /* Fondo de las barras de marca; NO se aclara en oscuro, porque el
+         blanco encima necesita contraste. */
+      --brand-bar: #E2001A;
+      /* Color del NÚMERO del KPI: legible sobre la superficie de cada tema.
+         El aro puede seguir brillante, que es un gráfico. */
+      --kpi-ok: #1F7A4E;  --kpi-aviso: #B26A00;
       /* Color por tipo de equipo; el modo oscuro los redefine abajo. */
       --tipo-hh: #1F7A4E;  --tipo-hh-suave: #C8E6C9;  --tipo-hh-fuerte: #155724;
       --tipo-tt: #0066CC;  --tipo-tt-suave: #E3F2FD;  --tipo-tt-fuerte: #003399;
@@ -131,6 +137,8 @@
       --tipo-hh: #4ADE80;  --tipo-hh-suave: rgba(74,222,128,0.12);  --tipo-hh-fuerte: #8FE9B4;
       --tipo-tt: #5AA9FF;  --tipo-tt-suave: rgba(90,169,255,0.12);  --tipo-tt-fuerte: #A8CFFF;
       --sobre-tipo: #0F0E11;
+      --brand-bar: #E2001A;
+      --kpi-ok: #4ADE80;  --kpi-aviso: #FBBF24;
       color-scheme: dark;
     }
 
@@ -239,7 +247,7 @@
     }
 
     .sidebar-header {
-      background: var(--primary);
+      background: var(--brand-bar);
       color: white;
       padding: 24px 20px;
       display: flex;
@@ -572,7 +580,7 @@
        APP BAR — Variante C (2 filas: marca + breadcrumbs)
        ==================================================================== */
     .app-bar {
-      background: var(--primary);
+      background: var(--brand-bar);
       color: white;
       box-shadow: var(--shadow-2);
       display: flex;
@@ -717,7 +725,7 @@
     .app-bar-icon-btn .material-symbols-outlined { font-size: 20px; }
     .app-bar-icon-btn .badge {
       position: absolute; top: -3px; right: -3px;
-      background: #FBBF24;
+      background: #FFD166;
       color: #1C1B1F;
       font-size: 11px; font-weight: 700;
       min-width: 16px; height: 16px;
@@ -800,16 +808,15 @@
     /* TABS - GLASSMORPHISM PREMIUM */
     .tabs {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 6px;
       background: rgba(255,255,255,0.7);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(226,0,26,0.1);
       border-radius: 16px;
       padding: 6px;
-      margin: 16px auto;
-      max-width: fit-content;
-      box-shadow: var(--shadow-2);
+      margin: 16px 0;
+      box-shadow: var(--shadow-1);
       flex-wrap: wrap;
       animation: slideInUp 0.15s ease-out;
     }
@@ -923,8 +930,8 @@
     }
 
     .tab:hover {
-      color: var(--primary);
-      background: rgba(226,0,26,0.1);
+      color: var(--text);
+      background: var(--hover-bg);
       transform: translateY(-1px);
     }
 
@@ -6691,7 +6698,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       100% { transform: rotate(0); }
     }
     #notif-bell-btn.has-alerts #notif-bell-icon {
-      color: #FBBF24;
+      color: #FFD166;
       animation: bellRing 1s ease-in-out;
     }
     #notif-bell-btn.has-alerts .badge {
@@ -9471,15 +9478,15 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
        apagados-hh / apagados-tt quedan en gris neutral (sin color de estado). */
     .kpi-circular-widget[data-kpi="disp-hh"].status-error .kpi-number,
     .kpi-circular-widget[data-kpi="disp-tt"].status-error .kpi-number {
-      color: #FF1744 !important;
+      color: var(--error) !important;
       text-shadow: 0 0 12px rgba(255,23,68,0.35);
     }
     .kpi-circular-widget.status-warning .kpi-number {
-      color: #FF9100 !important;
+      color: var(--kpi-aviso) !important;
       text-shadow: 0 0 12px rgba(255,145,0,0.35);
     }
     .kpi-circular-widget.status-success .kpi-number {
-      color: #00C853 !important;
+      color: var(--kpi-ok) !important;
       text-shadow: 0 0 12px rgba(0,200,83,0.35);
     }
 
@@ -10190,7 +10197,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                           box-shadow: var(--shadow-2);"
                    id="search-wrapper"
                    onmouseover="document.getElementById('search-wrapper').style.borderColor='var(--primary)'; document.getElementById('search-wrapper').style.boxShadow='0 6px 24px rgba(25,118,210,0.12)';"
-                   onmouseout="document.getElementById('search-wrapper').style.borderColor='var(--border)'; document.getElementById('search-wrapper').style.boxShadow='0 4px 16px rgba(0,0,0,0.08)';">
+                   onmouseout="document.getElementById('search-wrapper').style.borderColor='var(--border)'; document.getElementById('search-wrapper').style.boxShadow='var(--shadow-2)';">
                 <div style="display:flex; align-items:center; padding:4px;">
                   <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px; padding:10px 12px 10px 14px;">location_on</span>
                   <input type="text" id="oxxo-search-input" placeholder="🔍 Buscar tienda en el mapa (Maples, Centro, Playas...)"
@@ -10924,7 +10931,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                         box-shadow:var(--shadow-2); transition:all 0.25s ease;
                         cursor:default; min-height:520px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(226,0,26,0.14)';"
-                 onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)';">
+                 onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow-2)';">
               <!-- Icono + título -->
               <div style="display:flex; align-items:center; gap:14px;">
                 <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#E2001A,#B80018);
@@ -10987,7 +10994,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
                         box-shadow:var(--shadow-2); transition:all 0.25s ease; cursor:default; min-height:520px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(33,115,70,0.14)';"
-                 onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)';">
+                 onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow-2)';">
               <div style="display:flex; align-items:center; gap:14px;">
                 <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#217346,#0E5C36);
                             display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(33,115,70,0.35);">
@@ -11046,7 +11053,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
                         box-shadow:var(--shadow-2); transition:all 0.25s ease; cursor:default; min-height:520px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(204,51,0,0.14)';"
-                 onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)';">
+                 onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow-2)';">
               <div style="display:flex; align-items:center; gap:14px;">
                 <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#CC3300,#991F00);
                             display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(204,51,0,0.35);">
@@ -11127,10 +11134,6 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         </div>
         <div class="config-container" style="padding-bottom: 120px;">
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-            <h1 style="font-size: 24px; margin: 0;">
-              <span class="material-symbols-outlined" style="vertical-align: middle; font-size: 28px;">settings</span>
-              Configuración del Sistema
-            </h1>
             <input type="text" id="cfg-search" placeholder="Buscar opciones..." style="flex: 1; max-width: 300px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--input-bg); color: var(--text);">
           </div>
 
@@ -14854,8 +14857,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                            cursor: pointer; transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
                            box-shadow: var(--shadow-2); animation: slideUp 0.15s ease-out;
                            display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden;"
-             onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.12)';"
-             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';"
+             onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-3)';"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-2)';"
              onclick="console.log('Filtrar por ${r.name}');">
 
           <!-- Decoración background -->
@@ -14885,9 +14888,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: relative; z-index: 1;">
             <!-- Total -->
             <div style="padding: 12px; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow-1); text-align: center; border-left: 4px solid ${r.color};">
-              <div style="font-size: 11px; font-weight: 600; color: var(--text-light); letter-spacing:0; margin-bottom: 4px;">Total</div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-light); letter-spacing:0; margin-bottom: 4px;">Tiendas con ${r.name}</div>
               <div style="font-size: 24px; font-weight: 800; color: ${r.color};">${r.total}</div>
-              <div style="font-size: 11px; color: var(--text-light); margin-top: 4px;">en BD</div>
+              <div style="font-size: 11px; color: var(--text-light); margin-top: 4px;">deben tener uno</div>
             </div>
             <!-- Offline -->
             <div style="padding: 12px; background: rgba(179, 38, 30, 0.08); border-radius: 12px; box-shadow: var(--shadow-1); text-align: center; border-left: 4px solid #B3261E;">
@@ -21200,13 +21203,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       // Actualizar stats del header consumiendo datos globales si existen
       function updateHeaderStats() {
         try {
+          // Leía `reportData`, una variable que no existe en ninguna parte de la
+          // aplicación: el array de equipos se llama D. Por eso estos dos
+          // contadores de la cabecera mostraron siempre un guion.
           var total = null, offline = null;
-          if (typeof window.reportData !== 'undefined' && Array.isArray(window.reportData)) {
-            total = window.reportData.length;
-            offline = window.reportData.filter(function (d) { return (d && d.days_ago >= 4); }).length;
-          } else if (typeof reportData !== 'undefined' && Array.isArray(reportData)) {
-            total = reportData.length;
-            offline = reportData.filter(function (d) { return (d && d.days_ago >= 4); }).length;
+          var datos = (typeof D !== 'undefined' && Array.isArray(D)) ? D : null;
+          if (datos && datos.length) {
+            total = datos.length;
+            offline = datos.filter(function (d) { return (d && d.days_ago >= 4); }).length;
           }
           var tv = document.getElementById('hdr-stat-total-val');
           var ov = document.getElementById('hdr-stat-offline-val');
@@ -22669,8 +22673,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     btn.onclick = window.toggleSound;
     btn.style.cssText = `
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      bottom: 16px;
+      right: 16px;
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -22688,11 +22692,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     `;
     btn.addEventListener('mouseenter', () => {
       btn.style.transform = 'scale(1.1)';
-      btn.style.boxShadow = '0 8px 24px rgba(0,0,0,0.18)';
+      btn.style.boxShadow = 'var(--shadow-3)';
     });
     btn.addEventListener('mouseleave', () => {
       btn.style.transform = 'scale(1)';
-      btn.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
+      btn.style.boxShadow = 'var(--shadow-2)';
     });
     document.body.appendChild(btn);
     updateSoundUI();
@@ -23500,6 +23504,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   [data-theme="dark"] .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.95); }
   [data-theme="dark"] .leaflet-control-attribution { background: rgba(0,0,0,0.6); color: var(--text-light); }
   [data-theme="dark"] .leaflet-control-attribution a { color: var(--text-light); }
+
+  /* El botón flotante de sonido se superponía al contenido en pantallas
+     estrechas; el contenido le reserva sitio. */
+  @media (max-width: 768px) {
+    #results-screen { padding-bottom: 84px; }
+  }
 
   [data-theme="dark"] body,
   [data-theme="dark"] #results-screen { background: var(--bg); }
@@ -25168,6 +25178,164 @@ function debugOSModelos() {
   debugDiv.style.display = 'block';
   console.log(info);
 }
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════
+     FILA DE KPI — una sola familia de tarjetas
+     Antes convivían dos lenguajes en la misma fila: cuatro tarjetas planas
+     junto a dos aros con halo de neón, de tamaños distintos, y las etiquetas
+     "Disponibilidad HH/TT" se salían del círculo y las cruzaba el propio aro.
+     Ahora las seis son la misma tarjeta con la anatomía habitual de un stat
+     card — etiqueta, número, línea de apoyo — y la proporción de los dos
+     porcentajes se muestra con una barra, la misma que ya usan las tarjetas
+     HH/TABLET. Solo presentación: ningún cálculo cambia.
+     ════════════════════════════════════════════════════════════════ -->
+<style id="kpi-row-v2">
+  .section div.kpi-circular-widget {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-1) !important;
+    padding: 14px 16px !important;
+    min-height: 96px;
+    /* Los dos KPI de porcentaje llevaban min-width:200px de cuando tenían
+       un aro grande dentro; ahora rompía el ritmo de la rejilla. */
+    min-width: 0 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+  .section div.kpi-circular-widget::before,
+  .section div.kpi-circular-widget::after { display: none !important; }
+  .section div.kpi-circular-widget:hover {
+    border-color: var(--text-light) !important;
+    box-shadow: var(--shadow-2) !important;
+  }
+
+  /* Fuera los aros y su halo: un conteo no es una proporción, y donde sí lo
+     es la barra se lee mejor y no se come la etiqueta. */
+  .kpi-circle-svg { display: none !important; }
+  .kpi-circle-container {
+    width: auto !important;
+    height: auto !important;
+    display: block !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+  .kpi-circle-container::before,
+  .kpi-circle-container::after { display: none !important; }
+
+  /* El marcado trae número y luego etiqueta; column-reverse pone la etiqueta
+     arriba sin tocar el HTML. */
+  .kpi-circle-content {
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    align-items: flex-start !important;
+    gap: 2px !important;
+    text-align: left !important;
+  }
+  .kpi-label {
+    /* La etiqueta lleva dentro el icono de estado y un span solo para
+       lectores de pantalla; en flex el icono queda en línea con el texto. */
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: var(--fs-label) !important;
+    font-weight: 600 !important;
+    color: var(--text-light) !important;
+    letter-spacing: 0 !important;
+    line-height: 1.3 !important;
+    text-transform: none !important;
+    white-space: normal !important;
+  }
+  .kpi-label .kpi-status-glyph {
+    font-size: 16px !important;
+    line-height: 1 !important;
+    flex: 0 0 auto;
+  }
+  .kpi-label .sr-only { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  .kpi-number {
+    font-size: var(--fs-kpi) !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    text-shadow: none !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  /* Barra de proporción, solo en los KPI que son porcentaje */
+  .kpi-barra {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--hover-bg);
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .kpi-barra > i {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--text-light);
+    transition: width .4s ease;
+  }
+  .section div.kpi-circular-widget.status-success .kpi-barra > i { background: var(--kpi-ok); }
+  .section div.kpi-circular-widget.status-warning .kpi-barra > i { background: var(--kpi-aviso); }
+  .section div.kpi-circular-widget.status-error   .kpi-barra > i { background: var(--error); }
+
+  @media (max-width: 768px) {
+    .section div.kpi-circular-widget { min-height: 84px; padding: 12px 14px !important; }
+  }
+</style>
+<script>
+(function () {
+  // Marca como "con barra" los KPI cuyo número es un porcentaje y ajusta su
+  // ancho. No calcula nada: lee el valor que ya pintó la aplicación.
+  function marcarKpisConBarra() {
+    document.querySelectorAll('.kpi-circular-widget').forEach(function (w) {
+      var num = w.querySelector('.kpi-number');
+      if (!num) return;
+      var txt = (num.textContent || '').trim();
+      var barra = w.querySelector('.kpi-barra');
+      if (txt.indexOf('%') === -1) {
+        w.classList.remove('kpi-con-barra');
+        if (barra) barra.remove();
+        return;
+      }
+      var pct = parseFloat(txt.replace(',', '.'));
+      if (isNaN(pct)) return;
+      w.classList.add('kpi-con-barra');
+      if (!barra) {
+        barra = document.createElement('div');
+        barra.className = 'kpi-barra';
+        barra.appendChild(document.createElement('i'));
+        w.appendChild(barra);
+      }
+      barra.firstChild.style.width = Math.max(0, Math.min(100, pct)) + '%';
+    });
+  }
+
+  function engancharKpis() {
+    marcarKpisConBarra();
+    var obs = new MutationObserver(marcarKpisConBarra);
+    document.querySelectorAll('.kpi-number').forEach(function (n) {
+      obs.observe(n, { childList: true, characterData: true, subtree: true });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', engancharKpis);
+  } else {
+    engancharKpis();
+  }
+})();
 </script>
 
 </body>
