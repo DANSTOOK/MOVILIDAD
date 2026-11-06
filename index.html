@@ -23802,93 +23802,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
 
 <!-- Login Modal -->
-<div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(226,0,26,0.1) 100%); z-index:11000; align-items:center; justify-content:center; backdrop-filter:blur(2px); animation:fadeInBg 0.15s ease-in-out;">
-  <style>
-    @keyframes fadeInBg { from { opacity:0; } to { opacity:1; } }
-    @keyframes slideUp { from { transform:translateY(40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-    @keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.7; } }
-    @keyframes shimmer { 0% { background-position:-1000px 0; } 100% { background-position:1000px 0; } }
-    @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
-
-    .login-card { animation:slideUp 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .login-icon { animation:pulse 2s ease-in-out infinite; }
-    .login-btn.loading { animation:spin 0.15s linear infinite; pointer-events:none; }
-  </style>
-
-  <div class="login-card" style="background:linear-gradient(to bottom, #ffffff 0%, #f8f9fe 100%); border-radius:16px; width:90%; max-width:420px; padding:40px 32px; box-shadow:var(--shadow-4), 0 0 1px rgba(226,0,26,0.3); position:relative; overflow:hidden;">
-
-    <!-- Gradient border effect -->
-    <div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg, transparent, #E2001A, transparent);"></div>
-
-    <!-- Header with icon -->
-    <div style="text-align:center; margin-bottom:32px;">
-      <div class="login-icon" style="font-size:56px; margin-bottom:16px; display:inline-block;">📱</div>
-      <h1 style="margin:0; font-size:28px; font-weight:800; background:linear-gradient(135deg, #E2001A 0%, #B8001A 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">OXXO Movilidad</h1>
-      <p style="margin:6px 0 0 0; font-size:13px; color:#999; letter-spacing:0.5px;">API Backend Connection</p>
-    </div>
-
-    <form onsubmit="handleLogin(event)" style="display:flex; flex-direction:column; gap:16px;">
-
-      <!-- Username Field -->
-      <div style="position:relative;">
-        <label style="display:block; font-size:12px; font-weight:700; color:#333; margin-bottom:8px; letter-spacing:0;">👤 Usuario</label>
-        <div style="position:relative;">
-          <input type="text" id="login-username" placeholder="admin" value="admin"
-                 style="width:100%; padding:12px 14px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:14px; box-sizing:border-box; transition:all 0.15s ease; background:#fafafa; font-weight:500;"
-                 onfocus="this.style.borderColor='#E2001A'; this.style.background='white'; this.style.boxShadow='0 0 0 3px rgba(226,0,26,0.1)';"
-                 onblur="this.style.borderColor='#e0e0e0'; this.style.background='#fafafa'; this.style.boxShadow='none';">
-          <span class="material-symbols-outlined" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#999; font-size:20px; pointer-events:none;">person</span>
-        </div>
-      </div>
-
-      <!-- Password Field -->
-      <div style="position:relative;">
-        <label style="display:block; font-size:12px; font-weight:700; color:#333; margin-bottom:8px; letter-spacing:0;">🔐 Contraseña</label>
-        <div style="position:relative;">
-          <input type="password" id="login-password" placeholder="••••••••"
-                 style="width:100%; padding:12px 14px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:14px; box-sizing:border-box; transition:all 0.15s ease; background:#fafafa; font-weight:500; letter-spacing:2px;"
-                 onfocus="this.style.borderColor='#E2001A'; this.style.background='white'; this.style.boxShadow='0 0 0 3px rgba(226,0,26,0.1)';"
-                 onblur="this.style.borderColor='#e0e0e0'; this.style.background='#fafafa'; this.style.boxShadow='none';">
-          <span class="material-symbols-outlined" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#999; font-size:20px; pointer-events:none;">lock</span>
-        </div>
-      </div>
-
-      <!-- Error Message with animation -->
-      <div id="login-error" style="display:none; padding:12px 14px; background:linear-gradient(135deg, #FFEBEE 0%, #FCE4EC 100%); border:1.5px solid #EF5350; border-radius:8px; font-size:13px; color:#C62828; animation:slideUp 0.15s ease-in-out; font-weight:500;">
-        <span class="material-symbols-outlined" style="vertical-align:middle; margin-right:6px; font-size:18px;">error</span>
-        <span id="login-error-text"></span>
-      </div>
-
-      <!-- Local Mode Checkbox with enhanced styling -->
-      <div style="margin-top:8px; padding:14px; background:linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%); border:2px solid #66BB6A; border-radius:12px; transition:all 0.15s ease; cursor:pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(102,187,106,0.2)';" onmouseout="this.style.boxShadow='none';">
-        <label style="display:flex; align-items:flex-start; gap:12px; font-size:13px; cursor:pointer;">
-          <input type="checkbox" id="login-local-mode" style="margin-top:3px; cursor:pointer; width:18px; height:18px; accent-color:#66BB6A;">
-          <span>
-            <strong style="color:#1B5E20; display:block; margin-bottom:2px;">⚡ Modo Local (Testing)</strong>
-            <span style="color:#558B2F; font-size:12px;">Auto-login sin contraseña</span>
-          </span>
-        </label>
-      </div>
-
-      <!-- Submit Button with loading state -->
-      <button type="submit" class="login-btn" id="login-submit-btn"
-              style="background:linear-gradient(135deg, #E2001A 0%, #B8001A 100%); color:white; border:none; padding:13px 20px; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.15s ease; position:relative; overflow:hidden; letter-spacing:0; box-shadow:0 4px 15px rgba(226,0,26,0.3);"
-              onmouseover="if(!this.classList.contains('loading')) { this.style.boxShadow='0 8px 25px rgba(226,0,26,0.4)'; this.style.transform='translateY(-2px)'; }"
-              onmouseout="if(!this.classList.contains('loading')) { this.style.boxShadow='0 4px 15px rgba(226,0,26,0.3)'; this.style.transform='translateY(0)'; }">
-        <span id="login-btn-text">Conectar</span>
-        <span id="login-btn-spinner" style="display:none; margin-left:8px; animation:spin 0.15s linear infinite;">⟳</span>
-      </button>
-
-      <!-- Demo credentials info -->
-      <div style="text-align:center; font-size:12px; color:#999; margin-top:8px; line-height:1.6;">
-        <p style="margin:0; opacity:0.7;">Demo: <strong>admin</strong> / <strong>admin123</strong></p>
-      </div>
-    </form>
-
-    <!-- Bottom accent line -->
-    <div style="position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg, transparent, #E2001A, transparent);"></div>
-  </div>
-</div>
+<!-- El modal de login se eliminó: la aplicación trabaja con el archivo que
+     cargas, no necesita sesión. -->
 
 <!-- Real-time Alerts Container -->
 <div id="alerts-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; max-width:350px;"></div>
@@ -24614,65 +24529,20 @@ function clearAuth() {
   } catch (e) {}
 }
 
-function showLoginModal() {
-  document.getElementById('login-modal').style.display = 'flex';
-  document.getElementById('login-username').focus();
-}
+// El login se eliminó: la aplicación trabaja con el archivo que cargas y no
+// necesita sesión. Estas dos se quedan como no-op porque varias funciones del
+// camino del API todavía las llaman.
+function showLoginModal() {}
+function hideLoginModal() {}
 
-function hideLoginModal() {
-  document.getElementById('login-modal').style.display = 'none';
-}
-
-function handleLogin(event) {
-  event.preventDefault();
-
-  var useLocal = document.getElementById('login-local-mode').checked;
-  var username = document.getElementById('login-username').value.trim();
-  var password = document.getElementById('login-password').value.trim();
-  var submitBtn = document.getElementById('login-submit-btn');
-
-  // Si modo local está marcado, auto-login sin pedir credenciales
-  if (useLocal) {
-    // Mostrar spinner
-    submitBtn.classList.add('loading');
-    document.getElementById('login-btn-text').style.display = 'none';
-    document.getElementById('login-btn-spinner').style.display = 'inline';
-
-    // Simulación pequeña para dar feedback visual
-    setTimeout(function() {
-      _useLocalMode = true;
-      hideLoginModal();
-      clearLoginError();
-      loadLocalData();
-      showAlert('✓ Modo local activado (sin contraseña)', 'success');
-
-      // Reset botón
-      submitBtn.classList.remove('loading');
-      document.getElementById('login-btn-text').style.display = 'inline';
-      document.getElementById('login-btn-spinner').style.display = 'none';
-    }, 600);
-    return;
-  }
-
-  // Validar campos para modo API
-  if (!username || !password) {
-    showLoginErrorWithShake('Por favor completa todos los campos');
-    return;
-  }
-
-  // Mostrar spinner en botón
-  submitBtn.classList.add('loading');
-  document.getElementById('login-btn-text').style.display = 'none';
-  document.getElementById('login-btn-spinner').style.display = 'inline';
-
-  loginWithAPI(username, password, submitBtn);
-}
+// El formulario de login ya no existe; se deja un no-op por si algo la llama.
+function handleLogin(event) { if (event && event.preventDefault) event.preventDefault(); }
 
 function showLoginError(message) {
   var errorDiv = document.getElementById('login-error');
   var errorText = document.getElementById('login-error-text');
-  errorText.textContent = message;
-  errorDiv.style.display = 'block';
+  if (errorText) errorText.textContent = message;
+  if (errorDiv) errorDiv.style.display = 'block';
 }
 
 function showLoginErrorWithShake(message) {
@@ -24688,7 +24558,7 @@ function showLoginErrorWithShake(message) {
 
 function clearLoginError() {
   var errorDiv = document.getElementById('login-error');
-  errorDiv.style.display = 'none';
+  if (errorDiv) errorDiv.style.display = 'none';
 }
 
 // Agregar animación shake al CSS
@@ -24719,8 +24589,8 @@ async function loginWithAPI(username, password, submitBtn) {
       // Reset botón
       if (submitBtn) {
         submitBtn.classList.remove('loading');
-        document.getElementById('login-btn-text').style.display = 'inline';
-        document.getElementById('login-btn-spinner').style.display = 'none';
+        var _bt = document.getElementById('login-btn-text'); if (_bt) _bt.style.display = 'inline';
+        var _bs = document.getElementById('login-btn-spinner'); if (_bs) _bs.style.display = 'none';
       }
       return;
     }
@@ -24741,8 +24611,8 @@ async function loginWithAPI(username, password, submitBtn) {
     // Reset botón
     if (submitBtn) {
       submitBtn.classList.remove('loading');
-      document.getElementById('login-btn-text').style.display = 'inline';
-      document.getElementById('login-btn-spinner').style.display = 'none';
+      var _bt = document.getElementById('login-btn-text'); if (_bt) _bt.style.display = 'inline';
+      var _bs = document.getElementById('login-btn-spinner'); if (_bs) _bs.style.display = 'none';
     }
   } catch (error) {
     console.error('Login error:', error);
@@ -24752,8 +24622,8 @@ async function loginWithAPI(username, password, submitBtn) {
     // Reset botón
     if (submitBtn) {
       submitBtn.classList.remove('loading');
-      document.getElementById('login-btn-text').style.display = 'inline';
-      document.getElementById('login-btn-spinner').style.display = 'none';
+      var _bt = document.getElementById('login-btn-text'); if (_bt) _bt.style.display = 'inline';
+      var _bs = document.getElementById('login-btn-spinner'); if (_bs) _bs.style.display = 'none';
     }
   }
 }
@@ -24824,13 +24694,10 @@ function loadLocalData() {
 
 // Verificar autenticación al cargar la página
 function checkAuthOnLoad() {
-  var token = getAuthToken();
-  if (!token) {
-    showLoginModal();
-  } else {
-    // Intentar verificar token con el API
-    verifyTokenWithAPI();
-  }
+  // Sin login: se arranca siempre en modo local. Si hubiera un token guardado
+  // de antes, se intenta el API, pero su fallo ya no bloquea nada.
+  if (getAuthToken()) { verifyTokenWithAPI(); return; }
+  _useLocalMode = true;
 }
 
 async function verifyTokenWithAPI() {
@@ -24871,16 +24738,12 @@ function toggleUserMenu() {
 }
 
 function handleLogout() {
-  if (!confirm('¿Cerrar sesión?')) return;
-
+  // Sin login no hay sesión que cerrar; se limpian los datos cargados.
+  if (!confirm('¿Limpiar los datos cargados?')) return;
   clearAuth();
   toggleUserMenu();
-
-  // Limpiar datos
   D = [];
-
-  showAlert('Sesión cerrada', 'info');
-  showLoginModal();
+  showAlert('Datos limpiados', 'info');
 }
 
 // Cerrar user menu cuando hago clic afuera
@@ -25191,6 +25054,9 @@ function debugOSModelos() {
      HH/TABLET. Solo presentación: ningún cálculo cambia.
      ════════════════════════════════════════════════════════════════ -->
 <style id="kpi-row-v2">
+  /* Sin login no hay sesión: el avatar con iniciales y su menú sobran. */
+  #hdr-avatar, #user-menu { display: none !important; }
+
   .section div.kpi-circular-widget {
     display: flex !important;
     flex-direction: column !important;
