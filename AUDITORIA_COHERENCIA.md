@@ -25,8 +25,8 @@ Lo que todavía no habla un mismo idioma, por orden de impacto:
 | **Movimiento** | 8 duraciones, 9 curvas, 29 `transition: all`, 4 animaciones infinitas | ~~REHACER~~ **hecho** |
 | **Botones** | 12 variantes y **8 alturas distintas** para 39 botones | ~~REHACER~~ **hecho** |
 | **Espacio** | 11 valores de padding, 10 de gap, sin escala | ~~REHACER~~ **hecho** |
-| **Color** | 16 colores de texto, 2 verdes y 3 ámbares para lo mismo | **MEJORAR** |
-| **Colocación del texto** | 4 formas de alinear, 7 interlineados, tabla que parte todo | **MEJORAR** |
+| **Color** | 16 colores de texto, 2 verdes y 3 ámbares para lo mismo | ~~MEJORAR~~ **hecho** |
+| **Colocación del texto** | 3 formas de alinear, 7 interlineados, tabla que parte todo | ~~MEJORAR~~ **hecho** (salvo la tabla) |
 | **Adornos** | aurora de fondo, pulsos infinitos, robot animado | **ELIMINAR** |
 
 ---
@@ -409,3 +409,55 @@ forzarlo a 8 habría cambiado la densidad de media interfaz para ganar pureza en
 un documento. Se queda, declarado como `--space-icono`.
 
 Sin desbordes de texto ni scroll horizontal en claro, oscuro y móvil.
+---
+
+## Resultado: capítulos 4 y 5 aplicados
+
+### Color
+
+| | Antes | Después |
+|---|---|---|
+| Colores de texto en pantalla | 16 | **13** |
+| Verdes para "correcto" | 2 | **1** |
+| Ámbares para "atención" | 3 | **1** |
+
+- `#2A6E40` se unifica en `#1F7A4E`, y `#E8B400` en `#F5A623`: eran el mismo
+  significado pintado por manos distintas.
+- Los cuatro números grandes de KPI dejan `#333333` y pasan al token de texto.
+  Eran lo más visible de todo: se veían sucios al lado del resto y nadie sabría
+  decir por qué.
+- 17 grises `#999` sueltos pasan a `--text-light`, y los chips de plaza del
+  mapa dejan de heredar negro.
+- El mapa pintaba "plaza crítica" con el rojo **de marca**; ahora usa el de
+  error, como el resto de la aplicación.
+
+### Texto
+
+| | Antes | Después |
+|---|---|---|
+| Pesos tipográficos | 5 | **3** (400 · 600 · 800) |
+| Interlineados | 7 | **6**, dominados por 1.2 y 1.6 |
+| `line-height: 1` | 61 elementos | **3** |
+| Textos recortados por su caja | — | **0** |
+
+- `line-height: 1` dejaba el glifo sin aire: números de 28px en cajas de 28px,
+  con el trazo desbordando 3px. Pasa a 1.2 en 24 declaraciones.
+- 500 y 700 se colapsan en 600: a estos tamaños eran indistinguibles de sus
+  vecinos. Son 221 declaraciones, y el resultado es una interfaz menos
+  "gritada" sin perder jerarquía.
+- Lo que se lee —pies de tarjeta, etiquetas de estado, celdas de tabla— sube
+  de 11px a 13px. Lo que solo se ojea se queda en 12.
+- Las tarjetas alinean a la izquierda; los estados vacíos siguen centrados,
+  que es su sitio.
+
+### Una corrección a esta misma auditoría
+
+El capítulo 5 decía que convivían **cuatro formas de alinear** (`start`, `left`,
+`center`, `right`). Al ir a arreglarlo resultó que **`text-align: start` no se
+declara ni una sola vez**: es el valor por defecto del navegador para los
+elementos que no fijan alineación. No eran cuatro formas, eran tres.
+
+El hallazgo de fondo sí se sostiene, y es más simple de enunciar: hay **144
+reglas que centran frente a 44 que alinean a la izquierda**. La aplicación
+centra por defecto, y eso en una interfaz de datos es justo lo que hace que el
+texto parezca mal colocado.

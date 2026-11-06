@@ -2,6 +2,9 @@
 
 ## Sin publicar
 
+- Coherencia de color y texto: un verde y un ámbar, los colores sueltos a
+  tokens, tres pesos tipográficos y el cuerpo de texto legible.
+
 - Sistema de botón y escala de espaciado: los de icono a un solo tamaño, los
   de texto y pestañas a otro, mínimo táctil de 44px, y 415 valores de
   espacio normalizados a la escala de 4.
