@@ -22,7 +22,7 @@ Lo que todavía no habla un mismo idioma, por orden de impacto:
 
 | Capítulo | Medida | Veredicto |
 |---|---|---|
-| **Movimiento** | 8 duraciones, 9 curvas, 29 `transition: all`, 4 animaciones infinitas | **REHACER** |
+| **Movimiento** | 8 duraciones, 9 curvas, 29 `transition: all`, 4 animaciones infinitas | ~~REHACER~~ **hecho** |
 | **Botones** | 12 variantes y **8 alturas distintas** para 39 botones | **REHACER** |
 | **Espacio** | 11 valores de padding, 10 de gap, sin escala | **REHACER** |
 | **Color** | 16 colores de texto, 2 verdes y 3 ámbares para lo mismo | **MEJORAR** |
@@ -324,3 +324,44 @@ cargados, no de leer el CSS. Dos avisos para quien repita la medición:
   contraste. Es, en sí mismo, parte del hallazgo §1.5.
 - **El menú lateral fuera de pantalla devuelve valores congelados** en
   `getComputedStyle`. Hay que abrirlo para medirlo, o excluirlo.
+---
+
+## Resultado: capítulo 1 aplicado
+
+Medido en la aplicación corriendo, con 190 equipos:
+
+| | Antes | Después |
+|---|---|---|
+| Duraciones de transición | 8 | **4** (0.12 / 0.2 / 0.32 + 0.15 de terceros) |
+| Curvas de transición | 9 | **4**, dominadas por `--mov-curva` |
+| Elementos con `transition: all` | 29 | **0** |
+| Animaciones infinitas en pantalla | 4 | **0** |
+| Declaraciones `animation … infinite` | 82 | **0** propias |
+| Elementos animados a la vez | 34 | **11** |
+| Tiempo hasta que la vista queda quieta | segundos | **~200 ms** |
+
+**Lo que se hizo.**
+
+- Tres duraciones y dos curvas como tokens en `:root`. Se normalizaron **255
+  duraciones** y **229 curvas** (43 `cubic-bezier` sueltos y 186 palabras clave
+  `ease`/`ease-out`/`ease-in`) dentro de las declaraciones `transition:`.
+- **69 `transition: all` reescritos** nombrando propiedades: fondo, color,
+  borde, sombra, transform y opacidad. Ninguna que provoque reflow, que era la
+  causa de que las tablas temblaran al filtrar.
+- **Fuera las animaciones en bucle decorativas**: la aurora de fondo de 30s, el
+  pulso de los iconos del menú, el del contador de offline, el de los puntos
+  del mapa, el robot de la pantalla de carga con sus veinte piezas, el splash y
+  los pulsos de estado. Se conservan las que dicen "estoy trabajando":
+  spinner, barra de progreso, esqueletos de carga y el robot *mientras* procesa
+  un archivo.
+- **La entrada de sección deja de ser escalonada**: `cardStagger` (10
+  elementos) y `chartFade` (9, con 0.7s cada uno) se retiran y queda una sola
+  opacidad de 200 ms. Con 19 tarjetas, el escalonado había dejado de ser
+  elegante para ser una espera.
+- `prefers-reduced-motion` ahora cubre también lo añadido aquí, no solo lo que
+  había antes.
+
+**Lo que queda fuera a propósito.** Las 20 transiciones de 0.15s y las 13
+curvas `ease` que siguen apareciendo vienen del CSS de Leaflet, que es de
+terceros. Y las partículas de confeti mantienen su transición aleatoria: son
+un efecto puntual que se destruye solo, no parte del sistema.

@@ -68,6 +68,15 @@
       --radius-md: 12px;
       --radius-lg: 16px;
       --radius-pill: 999px;
+      /* === MOVIMIENTO ===
+         Tres duraciones y dos curvas. Antes convivían 8 duraciones y 9 curvas
+         distintas: nadie distingue 0.15s de 0.18s, pero sí se nota que la
+         interfaz no tiene un ritmo propio. */
+      --mov-rapido: 120ms;  /* hover, foco, cambios de color */
+      --mov-base:   200ms;  /* abrir/cerrar, aparecer */
+      --mov-lento:  320ms;  /* paneles y modales */
+      --mov-curva:        cubic-bezier(0.2, 0, 0, 1);
+      --mov-curva-salida: cubic-bezier(0.4, 0, 1, 1);
       /* Texto sobre el rojo de marca: --text-light es para fondo claro */
       --text-on-brand: rgba(255,255,255,0.92);
       /* Fondo de las barras de marca; NO se aclara en oscuro, porque el
@@ -152,7 +161,7 @@
     .metric-card,
     [class*="btn"],
     [class*="button"] {
-      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva);
     }
 
     /* Optimización GPU: usar will-change en elementos que se animan frecuentemente */
@@ -185,18 +194,18 @@
     input,
     select,
     textarea {
-      transition: all 0.15s ease;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     input:focus,
     select:focus,
     textarea:focus {
-      transition: all 0.2s ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
     }
 
     /* Transiciones suaves para enlaces */
     a {
-      transition: color 0.2s ease, opacity 0.2s ease;
+      transition: color var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
     }
 
     a:hover {
@@ -234,7 +243,7 @@
       background: var(--card-bg);
       box-shadow: 2px 0 8px rgba(0,0,0,0.15);
       transform: translateX(-100%);
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease-out;
+      transition: transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva);
       z-index: 1200;
       overflow-y: auto;
       display: flex;
@@ -315,7 +324,7 @@
       color: var(--text);
       text-decoration: none;
       border-left: 3px solid transparent;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
       cursor: pointer;
       background: transparent;
       border: none;
@@ -347,7 +356,7 @@
       width: 20px;
       display: flex;
       align-items: center;
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform var(--mov-rapido) var(--mov-curva);
     }
 
     .sidebar-nav-link:hover .sidebar-nav-icon {
@@ -441,7 +450,7 @@
       width: 0;
       height: 100%;
       background: linear-gradient(90deg, rgba(226,0,26,0.08), transparent);
-      transition: width 0.15s ease;
+      transition: width var(--mov-rapido) var(--mov-curva);
       z-index: 0;
     }
 
@@ -470,7 +479,7 @@
       color: var(--text-light);
       opacity: 0;
       transform: translateX(-8px);
-      transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.15s;
+      transition: opacity var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), color var(--mov-rapido);
     }
 
     .sidebar-nav-link:hover .sidebar-nav-arrow {
@@ -508,7 +517,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
       position: relative;
       overflow: hidden;
     }
@@ -521,7 +530,7 @@
       width: 100%;
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.15s ease;
+      transition: left var(--mov-rapido) var(--mov-curva);
     }
 
     .sidebar-footer-btn:hover {
@@ -550,7 +559,7 @@
       background: rgba(0,0,0,0.4);
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.15s;
+      transition: opacity var(--mov-rapido);
       z-index: 1150;
     }
 
@@ -569,7 +578,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.15s;
+      transition: transform var(--mov-rapido);
     }
 
     .sidebar-toggle:hover {
@@ -714,7 +723,7 @@
       cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center;
       position: relative;
-      transition: background .2s ease, transform .2s ease;
+      transition: background var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva);
       font-family: inherit;
       padding: 0;
     }
@@ -744,7 +753,7 @@
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer;
       border: 2px solid rgba(255,255,255,0.6);
-      transition: transform .2s ease;
+      transition: transform var(--mov-base) var(--mov-curva);
       flex-shrink: 0;
       user-select: none;
     }
@@ -763,7 +772,7 @@
       padding: 4px 9px;
       border-radius: 6px;
       cursor: pointer;
-      transition: background .2s ease;
+      transition: background var(--mov-base) var(--mov-curva);
       display: inline-flex; align-items: center; gap: 4px;
     }
     .app-bar-crumbs a:hover { background: rgba(255,255,255,0.12); }
@@ -829,7 +838,7 @@
       color: var(--text-light);
       font-weight: 500;
       font-size: 12px;
-      transition: color 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), font-weight 0.15s ease;
+      transition: color var(--mov-rapido) var(--mov-curva), background var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), font-weight var(--mov-rapido) var(--mov-curva);
       border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
@@ -847,7 +856,7 @@
       height: 18px;
       font-size: 16px;
       line-height: 18px;
-      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     .tab-icon-svg {
@@ -857,7 +866,7 @@
       margin-right: 6px;
       stroke-linecap: round;
       stroke-linejoin: round;
-      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     /* Estilos fluidos para modales */
@@ -865,7 +874,7 @@
     .modal-backdrop {
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.15s ease, background-color 0.15s ease;
+      transition: opacity var(--mov-rapido) var(--mov-curva), background-color var(--mov-rapido) var(--mov-curva);
     }
 
     [id*="modal"][style*="display:block"],
@@ -873,7 +882,7 @@
     .modal-backdrop[style*="display:block"] {
       opacity: 1;
       pointer-events: auto;
-      transition: opacity 0.15s ease, background-color 0.15s ease;
+      transition: opacity var(--mov-rapido) var(--mov-curva), background-color var(--mov-rapido) var(--mov-curva);
     }
 
     /* Animación suave de tablas */
@@ -894,11 +903,11 @@
 
     /* Transiciones suaves en cards */
     .card, [class*="card"] {
-      transition: all 0.15s ease;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     .card:hover, [class*="card"]:hover {
-      transition: all 0.2s ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
     }
 
     .tab:hover .tab-icon-svg {
@@ -958,7 +967,7 @@
       padding: var(--space-lg);
       text-align: center;
       box-shadow: var(--shadow-1);
-      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
       position: relative;
       overflow: hidden;
       cursor: pointer;
@@ -972,7 +981,7 @@
       width: 4px;
       height: 100%;
       background: var(--primary);
-      transition: all 0.15s ease;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     .metric-card.error::before {
@@ -1010,7 +1019,7 @@
       animation: dispGlow 3s ease-in-out infinite;
       min-width: 200px;
       flex: 1.2;
-      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     /* === LÍNEA DINÁMICA EN METRIC-VALUE === */
@@ -1031,7 +1040,7 @@
       height: 3px;
       background: currentColor;
       border-radius: 6px;
-      transition: background 0.15s ease;
+      transition: background var(--mov-rapido) var(--mov-curva);
       animation: lineGlow 1.8s ease-in-out infinite;
     }
 
@@ -1075,7 +1084,7 @@
       height: 3px;
       background: #F5A623;
       border-radius: 6px;
-      transition: background 0.15s ease;
+      transition: background var(--mov-rapido) var(--mov-curva);
       animation: lineGlow 1.8s ease-in-out infinite;
     }
 
@@ -1173,7 +1182,7 @@
       top: 12px;
       right: 12px;
       opacity: 0;
-      transition: opacity 0.15s, transform 0.15s;
+      transition: opacity var(--mov-rapido), transform var(--mov-rapido);
       color: var(--primary);
       font-weight: 800;
       font-size: 18px;
@@ -1235,7 +1244,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       box-shadow: var(--shadow-1);
-      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
       animation: slideUpFadeIn 0.15s ease-out backwards;
     }
 
@@ -1271,7 +1280,7 @@
       background: rgba(255,255,255,0.4);
       border-radius: 50%;
       transform: translate(-50%, -50%);
-      transition: width 0.15s cubic-bezier(0.34,1.56,0.64,1), height 0.15s cubic-bezier(0.34,1.56,0.64,1);
+      transition: width var(--mov-rapido) var(--mov-curva), height var(--mov-rapido) var(--mov-curva);
       pointer-events: none;
     }
 
@@ -1290,7 +1299,7 @@
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
     }
 
     .export-btn:hover {
@@ -1366,7 +1375,7 @@
       white-space: nowrap;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.15s, transform 0.15s;
+      transition: opacity var(--mov-rapido), transform var(--mov-rapido);
       z-index: 100;
     }
 
@@ -1453,7 +1462,7 @@
       border-radius: 6px;
       cursor: pointer;
       background: var(--card-bg);
-      transition: all 0.2s ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
       accent-color: var(--primary);
     }
 
@@ -1483,7 +1492,7 @@
       outline: none;
       background: var(--input-bg);
       color: var(--text);
-      transition: border-color 0.2s;
+      transition: border-color var(--mov-base);
     }
     .filter-toolbar input[type="text"].search-global:focus {
       border-color: var(--primary);
@@ -1497,7 +1506,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
       white-space: nowrap;
     }
     .filter-toolbar button.btn-clear:hover {
@@ -1556,9 +1565,9 @@
       border-radius: 16px;
       padding: 20px;
       cursor: pointer;
-      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  box-shadow 0.28s ease,
-                  border-color 0.28s ease;
+      transition: transform var(--mov-lento) var(--mov-curva),
+                  box-shadow var(--mov-lento) var(--mov-curva),
+                  border-color var(--mov-lento) var(--mov-curva);
       position: relative;
       overflow: hidden;
       /* Sombra base más marcada para que resalten sobre el fondo */
@@ -1650,7 +1659,7 @@
       width: 0;
       height: 100%;
       background: linear-gradient(135deg, rgba(226, 0, 26, 0.05), transparent);
-      transition: width 0.15s ease;
+      transition: width var(--mov-rapido) var(--mov-curva);
     }
 
     .dashboard-card:hover::after {
@@ -1670,9 +1679,9 @@
       min-height: 260px;
       position: relative;
       overflow: hidden;
-      transition: transform .28s cubic-bezier(.34,1.56,.64,1),
-                  box-shadow .28s ease,
-                  border-color .28s ease;
+      transition: transform var(--mov-lento) var(--mov-curva),
+                  box-shadow var(--mov-lento) var(--mov-curva),
+                  border-color var(--mov-lento) var(--mov-curva);
       animation: none;
     }
 
@@ -1682,7 +1691,8 @@
       to   { opacity: 1; transform: translateY(0); }
     }
     #resumen.active .dashboard-card {
-      animation: cardStagger 0.15s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+      /* Escalonado retirado: con 19 tarjetas deja de ser elegante y pasa a
+         ser una espera. La sección entera entra de una vez. */
     }
     #resumen.active .dashboard-card:nth-child(1)  { animation-delay: 0.04s; }
     #resumen.active .dashboard-card:nth-child(2)  { animation-delay: 0.09s; }
@@ -1707,7 +1717,7 @@
       opacity: 0;
       transform: scaleX(0.4);
       transform-origin: center;
-      transition: opacity .4s ease, transform .5s cubic-bezier(.34,1.56,.64,1);
+      transition: opacity var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva);
       z-index: 1;
       pointer-events: none;
     }
@@ -1748,7 +1758,7 @@
       transform: translateX(-50%);
       background: radial-gradient(ellipse, rgba(226,0,26,0.10), transparent 65%);
       opacity: 0;
-      transition: opacity .45s ease;
+      transition: opacity var(--mov-lento) var(--mov-curva);
       pointer-events: none;
       z-index: 0;
     }
@@ -1805,7 +1815,7 @@
       font-size: 13px;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 200ms ease, background 150ms ease, color 150ms ease;
+      transition: opacity 200ms var(--mov-curva), background 150ms var(--mov-curva), color 150ms var(--mov-curva);
       z-index: 10;
     }
     .chart-download-btn .material-symbols-outlined { font-size: 16px; }
@@ -1870,7 +1880,7 @@
       background: rgba(226,0,26,0.10);
       color: var(--primary);
       font-size: 16px !important;
-      transition: background .3s ease, transform .3s ease;
+      transition: background var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva);
     }
     .dashboard-card:hover h3 .material-symbols-outlined {
       background: var(--primary);
@@ -1894,7 +1904,7 @@
     /* Canvas con fade-in suave al renderizar */
     /* ===== KPI ENHANCEMENTS (counters, sparklines, trends, badges) ===== */
     .metric-card .metric-value {
-      transition: color 0.15s ease;
+      transition: color var(--mov-rapido) var(--mov-curva);
       font-variant-numeric: tabular-nums;
     }
     /* Trend indicator under the value */
@@ -2035,7 +2045,7 @@
     }
 
   .dashboard-card .chart-wrap canvas {
-      animation: chartFade 0.7s ease-out 0.15s backwards;
+      /* Fundido propio retirado: lo cubre la entrada de la sección. */
     }
     @keyframes chartFade {
       0%   { opacity: 0; }
@@ -2104,7 +2114,7 @@
       color: var(--text-light);
       cursor: pointer;
       opacity: 0;
-      transition: opacity .2s ease, background .2s ease, color .2s ease;
+      transition: opacity var(--mov-base) var(--mov-curva), background var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva);
     }
     .dashboard-card:hover .chart-expand-btn { opacity: 1; }
     .chart-expand-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
@@ -2279,7 +2289,7 @@
     }
 
     table tbody tr {
-      transition: background-color 0.15s ease;
+      transition: background-color var(--mov-rapido) var(--mov-curva);
       border-bottom: 1px solid var(--border);
     }
 
@@ -2348,7 +2358,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-radius: 12px;
       background: var(--card-bg);
       align-items: center;
-      transition: all 0.2s;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
     }
     .mode-option-card .material-symbols-outlined {
       color: var(--text-light);
@@ -2417,7 +2427,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: var(--card-bg);
       color: var(--text);
       cursor: pointer;
-      transition: all 0.15s;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
     .btn-view:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
     .btn-view:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -2434,7 +2444,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: var(--card-bg);
       color: var(--text);
       outline: none;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color var(--mov-base), background var(--mov-base);
     }
     input.note-input:hover { border-color: var(--primary); }
     input.note-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(226,0,26,0.1); }
@@ -2457,7 +2467,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       cursor: pointer;
       outline: none;
       font-weight: 500;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color var(--mov-base), background var(--mov-base);
       min-height: 36px;
       box-sizing: border-box;
     }
@@ -2619,7 +2629,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
        la clase .plaza-transitioning brevemente para hacer un fade-out suave,
        y luego al renderizar los datos nuevos se hace fade-in. */
     .section {
-      transition: opacity 0.18s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: opacity var(--mov-rapido) var(--mov-curva), transform var(--mov-base) var(--mov-curva);
     }
     .section.plaza-transitioning {
       opacity: 0.35;
@@ -2632,7 +2642,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .section.plaza-transitioning .table-wrapper,
     .section.plaza-transitioning .dashboards-grid {
       filter: blur(1.2px);
-      transition: filter 0.18s ease;
+      transition: filter var(--mov-rapido) var(--mov-curva);
     }
 
     /* === LAYOUT SIDE-BY-SIDE DETALLE + STOCK === */
@@ -2827,7 +2837,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     tbody tr:hover {
       background: rgba(226,0,26,0.08);
-      transition: background 0.2s ease;
+      transition: background var(--mov-base) var(--mov-curva);
     }
 
     table {
@@ -2850,7 +2860,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       position: relative;
       border: 1px solid transparent;
       background: transparent;
-      transition: background .25s ease, border-color .25s ease, color .25s ease, box-shadow .25s ease, transform .15s ease;
+      transition: background var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva);
       font-family: 'Roboto', sans-serif;
       text-transform: none;
       line-height: 1.2;
@@ -2999,7 +3009,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       margin-bottom: 20px;
       animation: float 3s ease-in-out infinite;
       display: inline-block;
-      transition: all 0.15s ease;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     .upload-card h1 {
@@ -3042,12 +3052,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: background .3s ease, color .3s ease, transform .3s ease;
+      transition: background var(--mov-lento) var(--mov-curva), color var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva);
       z-index: 1;
     }
     .step-bubble .num,
     .step-bubble .material-symbols-outlined {
-      transition: opacity .3s ease, transform .3s ease;
+      transition: opacity var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva);
     }
     .step-bubble .step-check {
       position: absolute;
@@ -3055,7 +3065,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       display: flex; align-items: center; justify-content: center;
       opacity: 0;
       transform: scale(0.4);
-      transition: opacity .3s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+      transition: opacity var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva);
       font-size: 20px;
     }
     .step-bubble.active {
@@ -3091,7 +3101,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       width: 0;
       background: linear-gradient(90deg, #1F7A4E, var(--primary));
       border-radius: inherit;
-      transition: width .9s cubic-bezier(.4,0,.2,1);
+      transition: width var(--mov-lento) var(--mov-curva);
     }
     .step-line.filled::after { width: 100%; }
 
@@ -3216,7 +3226,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 28px 18px 26px;
       border-radius: 16px;
       text-align: center;
-      transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, border-color .3s ease;
+      transition: transform var(--mov-lento) var(--mov-curva), box-shadow var(--mov-lento) var(--mov-curva), border-color var(--mov-lento) var(--mov-curva);
       overflow: hidden;
       margin-bottom: 12px;
       box-shadow:
@@ -3356,7 +3366,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       text-decoration-thickness: 1.5px;
       text-underline-offset: 3px;
       text-decoration-color: rgba(226,0,26,0.4);
-      transition: text-decoration-color .2s ease;
+      transition: text-decoration-color var(--mov-base) var(--mov-curva);
     }
     .dropzone-v2:hover .dz-link {
       text-decoration-color: var(--primary);
@@ -3384,7 +3394,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-radius: 999px;
       letter-spacing: 0.04em;
       box-shadow: var(--shadow-1);
-      transition: transform .2s ease, border-color .2s ease;
+      transition: transform var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva);
     }
     .dropzone-v2 .dz-chip svg { color: var(--primary); flex-shrink: 0; }
     .dropzone-v2 .dz-chip-size svg { color: var(--text-light); }
@@ -3491,7 +3501,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
 
     /* Mejillas que aparecen al sonreír */
-    .robot-cheek { opacity: 0; transition: opacity .3s ease .25s; }
+    .robot-cheek { opacity: 0; transition: opacity var(--mov-lento) var(--mov-curva) var(--mov-base); }
     .dropzone-v2.success .robot-cheek { opacity: 0.65; }
 
     /* Confetti */
@@ -3531,7 +3541,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       align-items: center; justify-content: center;
       opacity: 0;
       transform: scale(0.4) rotate(-30deg);
-      transition: opacity .3s ease .35s, transform .45s cubic-bezier(.34,1.56,.64,1) .35s;
+      transition: opacity var(--mov-lento) var(--mov-curva) var(--mov-lento), transform var(--mov-lento) var(--mov-curva) var(--mov-lento);
       z-index: 3;
       box-shadow: 0 4px 10px rgba(31,122,78,0.3);
     }
@@ -3560,7 +3570,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 32px 16px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
       margin-bottom: 12px;
       position: relative;
       overflow: hidden;
@@ -3586,7 +3596,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       width: 100%;
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(226,0,26,0.15), transparent);
-      transition: left 0.15s;
+      transition: left var(--mov-rapido);
     }
 
     .dropzone:hover {
@@ -3616,7 +3626,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-size: 40px;
       color: var(--primary);
       margin-bottom: 12px;
-      transition: all 0.15s ease-out;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     .dropzone.success .dropzone-icon {
@@ -3670,14 +3680,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       margin-top: 0;
       overflow: hidden;
       transform: translateY(-3px);
-      transition:
-        opacity 0.15s ease,
-        max-height 0.35s ease,
-        padding 0.15s ease,
-        margin 0.15s ease,
-        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-        background 0.15s ease,
-        border-color 0.15s ease;
+      transition: opacity var(--mov-rapido) var(--mov-curva),
+        max-height var(--mov-lento) var(--mov-curva),
+        padding var(--mov-rapido) var(--mov-curva),
+        margin var(--mov-rapido) var(--mov-curva),
+        transform var(--mov-lento) var(--mov-curva),
+        background var(--mov-rapido) var(--mov-curva),
+        border-color var(--mov-rapido) var(--mov-curva);
       pointer-events: none;
     }
 
@@ -3703,14 +3712,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s ease, color 0.15s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: background var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva);
     }
 
     .file-status-check .material-symbols-outlined {
       font-size: 18px;
       font-weight: 700;
       transform: scale(0);
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s;
+      transition: transform var(--mov-rapido) var(--mov-curva) var(--mov-rapido);
     }
 
     .file-status-pill.loaded .file-status-check {
@@ -3768,7 +3777,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -4142,7 +4151,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-radius: var(--radius-md);
       padding: 28px;
       margin-bottom: 24px;
-      transition: all 0.15s ease;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     .config-section:hover {
@@ -4194,7 +4203,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-family: 'Roboto', sans-serif;
       font-size: 14px;
       color: var(--text);
-      transition: all 0.15s;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
       background: var(--card-bg);
     }
 
@@ -4218,7 +4227,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 14px;
       background: var(--surface);
       border-radius: var(--radius-sm);
-      transition: all 0.15s;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     .config-toggle:hover {
@@ -4246,7 +4255,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: none;
       border-radius: var(--radius-md);
       position: relative;
-      transition: all 0.15s;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
       flex-shrink: 0;
     }
 
@@ -4263,7 +4272,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: var(--card-bg);
       top: 2px;
       left: 2px;
-      transition: all 0.15s;
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     .config-toggle input[type="checkbox"]:checked::before {
@@ -4386,7 +4395,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: 1.5px solid rgba(226,0,26,0.30);
       border-radius: 999px;
       padding: 4px 10px 4px 4px;
-      transition: border-color .25s ease, box-shadow .25s ease, transform .2s ease, background .25s ease;
+      transition: border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), background var(--mov-base) var(--mov-curva);
       cursor: pointer;
       min-width: 230px;
       position: relative;
@@ -4412,7 +4421,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       justify-content: center;
       margin-right: 10px;
       flex-shrink: 0;
-      transition: transform .35s cubic-bezier(.34,1.56,.64,1), background .25s ease;
+      transition: transform var(--mov-lento) var(--mov-curva), background var(--mov-base) var(--mov-curva);
       box-shadow: 0 2px 6px rgba(226,0,26,0.25);
     }
     .plaza-pill-badge .material-symbols-outlined { font-size: 18px; }
@@ -4441,7 +4450,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 160px;
-      transition: color .25s ease;
+      transition: color var(--mov-base) var(--mov-curva);
     }
     .plaza-pill select {
       position: absolute;
@@ -4478,7 +4487,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       justify-content: center;
       margin-left: 8px;
       flex-shrink: 0;
-      transition: transform .35s cubic-bezier(.34,1.56,.64,1), background .25s ease;
+      transition: transform var(--mov-lento) var(--mov-curva), background var(--mov-base) var(--mov-curva);
     }
     .plaza-pill-chevron .material-symbols-outlined { font-size: 18px; }
     .plaza-pill:focus-within .plaza-pill-chevron {
@@ -4578,7 +4587,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: var(--card-bg);
       cursor: default;
       overflow: hidden;
-      transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+      transition: transform var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva);
       display: flex; flex-direction: column; gap: 5px;
       min-height: 74px;
     }
@@ -4598,7 +4607,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-radius: 50%;
       background: var(--ec-accent);
       opacity: 0.06;
-      transition: transform .4s ease, opacity .3s ease;
+      transition: transform var(--mov-lento) var(--mov-curva), opacity var(--mov-lento) var(--mov-curva);
       pointer-events: none;
       z-index: 0;
     }
@@ -4629,7 +4638,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       color: var(--ec-accent);
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      transition: transform var(--mov-lento) var(--mov-curva);
     }
     .estado-card-sub {
       font-size: 11px;
@@ -4685,7 +4694,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-bottom: 2px solid var(--border);
     }
     .incon-card tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12px; }
-    .incon-card tbody tr { transition: background .15s ease; }
+    .incon-card tbody tr { transition: background var(--mov-rapido) var(--mov-curva); }
     .incon-card tbody tr:hover { background: var(--hover-bg); }
 
     /* Estado vacío con check animado */
@@ -4762,7 +4771,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: var(--ec-bg-soft, transparent);
       color: var(--ec-accent, var(--text-light));
       border-color: var(--ec-border, rgba(0,0,0,0.10));
-      transition: background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
+      transition: background var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva);
       font-family: 'Roboto', sans-serif;
       user-select: none;
     }
@@ -4808,7 +4817,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: 1px solid var(--border);
       border-radius: 12px;
       margin-bottom: 22px;
-      transition: opacity .25s ease, transform .25s ease;
+      transition: opacity var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva);
     }
     .estado-table-wrap.fading { opacity: 0; transform: translateY(4px); }
     .estado-table-empty {
@@ -4905,7 +4914,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-size: 14px;
       font-weight: 600;
       text-align: center;
-      transition: all 0.2s ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
       box-sizing: border-box;
     }
 
@@ -4921,7 +4930,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-size: 14px;
       font-weight: 600;
       text-align: center;
-      transition: all 0.2s ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
       box-sizing: border-box;
     }
 
@@ -4960,7 +4969,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-weight: 700;
       font-family: inherit;
       letter-spacing: 0.02em;
-      transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+      transition: transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), background var(--mov-base) var(--mov-curva);
       flex: 1; min-width: 180px;
       position: relative;
       overflow: hidden;
@@ -4993,7 +5002,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       width: 60%; height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
       transform: skewX(-22deg);
-      transition: left .55s ease;
+      transition: left var(--mov-lento) var(--mov-curva);
     }
     .btn-stock:hover::after { left: 130%; }
 
@@ -5084,7 +5093,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       user-select: none;
       background: var(--surface);
       border-bottom: 1px solid transparent;
-      transition: background 200ms ease;
+      transition: background 200ms var(--mov-curva);
     }
     .config-summary:hover {
       background: var(--hover-bg);
@@ -5095,7 +5104,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .config-summary .material-symbols-outlined {
       font-size: 20px;
-      transition: transform 200ms ease;
+      transition: transform 200ms var(--mov-curva);
       color: var(--primary);
       flex-shrink: 0;
     }
@@ -5124,7 +5133,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     #cfg-search {
       font-size: 14px;
       border-radius: 6px !important;
-      transition: all 200ms ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
     }
     #cfg-search:focus {
       border-color: var(--primary) !important;
@@ -5141,7 +5150,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     /* Estados de botones mejorados */
     .btn {
-      transition: all 200ms ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
       cursor: pointer;
     }
     .btn:hover:not(:disabled) {
@@ -5299,7 +5308,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       flex-direction: column;
       align-items: center;
       text-align: center;
-      transition: all .35s cubic-bezier(.34,1.56,.64,1);
+      transition: background-color var(--mov-lento) var(--mov-curva), color var(--mov-lento) var(--mov-curva), border-color var(--mov-lento) var(--mov-curva), box-shadow var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva), opacity var(--mov-lento) var(--mov-curva);
       overflow: hidden;
       animation: summaryCardIn .5s cubic-bezier(.34,1.56,.64,1) backwards;
     }
@@ -5318,7 +5327,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: linear-gradient(90deg, transparent, var(--primary), transparent);
       transform: scaleX(0);
       transform-origin: center;
-      transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+      transition: transform var(--mov-lento) var(--mov-curva);
     }
     .summary-card:hover::before { transform: scaleX(1); }
     .summary-card::after {
@@ -5327,7 +5336,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       inset: 0;
       background: radial-gradient(circle at 50% 0%, rgba(226,0,26,0.15), transparent 60%);
       opacity: 0;
-      transition: opacity .4s ease;
+      transition: opacity var(--mov-lento) var(--mov-curva);
       pointer-events: none;
       z-index: 0;
     }
@@ -5348,7 +5357,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       justify-content: center;
       font-size: 20px;
       margin-bottom: 6px;
-      transition: all .3s ease;
+      transition: background-color var(--mov-lento) var(--mov-curva), color var(--mov-lento) var(--mov-curva), border-color var(--mov-lento) var(--mov-curva), box-shadow var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva), opacity var(--mov-lento) var(--mov-curva);
       position: relative;
       z-index: 1;
     }
@@ -5508,7 +5517,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       text-align: left;
       cursor: pointer;
       user-select: none;
-      transition: background 0.2s;
+      transition: background var(--mov-base);
     }
     
     #detalle .table-wrapper thead th:hover {
@@ -5541,7 +5550,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     
     #detalle .table-wrapper tbody tr {
       border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
+      transition: background var(--mov-rapido);
     }
     
     #detalle .table-wrapper tbody tr:nth-child(even) {
@@ -5581,7 +5590,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     
     #cruce .table-wrapper tbody tr {
       border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
+      transition: background var(--mov-rapido);
     }
     
     #cruce .table-wrapper tbody tr:nth-child(even) {
@@ -5654,7 +5663,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     /* Cruce table body styling */
     #cruce .table-wrapper table tbody tr {
       border-bottom: 1px solid var(--border);
-      transition: background 0.15s ease;
+      transition: background var(--mov-rapido) var(--mov-curva);
     }
     
     #cruce .table-wrapper table tbody tr:nth-child(even) {
@@ -6185,7 +6194,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-weight: 600;
       cursor: pointer;
       border: none;
-      transition: all 0.2s;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
     }
 
     .empty-state-cta:hover {
@@ -6345,7 +6354,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       to { opacity: 1; transform: translateY(0); }
     }
     .tabs .tab {
-      transition: all 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
     
     /* 6. GLASSMORPHISM */
@@ -6372,17 +6381,17 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     
     /* 8. SIDEBAR ICON ANIMATIONS */
     .sidebar-nav-link {
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
     }
     .sidebar-nav-icon {
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform var(--mov-rapido) var(--mov-curva);
       display: inline-block;
     }
     .sidebar-nav-link:hover .sidebar-nav-icon {
       transform: scale(1.18) rotate(-8deg);
     }
     .sidebar-nav-link.active .sidebar-nav-icon {
-      animation: iconPulseGlow 2s ease-in-out infinite;
+      /* Pulso retirado: el icono activo ya se distingue por color y fondo. */
     }
     @keyframes iconPulseGlow {
       0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
@@ -6660,7 +6669,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-weight: 600;
       color: var(--text);
       box-shadow: var(--shadow-2);
-      transition: all 0.2s ease;
+      transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
     }
     .sound-toggle:hover {
       transform: translateY(-2px);
@@ -6731,7 +6740,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-radius: 8px;
       margin-bottom: 4px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background var(--mov-base);
       display: flex;
       align-items: flex-start;
       gap: 10px;
@@ -6751,7 +6760,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .notif-item-desc { font-size: 11px; color: var(--text-light); line-height: 1.4; }
     /* Solo las notificaciones con acción muestran cursor/realce de clic */
     .notif-item:not(.notif-clickable) { cursor: default; }
-    .notif-item-cta { font-size: 11px; font-weight: 700; color: var(--primary); margin-top: 4px; opacity: 0; transition: opacity 0.2s; }
+    .notif-item-cta { font-size: 11px; font-weight: 700; color: var(--primary); margin-top: 4px; opacity: 0; transition: opacity var(--mov-base); }
     .notif-clickable:hover .notif-item-cta { opacity: 1; }
     .notif-clickable:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
@@ -6768,7 +6777,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 10px 12px; border-radius: 12px; cursor: pointer; text-align: left;
       background: var(--card-bg); border: 1px solid var(--border);
       border-left: 4px solid var(--chip-color, #999);
-      transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+      transition: transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva);
     }
     .map-plaza-chip:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
     .map-plaza-chip:active { transform: translateY(-1px); }
@@ -7019,7 +7028,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     box-shadow: 0 0 2.5rem 0 rgba(136,152,170,0.30) !important;
     padding: 22px 24px !important;
     overflow: hidden;
-    transition: transform .25s ease, box-shadow .25s ease;
+    transition: transform var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva);
   }
   .dashboard-card:hover {
     transform: translateY(-6px);
@@ -7083,8 +7092,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         radial-gradient(circle at 15% 18%, var(--aurora-c1, rgba(130,130,130,0.05)), transparent 45%),
         radial-gradient(circle at 85% 12%, var(--aurora-c2, rgba(130,130,130,0.04)), transparent 42%),
         radial-gradient(circle at 50% 92%, var(--aurora-c3, rgba(130,130,130,0.05)), transparent 50%);
-      transition: background 1.4s ease;
-      animation: auroraDrift 30s ease-in-out infinite alternate;
+      transition: background var(--mov-lento) var(--mov-curva);
+      /* Aurora de fondo retirada: 30s en bucle repintando un degradado que
+         apenas se ve. */
       will-change: transform;
     }
     @keyframes auroraDrift {
@@ -7341,7 +7351,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               <div style="font-size:13px; font-weight:600; color:#1C1B1F;" id="user-menu-name">Admin</div>
             </div>
             <div style="padding:4px;">
-              <button onclick="handleLogout()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; color:#E2001A; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s;" onmouseover="this.style.background='rgba(226,0,26,0.05)'" onmouseout="this.style.background='transparent'">
+              <button onclick="handleLogout()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; color:#E2001A; font-size:12px; font-weight:600; cursor:pointer; transition: background var(--mov-base);" onmouseover="this.style.background='rgba(226,0,26,0.05)'" onmouseout="this.style.background='transparent'">
                 <span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:6px;">logout</span>Cerrar Sesión
               </button>
             </div>
@@ -7547,7 +7557,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <button type="button" onclick="openAirWatchPortal()" title="Abrir el portal AirWatch en una pestaña nueva"
             style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; cursor:pointer;
                    background:#fff; color:#E2001A; border:1.5px solid #E2001A; border-radius:16px;
-                   font-weight:700; font-size:12px; transition:all .2s;"
+                   font-weight:700; font-size:12px; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"
             onmouseover="this.style.background='#E2001A';this.style.color='#fff';"
             onmouseout="this.style.background='#fff';this.style.color='#E2001A';">
             <span class="material-symbols-outlined" style="font-size:14px;">cloud_download</span>
@@ -7753,7 +7763,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             border: none;
             border-radius: 16px;
             box-shadow: none;
-            transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+            transition: transform var(--mov-rapido) var(--mov-curva);
             cursor: pointer;
             position: relative;
             isolation: isolate;
@@ -7781,7 +7791,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
           .kpi-circular-widget:active {
             transform: translateY(-4px) scale(1.01);
-            transition: transform 0.12s ease;
+            transition: transform var(--mov-rapido) var(--mov-curva);
           }
 
           .kpi-circular-widget.status-success { --widget-glow: rgba(22,163,74,0.5); }
@@ -7830,7 +7840,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           }
 
           .progress-circle {
-            transition: stroke-dasharray 0.15s cubic-bezier(0.25,0.46,0.45,0.94);
+            transition: stroke-dasharray var(--mov-rapido) var(--mov-curva);
             stroke-linecap: round;
             shape-rendering: geometricPrecision;
           }
@@ -7850,7 +7860,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             font-weight: 800;
             line-height: 1.1;
             color: #333333;
-            transition: all 0.15s ease;
+            transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
             letter-spacing: -0.3px;
             position: relative;
           }
@@ -7863,7 +7873,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             background-color: currentColor;
             margin: 3px auto 0;
             border-radius: 6px;
-            transition: all 0.15s ease;
+            transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
           }
 
           .kpi-label {
@@ -7967,7 +7977,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            transition: filter 0.2s ease, transform 0.1s ease;
+            transition: filter var(--mov-base) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva);
           }
           .empty-state-btn:hover { filter: brightness(1.08); }
           .empty-state-btn:active { transform: scale(0.97); }
@@ -7995,7 +8005,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             z-index: 900;
             opacity: 0;
             pointer-events: none;
-            transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s ease;
+            transition: transform var(--mov-lento) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
           }
           .bulk-action-bar.visible {
             transform: translateX(-50%) translateY(0);
@@ -8021,7 +8031,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.18s ease;
+            transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
           }
           .bulk-btn:hover { background: var(--hover-bg); }
           .bulk-btn-primary {
@@ -8032,7 +8042,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           .bulk-btn-primary:hover { filter: brightness(1.08); background: var(--primary); }
           .bulk-btn-ghost { color: var(--text-light); }
           @media (prefers-reduced-motion: reduce) {
-            .bulk-action-bar { transition: opacity 0.2s ease; }
+            .bulk-action-bar { transition: opacity var(--mov-base) var(--mov-curva); }
           }
 
           /* Respeta la preferencia del sistema de reducir movimiento */
@@ -8059,7 +8069,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             text-align: center;
             line-height: 1.3;
             opacity: 0;
-            transition: opacity 0.15s ease;
+            transition: opacity var(--mov-rapido) var(--mov-curva);
             position: relative;
             z-index: 20;
           }
@@ -8120,7 +8130,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           }
 
           .kpi-circular-widget .kpi-circle-svg {
-            transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+            transition: transform var(--mov-rapido) var(--mov-curva);
           }
 
           .kpi-circular-widget:hover .kpi-circle-svg {
@@ -8164,10 +8174,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 24px !important;
       border-radius: 16px !important;
       border-width: 1.5px !important;
-      transition:
-        transform 0.15s cubic-bezier(0.34,1.56,0.64,1),
-        box-shadow 0.15s ease,
-        border-color 0.15s ease !important;
+      transition: transform var(--mov-rapido) var(--mov-curva),
+        box-shadow var(--mov-rapido) var(--mov-curva),
+        border-color var(--mov-rapido) var(--mov-curva) !important;
       box-shadow: var(--shadow-2), inset 0 1px 1px rgba(255,255,255,0.7) !important;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
@@ -8199,7 +8208,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.4), transparent 60%);
       opacity: 0.6;
       pointer-events: none;
-      transition: opacity 0.15s ease;
+      transition: opacity var(--mov-rapido) var(--mov-curva);
       z-index: 0;
     }
     #exportacion .export-card:hover::after { opacity: 1; }
@@ -8208,10 +8217,9 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     /* Buttons inside export cards */
     #exportacion .export-card button {
-      transition:
-        transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
-        box-shadow 0.25s ease,
-        filter 0.25s ease !important;
+      transition: transform var(--mov-base) var(--mov-curva),
+        box-shadow var(--mov-base) var(--mov-curva),
+        filter var(--mov-base) var(--mov-curva) !important;
       position: relative;
       overflow: hidden;
     }
@@ -8222,7 +8230,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     #exportacion .export-card button:active {
       transform: translateY(0) !important;
-      transition: transform 0.1s ease !important;
+      transition: transform var(--mov-rapido) var(--mov-curva) !important;
     }
 
     /* Header improvement */
@@ -8285,7 +8293,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 10px 14px !important;
       border-radius: 12px !important;
       font-size: 13px !important;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      transition: border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva);
     }
     #configuracion #cfg-search:focus {
       border-color: var(--primary);
@@ -8303,7 +8311,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       margin-bottom: 14px !important;
       overflow: hidden;
       box-shadow: 0 4px 16px rgba(31,38,135,0.06), inset 0 1px 1px rgba(255,255,255,0.7);
-      transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+      transition: box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva);
       opacity: 0;
       transform: translateY(15px);
       animation: configIn 0.15s ease-out forwards;
@@ -8329,7 +8337,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       align-items: center;
       gap: 14px;
       list-style: none;
-      transition: background 0.15s ease;
+      transition: background var(--mov-rapido) var(--mov-curva);
       border-radius: 16px;
       position: relative;
     }
@@ -8339,7 +8347,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     #configuracion .config-summary > .material-symbols-outlined:first-child {
       color: var(--primary);
-      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+      transition: transform var(--mov-rapido) var(--mov-curva);
       font-size: 24px !important;
     }
     #configuracion .config-details[open] .config-summary > .material-symbols-outlined:first-child {
@@ -8394,7 +8402,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-radius: 8px !important;
       background: var(--input-bg) !important;
       font-size: 13px !important;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      transition: border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva);
     }
     #configuracion .config-item input:focus,
     #configuracion .config-item select:focus {
@@ -8420,7 +8428,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: rgba(0,0,0,0.15);
       border-radius: 999px;
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: background var(--mov-rapido) var(--mov-curva);
       flex-shrink: 0;
     }
     #configuracion .config-toggle input[type="checkbox"]::after {
@@ -8432,7 +8440,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       height: 20px;
       background: var(--card-bg);
       border-radius: 50%;
-      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+      transition: transform var(--mov-rapido) var(--mov-curva);
       box-shadow: var(--shadow-1);
     }
     #configuracion .config-toggle input[type="checkbox"]:checked {
@@ -8498,12 +8506,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background: rgba(255,255,255,0.7);
       border: 1.5px solid rgba(0,0,0,0.08);
       color: var(--text);
-      transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
-        box-shadow 0.15s ease,
-        color 0.15s ease;
+      transition: background var(--mov-rapido) var(--mov-curva),
+        border-color var(--mov-rapido) var(--mov-curva),
+        transform var(--mov-base) var(--mov-curva),
+        box-shadow var(--mov-rapido) var(--mov-curva),
+        color var(--mov-rapido) var(--mov-curva);
       position: relative;
       overflow: hidden;
       backdrop-filter: blur(8px);
@@ -8514,7 +8521,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .filter-chip:active {
       transform: translateY(0) scale(0.97);
-      transition: transform 0.1s ease;
+      transition: transform var(--mov-rapido) var(--mov-curva);
     }
     .filter-chip input[type="checkbox"] {
       position: absolute;
@@ -8528,7 +8535,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       height: 10px;
       border-radius: 50%;
       background: rgba(0,0,0,0.2);
-      transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+      transition: background var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva);
     }
 
     /* DANGER chip when checked */
@@ -8573,12 +8580,12 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       background-position: center;
       opacity: 0;
       pointer-events: none;
-      transition: background-size 0.15s ease-out, opacity 0.15s ease-out;
+      transition: background-size var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
     .filter-chip:active::after {
       background-size: 0% 0%;
       opacity: 0.15;
-      transition: 0s;
+      transition: var(--mov-rapido);
     }
 
     /* Search input wrapper */
@@ -8596,7 +8603,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       color: var(--text-light);
       font-size: 18px !important;
       pointer-events: none;
-      transition: color 0.15s ease, transform 0.15s ease;
+      transition: color var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva);
     }
     .filter-search:focus-within .filter-search-icon {
       color: var(--primary);
@@ -8612,15 +8619,14 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       color: var(--text);
       font-size: 13px;
       font-weight: 500;
-      transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease,
-        background 0.15s ease;
+      transition: border-color var(--mov-rapido) var(--mov-curva),
+        box-shadow var(--mov-rapido) var(--mov-curva),
+        background var(--mov-rapido) var(--mov-curva);
       outline: none;
     }
     .filter-search-input::placeholder {
       color: var(--text-light);
-      transition: color 0.15s ease;
+      transition: color var(--mov-rapido) var(--mov-curva);
     }
     .filter-search-input:focus {
       border-color: var(--primary);
@@ -8645,7 +8651,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       align-items: center;
       justify-content: center;
       color: var(--text-light);
-      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      transition: background var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva);
     }
     .filter-search-clear:hover {
       background: rgba(226,0,26,0.1);
@@ -8678,18 +8684,17 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       font-weight: 700;
       cursor: pointer;
       letter-spacing: 0.3px;
-      transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
-        box-shadow 0.15s ease,
-        color 0.15s ease;
+      transition: background var(--mov-rapido) var(--mov-curva),
+        border-color var(--mov-rapido) var(--mov-curva),
+        transform var(--mov-base) var(--mov-curva),
+        box-shadow var(--mov-rapido) var(--mov-curva),
+        color var(--mov-rapido) var(--mov-curva);
       position: relative;
       overflow: hidden;
     }
     .filter-clear-btn .material-symbols-outlined {
       font-size: 16px !important;
-      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+      transition: transform var(--mov-rapido) var(--mov-curva);
     }
     .filter-clear-btn:hover {
       background: linear-gradient(135deg, var(--primary), #B3261E);
@@ -8703,7 +8708,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     .filter-clear-btn:active {
       transform: translateY(0) scale(0.96);
-      transition: transform 0.1s ease;
+      transition: transform var(--mov-rapido) var(--mov-curva);
     }
 
     /* Counter */
@@ -8856,7 +8861,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-radius: 6px;
       cursor: pointer;
       color: var(--text-light, #888);
-      transition: background 0.2s ease;
+      transition: background var(--mov-base) var(--mov-curva);
     }
     .oxxo-toast .toast-close:hover { background: rgba(0,0,0,0.06); }
     .oxxo-toast.exit { animation: toastOut 0.15s ease-out forwards; }
@@ -8876,7 +8881,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     /* --- Sticky app-bar with blur on scroll --- */
     .app-bar {
-      transition: backdrop-filter 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+      transition: backdrop-filter var(--mov-rapido) var(--mov-curva), background var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva);
     }
     .app-bar.scrolled {
       backdrop-filter: blur(20px) saturate(180%);
@@ -8890,7 +8895,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
     /* --- Table row hover lift --- */
     .table-wrapper table tbody tr {
-      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, background 0.2s ease;
+      transition: transform var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), background var(--mov-base) var(--mov-curva);
     }
     .table-wrapper table tbody tr:hover {
       transform: translateY(-1px);
@@ -8903,7 +8908,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     /* --- Animated sort arrows --- */
     th[onclick*="onSortChange"], th[onclick*="onDetalleSortChange"] {
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background var(--mov-base) var(--mov-curva);
     }
     th[onclick*="onSortChange"]:hover,
     th[onclick*="onDetalleSortChange"]:hover {
@@ -8911,7 +8916,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     }
     th .sort-icon, span[id^="sort-icon"], span[id^="dsort-icon"] {
       display: inline-block;
-      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+      transition: transform var(--mov-rapido) var(--mov-curva);
       margin-left: 4px;
     }
 
@@ -9016,7 +9021,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       pointer-events: none;
       opacity: 0;
       transform: translateY(4px);
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: opacity var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva);
       z-index: 99999;
       max-width: 280px;
       line-height: 1.45;
@@ -9123,7 +9128,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       padding: 10px 20px;
       cursor: pointer;
       font-size: 13px;
-      transition: background 0.15s ease;
+      transition: background var(--mov-rapido) var(--mov-curva);
     }
     .cmd-item:hover, .cmd-item.active {
       background: rgba(226,0,26,0.08);
@@ -9281,7 +9286,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       pointer-events: none;
       opacity: 0;
       transform: translateY(8px);
-      transition: opacity 0.15s ease, transform 0.15s ease;
+      transition: opacity var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva);
     }
     .shortcuts-hint.show { opacity: 1; transform: translateY(0); }
 
@@ -9317,7 +9322,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border-radius: 8px;
       cursor: pointer;
       font-size: 12px;
-      transition: background 0.2s ease;
+      transition: background var(--mov-base) var(--mov-curva);
     }
     .file-history-item:hover { background: rgba(226,0,26,0.06); }
     .file-history-item .fh-meta { color: var(--text-light); font-size: 11px; }
@@ -9360,7 +9365,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       height: 100%;
       background: linear-gradient(90deg, #16A34A, #4ADE80);
       border-radius: 6px;
-      transition: width 0.15s cubic-bezier(0.34,1.56,0.64,1);
+      transition: width var(--mov-rapido) var(--mov-curva);
     }
     .health-gauge.warning .health-gauge-bar-fill { background: linear-gradient(90deg, #F5A623, #FBBF24); }
     .health-gauge.critical .health-gauge-bar-fill { background: linear-gradient(90deg, #DC2626, #EF4444); }
@@ -9422,7 +9427,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       border: none;
       cursor: pointer;
       opacity: 0;
-      transition: opacity 0.2s ease, background 0.2s ease;
+      transition: opacity var(--mov-base) var(--mov-curva), background var(--mov-base) var(--mov-curva);
       display: flex; align-items: center; justify-content: center;
       font-size: 14px;
       z-index: 5;
@@ -9578,13 +9583,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     #sound-toggle { display: none !important; }
 
     /* ===== Logo cargable en el header ===== */
-    .app-bar-logo { position: relative; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+    .app-bar-logo { position: relative; cursor: pointer; transition: transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva); }
     .app-bar-logo:hover { transform: translateY(-1px); box-shadow: var(--shadow-2); }
     .app-bar-logo:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     #logo-remove-btn { align-items: center; }
 
     /* ===== Stats del header interactivas/reactivas ===== */
-    .app-bar-stat-clickable { cursor: pointer; transition: background .18s ease, transform .12s ease, box-shadow .18s ease; border-radius: 8px; }
+    .app-bar-stat-clickable { cursor: pointer; transition: background var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva); border-radius: 8px; }
     .app-bar-stat-clickable:hover { background: rgba(255,255,255,0.18); transform: translateY(-1px); }
     .app-bar-stat-clickable:active { transform: translateY(0); }
     .app-bar-stat-clickable:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
@@ -9592,7 +9597,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .app-bar-stat.warn.has-offline {
       background: rgba(255,221,87,0.22);
       box-shadow: 0 0 0 1px rgba(255,221,87,0.5), 0 0 14px rgba(255,221,87,0.35);
-      animation: offlinePulse 2.4s ease-in-out infinite;
+      /* Pulso retirado: un parpadeo eterno deja de leerse como alarma a los
+         dos minutos. El color del chip ya avisa. */
     }
     .app-bar-stat.warn.has-offline strong { color: #FFE082; font-weight: 800; }
     @keyframes offlinePulse {
@@ -9815,15 +9821,15 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
 <!-- Botón flotante compacto en la esquina superior derecha (no estorba) -->
         <button id="export-resumen-btn" onclick="toggleExportMenu()" title="Descargar resumen"
-          style="position:absolute; top:0; right:12px; z-index:30; background:var(--primary); color:white; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(226,0,26,.32); transition:all 0.2s;"
+          style="position:absolute; top:0; right:12px; z-index:30; background:var(--primary); color:white; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(226,0,26,.32); transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"
           onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='';">
           <span class="material-symbols-outlined" style="font-size:20px;">download</span>
         </button>
         <div id="export-menu" style="display:none; position:absolute; right:12px; top:44px; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow-2); z-index:1000; min-width:140px;">
-          <button onclick="exportResumenAsPNG()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; cursor:pointer; color:var(--text); font-size:12px; border-bottom:1px solid var(--border); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">
+          <button onclick="exportResumenAsPNG()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; cursor:pointer; color:var(--text); font-size:12px; border-bottom:1px solid var(--border); transition: background var(--mov-base);" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">
             <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">image</span> Descargar PNG
           </button>
-          <button onclick="exportResumenAsPDF()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; cursor:pointer; color:var(--text); font-size:12px; transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">
+          <button onclick="exportResumenAsPDF()" style="display:block; width:100%; text-align:left; padding:10px 16px; border:none; background:none; cursor:pointer; color:var(--text); font-size:12px; transition: background var(--mov-base);" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">
             <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">picture_as_pdf</span> Descargar PDF
           </button>
         </div>
@@ -10193,7 +10199,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- SEARCH INPUT COMPACTO -->
             <div style="position:relative;">
               <div style="position:relative; background:linear-gradient(135deg, white 0%, rgba(25,118,210,0.02) 100%);
-                          border:2px solid var(--border); border-radius:16px; transition:all 0.15s ease;
+                          border:2px solid var(--border); border-radius:16px; transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
                           box-shadow: var(--shadow-2);"
                    id="search-wrapper"
                    onmouseover="document.getElementById('search-wrapper').style.borderColor='var(--primary)'; document.getElementById('search-wrapper').style.boxShadow='0 6px 24px rgba(25,118,210,0.12)';"
@@ -10205,7 +10211,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                            outline:none; font-weight:500;"
                     oninput="searchOxxoByName(this.value)">
                   <span id="search-clear-btn" style="display:none; cursor:pointer; color:var(--text-light); padding:10px 14px;
-                                                      font-size:18px; transition:color 0.2s;"
+                                                      font-size:18px; transition: color var(--mov-base);"
                         onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-light)'"
                         onclick="document.getElementById('oxxo-search-input').value=''; searchOxxoByName(''); document.getElementById('search-clear-btn').style.display='none'; document.getElementById('search-results-container').style.display='none';">✕</span>
                 </div>
@@ -10237,7 +10243,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <div id="oxxo-location-label" style="font-size:11px; color:var(--text-light); margin-top:2px;">📍 Ubicación</div>
               </div>
               <button onclick="closeOxxoDetails()" style="background:none; border:none; color:var(--text-light); cursor:pointer; font-size:18px;
-                                                          width:28px; height:28px; border-radius:50%; transition:all 0.2s;
+                                                          width:28px; height:28px; border-radius:50%; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
                                                           display:flex; align-items:center; justify-content:center;"
                 onmouseover="this.style.background='rgba(0,0,0,0.05)'; this.style.color='var(--text)';" onmouseout="this.style.background='none'; this.style.color='var(--text-light)';">✕</button>
             </div>
@@ -10641,11 +10647,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <!-- FILTROS + TABLA EQUIPOS -->
           <div class="estado-table-wrap" id="estado-table-wrap" style="margin-bottom:28px;">
             <div class="estado-filters" style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap;">
-              <button class="estado-chip robo" onclick="filterGarantiaByEstado('ROBO')" style="padding:8px 14px; border:1px solid rgba(179,38,30,0.3); background:rgba(179,38,30,0.04); color:var(--error); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">report</span>Robo</button>
-              <button class="estado-chip danada" onclick="filterGarantiaByEstado('DAÑADA')" style="padding:8px 14px; border:1px solid rgba(245,166,35,0.3); background:rgba(245,166,35,0.04); color:#F5A623; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">build</span>Dañada</button>
-              <button class="estado-chip garantia" onclick="filterGarantiaByEstado('GARANTÍA')" style="padding:8px 14px; border:1px solid rgba(25,118,210,0.3); background:rgba(25,118,210,0.04); color:#1976D2; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">verified</span>Garantía</button>
-              <button class="estado-chip apagada" onclick="filterGarantiaByEstado('APAGADA')" style="padding:8px 14px; border:1px solid rgba(95,99,104,0.3); background:rgba(95,99,104,0.04); color:#5F6368; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">power_settings_new</span>Apagada</button>
-              <button class="estado-chip all" onclick="filterGarantiaByEstado('')" style="padding:8px 14px; border:1px solid var(--primary); background:transparent; color:var(--primary); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">👁️ Ver todos</button>
+              <button class="estado-chip robo" onclick="filterGarantiaByEstado('ROBO')" style="padding:8px 14px; border:1px solid rgba(179,38,30,0.3); background:rgba(179,38,30,0.04); color:var(--error); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">report</span>Robo</button>
+              <button class="estado-chip danada" onclick="filterGarantiaByEstado('DAÑADA')" style="padding:8px 14px; border:1px solid rgba(245,166,35,0.3); background:rgba(245,166,35,0.04); color:#F5A623; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">build</span>Dañada</button>
+              <button class="estado-chip garantia" onclick="filterGarantiaByEstado('GARANTÍA')" style="padding:8px 14px; border:1px solid rgba(25,118,210,0.3); background:rgba(25,118,210,0.04); color:#1976D2; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">verified</span>Garantía</button>
+              <button class="estado-chip apagada" onclick="filterGarantiaByEstado('APAGADA')" style="padding:8px 14px; border:1px solid rgba(95,99,104,0.3); background:rgba(95,99,104,0.04); color:#5F6368; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">power_settings_new</span>Apagada</button>
+              <button class="estado-chip all" onclick="filterGarantiaByEstado('')" style="padding:8px 14px; border:1px solid var(--primary); background:transparent; color:var(--primary); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);">👁️ Ver todos</button>
             </div>
             <div id="garantia-estados-table" style="min-height:120px; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow-x:auto; width:100%; max-width:100%;">
               <div class="estado-table-empty" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:40px 20px; color:var(--text-light); text-align:center;">
@@ -10696,11 +10702,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
               </div>
 
               <div style="display:flex; gap:10px;">
-                <button onclick="addStockRow()" style="flex:1; padding:10px 16px; background:#2E7D32; color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+                <button onclick="addStockRow()" style="flex:1; padding:10px 16px; background:#2E7D32; color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);">
                   <span class="material-symbols-outlined" style="font-size:16px;">add_circle</span>
                   Agregar a tabla
                 </button>
-                <button onclick="saveGarantiaData()" style="flex:1; padding:10px 16px; background:#1B5E20; color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;">
+                <button onclick="saveGarantiaData()" style="flex:1; padding:10px 16px; background:#1B5E20; color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);">
                   <span class="material-symbols-outlined" style="font-size:16px;">save</span>
                   Guardar todo
                 </button>
@@ -10718,7 +10724,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                     <span id="stock-kpi-hh-total">0</span>
                   </div>
                   <div id="stock-hh-gauge" style="width:100%; height:6px; background:rgba(25,118,210,0.2); border-radius:6px; overflow:hidden;">
-                    <div style="width:0%; height:100%; background:linear-gradient(90deg, #1976D2, #42A5F5); transition:width 0.15s ease;"></div>
+                    <div style="width:0%; height:100%; background:linear-gradient(90deg, #1976D2, #42A5F5); transition: width var(--mov-rapido) var(--mov-curva);"></div>
                   </div>
                 </div>
               </div>
@@ -10732,7 +10738,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                     <span id="stock-kpi-tt-total">0</span>
                   </div>
                   <div id="stock-tt-gauge" style="width:100%; height:6px; background:rgba(123,31,162,0.2); border-radius:6px; overflow:hidden;">
-                    <div style="width:0%; height:100%; background:linear-gradient(90deg, #7B1FA2, #BA68C8); transition:width 0.15s ease;"></div>
+                    <div style="width:0%; height:100%; background:linear-gradient(90deg, #7B1FA2, #BA68C8); transition: width var(--mov-rapido) var(--mov-curva);"></div>
                   </div>
                 </div>
               </div>
@@ -10746,7 +10752,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                     <span id="stock-kpi-imp-total">0</span>
                   </div>
                   <div id="stock-imp-gauge" style="width:100%; height:6px; background:rgba(245,124,0,0.2); border-radius:6px; overflow:hidden;">
-                    <div style="width:0%; height:100%; background:linear-gradient(90deg, #F57C00, #FFB74D); transition:width 0.15s ease;"></div>
+                    <div style="width:0%; height:100%; background:linear-gradient(90deg, #F57C00, #FFB74D); transition: width var(--mov-rapido) var(--mov-curva);"></div>
                   </div>
                 </div>
               </div>
@@ -10760,7 +10766,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                     <span id="stock-kpi-carg-total">0</span>
                   </div>
                   <div id="stock-carg-gauge" style="width:100%; height:6px; background:rgba(56,142,60,0.2); border-radius:6px; overflow:hidden;">
-                    <div style="width:0%; height:100%; background:linear-gradient(90deg, #388E3C, #81C784); transition:width 0.15s ease;"></div>
+                    <div style="width:0%; height:100%; background:linear-gradient(90deg, #388E3C, #81C784); transition: width var(--mov-rapido) var(--mov-curva);"></div>
                   </div>
                 </div>
               </div>
@@ -10928,7 +10934,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- ═══════════ CARD 1: CORREO ═══════════ -->
             <div style="background:var(--card-bg); border:1.5px solid var(--border); border-top:4px solid #E2001A;
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
-                        box-shadow:var(--shadow-2); transition:all 0.25s ease;
+                        box-shadow:var(--shadow-2); transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);
                         cursor:default; min-height:520px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(226,0,26,0.14)';"
                  onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow-2)';">
@@ -10962,7 +10968,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 style="padding:14px 20px;background:linear-gradient(135deg,#E2001A,#B80018);color:white;
                        border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;
                        display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
-                       box-shadow:0 4px 14px rgba(226,0,26,0.35);transition:all 0.2s;"
+                       box-shadow:0 4px 14px rgba(226,0,26,0.35);transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"
                 onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 6px 20px rgba(226,0,26,0.45)';"
                 onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(226,0,26,0.35)';">
                 <span class="material-symbols-outlined" style="font-size:20px;">download</span>
@@ -10973,7 +10979,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <button onclick="previewEmail()"
                   style="flex:1;padding:9px 12px;background:rgba(226,0,26,0.06);color:#E2001A;
                          border:1px solid rgba(226,0,26,0.2);border-radius:8px;font-weight:600;
-                         font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;"
+                         font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:5px;"
                   onmouseover="this.style.background='rgba(226,0,26,0.12)';"
                   onmouseout="this.style.background='rgba(226,0,26,0.06)';">
                   <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Vista previa
@@ -10981,7 +10987,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <button onclick="downloadReportEmail()"
                   style="flex:1;padding:9px 12px;background:rgba(226,0,26,0.06);color:#E2001A;
                          border:1px solid rgba(226,0,26,0.2);border-radius:8px;font-weight:600;
-                         font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;"
+                         font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:5px;"
                   onmouseover="this.style.background='rgba(226,0,26,0.12)';"
                   onmouseout="this.style.background='rgba(226,0,26,0.06)';">
                   <span class="material-symbols-outlined" style="font-size:14px;">content_copy</span> Copiar HTML
@@ -10992,7 +10998,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- ═══════════ CARD 2: EXCEL / CSV ═══════════ -->
             <div style="background:var(--card-bg); border:1.5px solid var(--border); border-top:4px solid #217346;
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
-                        box-shadow:var(--shadow-2); transition:all 0.25s ease; cursor:default; min-height:520px;"
+                        box-shadow:var(--shadow-2); transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva); cursor:default; min-height:520px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(33,115,70,0.14)';"
                  onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow-2)';">
               <div style="display:flex; align-items:center; gap:14px;">
@@ -11021,7 +11027,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 style="padding:14px 20px;background:linear-gradient(135deg,#217346,#0E5C36);color:white;
                        border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;
                        display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
-                       box-shadow:0 4px 14px rgba(33,115,70,0.35);transition:all 0.2s;"
+                       box-shadow:0 4px 14px rgba(33,115,70,0.35);transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"
                 onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 6px 20px rgba(33,115,70,0.45)';"
                 onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(33,115,70,0.35)';">
                 <span class="material-symbols-outlined" style="font-size:20px;">download</span>
@@ -11032,7 +11038,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <button onclick="previewExcel()"
                   style="flex:1;padding:9px 12px;background:rgba(33,115,70,0.06);color:#217346;
                          border:1px solid rgba(33,115,70,0.2);border-radius:8px;font-weight:600;
-                         font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;"
+                         font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:5px;"
                   onmouseover="this.style.background='rgba(33,115,70,0.12)';"
                   onmouseout="this.style.background='rgba(33,115,70,0.06)';">
                   <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Vista previa
@@ -11040,7 +11046,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <button onclick="exportDataByFormat('csv-todo')"
                   style="flex:1;padding:9px 12px;background:rgba(33,115,70,0.06);color:#217346;
                          border:1px solid rgba(33,115,70,0.2);border-radius:8px;font-weight:600;
-                         font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;"
+                         font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:5px;"
                   onmouseover="this.style.background='rgba(33,115,70,0.12)';"
                   onmouseout="this.style.background='rgba(33,115,70,0.06)';">
                   <span class="material-symbols-outlined" style="font-size:14px;">description</span> CSV (.csv)
@@ -11051,7 +11057,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             <!-- ═══════════ CARD 3: PDF ═══════════ -->
             <div style="background:var(--card-bg); border:1.5px solid var(--border); border-top:4px solid #CC3300;
                         border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px;
-                        box-shadow:var(--shadow-2); transition:all 0.25s ease; cursor:default; min-height:520px;"
+                        box-shadow:var(--shadow-2); transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva); cursor:default; min-height:520px;"
                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(204,51,0,0.14)';"
                  onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow-2)';">
               <div style="display:flex; align-items:center; gap:14px;">
@@ -11080,7 +11086,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 style="padding:14px 20px;background:linear-gradient(135deg,#CC3300,#991F00);color:white;
                        border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;
                        display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
-                       box-shadow:0 4px 14px rgba(204,51,0,0.35);transition:all 0.2s;"
+                       box-shadow:0 4px 14px rgba(204,51,0,0.35);transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"
                 onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 6px 20px rgba(204,51,0,0.45)';"
                 onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(204,51,0,0.35)';">
                 <span class="material-symbols-outlined" style="font-size:20px;">download</span>
@@ -11091,7 +11097,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <button onclick="previewReportPDF(null, getPlazaScopedData())"
                   style="flex:1;padding:9px 12px;background:rgba(204,51,0,0.06);color:#CC3300;
                          border:1px solid rgba(204,51,0,0.2);border-radius:8px;font-weight:600;
-                         font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px;"
+                         font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:5px;"
                   onmouseover="this.style.background='rgba(204,51,0,0.12)';"
                   onmouseout="this.style.background='rgba(204,51,0,0.06)';">
                   <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Vista previa
@@ -11110,13 +11116,13 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
                 <span style="font-size:12px; opacity:0.6; margin-left:auto;">▼</span>
               </summary>
               <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px; padding-top:12px; border-top:1px solid rgba(179,38,30,0.1);">
-                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="clearPersistedComments()">
+                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" onclick="clearPersistedComments()">
                   🗑️ Limpiar comentarios
                 </button>
-                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="clearAttendedAll()">
+                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" onclick="clearAttendedAll()">
                   🗑️ Quitar "atendidos"
                 </button>
-                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="clearPersistedNotes()">
+                <button class="btn btn-secondary" style="padding:8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" onclick="clearPersistedNotes()">
                   🗑️ Limpiar notas
                 </button>
               </div>
@@ -13237,7 +13243,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           var healthPercentage = item.stats.count > 0 ? Math.round((item.stats.online / item.stats.count) * 100) : 0;
 
           html += '<div style="background:linear-gradient(135deg, white 0%, rgba(25,118,210,0.02) 100%); border:1px solid rgba(0,0,0,0.08); border-radius:12px; padding:14px; cursor:pointer;' +
-            'transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); position:relative; overflow:hidden;"' +
+            'transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva); position:relative; overflow:hidden;"' +
             'onmouseover="this.style.transform=\'translateY(-4px)\'; this.style.boxShadow=\'0 12px 32px rgba(0,0,0,0.12)\';"' +
             'onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.06)\';"' +
             'onclick="selectOxxoFromSearch(\'' + item.name.replace(/'/g, "\\'") + '\')">' +
@@ -13280,7 +13286,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             '<div style="background:rgba(0,0,0,0.05); height:6px; border-radius:6px; overflow:hidden;">' +
             '<div style="height:100%; background:linear-gradient(90deg, #1F7A4E 0%, #FFD54F 50%, #E2001A 100%);' +
             'width:' + healthPercentage + '%;' +
-            'transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);"></div>' +
+            'transition: width var(--mov-rapido) var(--mov-curva);"></div>' +
             '</div>' +
             '</div>' +
             '<div style="font-size:11px; font-weight:600; color:var(--text-light); min-width:28px; text-align:right;">' + healthPercentage + '%</div>' +
@@ -14138,7 +14144,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
         // Actualizar marker icon
         if (marker) {
-          var pulseAnim = dispPct < 95 ? 'animation:plazaPulseCSS 2s ease-in-out infinite;' : '';
+          // Sin pulso infinito en el mapa: el color del punto ya dice el estado.
+          var pulseAnim = '';
           marker.setIcon(L.divIcon({
             className: 'plaza-map-marker',
             html: '<div style="width:22px;height:22px;border-radius:50%;background:' + statusColor + ';border:3px solid white;box-shadow:var(--shadow-2);' + pulseAnim + '"></div>',
@@ -14855,7 +14862,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         html += `<div style="padding: 20px; background: var(--card-bg);
                            border: 1px solid var(--border); border-left: 4px solid ${r.color};
                            border-radius: var(--radius-md);
-                           cursor: pointer; transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+                           cursor: pointer; transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
                            box-shadow: var(--shadow-1); animation: slideUp 0.15s ease-out;
                            display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden;"
              onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-3)';"
@@ -14909,7 +14916,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             </div>
             <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
               <div style="width: ${progressPct}%; height: 100%; background: linear-gradient(90deg, ${progressColor} 0%, ${progressColor}dd 100%);
-                          border-radius: 12px; transition: width 0.15s ease-out; box-shadow: 0 0 8px ${progressColor}40;"></div>
+                          border-radius: 12px; transition: width var(--mov-rapido) var(--mov-curva); box-shadow: 0 0 8px ${progressColor}40;"></div>
             </div>
           </div>
 
@@ -14924,7 +14931,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
 
           <!-- CTA interactivo -->
           <div style="padding: 10px; background: ${r.color}; border-radius: 8px; text-align: center; cursor: pointer;
-                      transition: background 0.15s; position: relative; z-index: 1;"
+                      transition: background var(--mov-rapido); position: relative; z-index: 1;"
                onmouseover="this.style.background='${r.colorDark}';"
                onmouseout="this.style.background='${r.color}';">
             <div style="font-size: 12px; font-weight: 700; color: var(--sobre-tipo); display: flex; align-items: center; justify-content: center; gap: 6px;">
@@ -17599,7 +17606,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           + '<td>' + buildCommentSelect(d) + '</td>'
           + '<td>' + buildNoteInput(d) + '</td>'
           + '<td style="text-align:center;" class="detalle-history-cell" data-equipo-cr="' + escHTML(d.CR || '') + '">'
-            + '<button class="detalle-history-btn" style="background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:6px; color:#E2001A; font-weight:600; transition:all 0.2s;" title="Ver historial de seguimiento">'
+            + '<button class="detalle-history-btn" style="background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:6px; color:#E2001A; font-weight:600; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" title="Ver historial de seguimiento">'
               + '<span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle;">history</span>'
             + '</button>'
           + '</td>';
@@ -19477,7 +19484,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       var bgColor = type === 'success' ? '#1F7A4E' : type === 'error' ? '#B3261E' : '#424242';
       toast.style.cssText = 'position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); ' +
         'background:' + bgColor + '; color:white; padding:12px 24px; border-radius:8px; font-size:13px; font-weight:600; ' +
-        'box-shadow:var(--shadow-2); z-index:100000; opacity:0; transition:all 0.15s ease; ' +
+        'box-shadow:var(--shadow-2); z-index:100000; opacity:0; transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva); ' +
         'font-family:Segoe UI,Arial,sans-serif; max-width:500px; text-align:center;';
       toast.textContent = message;
       document.body.appendChild(toast);
@@ -20981,7 +20988,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           var estadoEmoji = estado === 'ROBO' ? '🔴' : estado === 'DAÑADA' ? '🟠' : estado === 'GARANTÍA' ? '🔵' : '⚪';
           var estadoColor = estado === 'ROBO' ? '#B3261E' : estado === 'DAÑADA' ? '#FF9800' : estado === 'GARANTÍA' ? '#2196F3' : '#666';
 
-          html += '<tr style="background:' + rowBg + '; border-bottom:1px solid var(--border); transition:background 0.2s;">';
+          html += '<tr style="background:' + rowBg + '; border-bottom:1px solid var(--border); transition: background var(--mov-base);">';
           html += '<td style="padding:8px;">' + escHTML(d.TIENDA || '-') + '</td>';
           html += '<td style="padding:8px; text-align:center; font-weight:600; font-size:11px;">' + escHTML(d.CR || '-') + '</td>';
           html += '<td style="padding:8px; text-align:center;">' + (d.equipo_type === 'HH' ? '📱' : d.equipo_type === 'TABLET' ? '📱' : '🖨️') + '</td>';
@@ -22192,8 +22199,8 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   <!-- ============ ANIMACIONES REACTIVAS (personalidad por pestaña) ============ -->
   <style>
     /* Micro-interacciones sutiles en hover/clic */
-    .dashboard-card { transition: transform .18s ease, box-shadow .18s ease; will-change: transform, box-shadow; }
-    tbody tr { transition: background-color .15s ease; }
+    .dashboard-card { transition: transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva); will-change: transform, box-shadow; }
+    tbody tr { transition: background-color var(--mov-rapido) var(--mov-curva); }
     /* Efecto ripple en pestañas y botones clave */
     .ripple-host { position: relative; overflow: hidden; }
     .ripple-ink {
@@ -22208,7 +22215,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .tab-slider {
       position: absolute; bottom: 0; left: 0; width: 0; height: 3px;
       background: var(--primary); border-radius: 6px 3px 0 0;
-      transition: left .25s cubic-bezier(.4,0,.2,1), width .25s cubic-bezier(.4,0,.2,1);
+      transition: left var(--mov-base) var(--mov-curva), width var(--mov-base) var(--mov-curva);
       pointer-events: none; z-index: 1;
       will-change: left, width;  /* GPU optimization para transiciones smooth */
     }
@@ -22246,7 +22253,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     .data-pulse { animation: dataPulseRing .7s ease-out; }
 
     /* Chips de filtro: micro-pop al interactuar */
-    .filter-chip, .chip, .estado-chip { transition: transform .12s ease, box-shadow .15s ease; }
+    .filter-chip, .chip, .estado-chip { transition: transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva); }
     .filter-chip:active, .chip:active, .estado-chip:active { transform: scale(.95); }
 
     @media (prefers-reduced-motion: reduce) {
@@ -22689,7 +22696,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
       justify-content: center;
       color: var(--primary, #E2001A);
       z-index: 9000;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva);
     `;
     btn.addEventListener('mouseenter', () => {
       btn.style.transform = 'scale(1.1)';
@@ -22884,7 +22891,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         width:8px; height:14px; background:${colors[i%colors.length]};
         z-index:99998; pointer-events:none; border-radius:6px;
         transform:rotate(${Math.random()*360}deg);
-        transition:all 2.5s cubic-bezier(0.5,1.5,0.5,1);
+        transition: background-color var(--mov-lento) var(--mov-curva), color var(--mov-lento) var(--mov-curva), border-color var(--mov-lento) var(--mov-curva), box-shadow var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva), opacity var(--mov-lento) var(--mov-curva);
       `;
       document.body.appendChild(c);
       requestAnimationFrame(() => {
@@ -23299,7 +23306,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
             background:${colors[i%colors.length]};z-index:99999;pointer-events:none;
             border-radius:${Math.random()<0.5?'2px':'50%'};
             transform:rotate(${Math.random()*360}deg);
-            transition:all ${2+Math.random()*2}s cubic-bezier(0.5,1,0.5,1);
+            transition: all ${2+Math.random()*2}s cubic-bezier(0.5,1,0.5,1);
           `;
           document.body.appendChild(c);
           requestAnimationFrame(() => {
@@ -23417,7 +23424,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   style="position:fixed; right:18px; bottom:18px; z-index:900; width:44px; height:44px; border:none;
          border-radius:50%; background:linear-gradient(135deg,#E2001A,#B80018); color:#fff; cursor:pointer;
          box-shadow:0 4px 14px rgba(226,0,26,.4); opacity:0; pointer-events:none;
-         align-items:center; justify-content:center; display:flex; transition:opacity .25s, transform .2s;"
+         align-items:center; justify-content:center; display:flex; transition: opacity var(--mov-base), transform var(--mov-base);"
   onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='';">
   <span class="material-symbols-outlined" style="font-size:24px;">keyboard_arrow_up</span>
 </button>
@@ -23549,7 +23556,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   select, textarea, .comment-select {
     border: 1px solid #cad1d7 !important;
     border-radius: .5rem !important;
-    transition: box-shadow .15s ease, border-color .15s ease !important;
+    transition: box-shadow var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva) !important;
   }
   input[type="text"]:focus, input[type="search"]:focus, input[type="number"]:focus,
   select:focus, textarea:focus, .comment-select:focus {
@@ -23566,7 +23573,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
   .btn, .bulk-btn {
     border-radius: .5rem !important;
     box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
-    transition: transform .15s ease, box-shadow .15s ease !important;
+    transition: transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva) !important;
   }
   .btn:hover, .bulk-btn:hover {
     transform: translateY(-1px);
@@ -23591,7 +23598,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     border: 1px solid currentColor;
     border-opacity: 0.2;
     box-shadow: var(--shadow-2);
-    transition: all .3s ease;
+    transition: background-color var(--mov-lento) var(--mov-curva), color var(--mov-lento) var(--mov-curva), border-color var(--mov-lento) var(--mov-curva), box-shadow var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva), opacity var(--mov-lento) var(--mov-curva);
   }
 
   .status-icon {
@@ -23672,7 +23679,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
     color: #E2001A !important;
     font-weight: 700 !important;
   }
-  .tab .material-symbols-outlined, .tab .tab-icon-svg { transition: transform .2s ease; }
+  .tab .material-symbols-outlined, .tab .tab-icon-svg { transition: transform var(--mov-base) var(--mov-curva); }
   .tab:hover .material-symbols-outlined, .tab:hover .tab-icon-svg { transform: translateY(-1px); }
 
   /* ---------- Scrollbars finas estilo Argon ---------- */
@@ -23773,20 +23780,20 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
      REACTIVIDAD / ANIMACIONES ARGON — hover lifts y transiciones suaves
      ════════════════════════════════════════════════════════════════ */
   .metric-card, .estado-card, .export-card, .config-section, .saved-views-bar {
-    transition: transform .22s ease, box-shadow .22s ease !important;
+    transition: transform var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva) !important;
   }
   .metric-card:hover, .estado-card:hover, .export-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 .75rem 2rem 0 rgba(136,152,170,0.30) !important;
   }
   /* Botones e inputs: micro-feedback */
-  .btn, .bulk-btn, button { transition: transform .12s ease, box-shadow .15s ease, background .15s ease; }
-  .tab { transition: all .2s cubic-bezier(.34,1.56,.64,1) !important; }
+  .btn, .bulk-btn, button { transition: transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), background var(--mov-rapido) var(--mov-curva); }
+  .tab { transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva); }
   .tab:not(.active):hover { background: rgba(226,0,26,0.06) !important; color: #E2001A !important; transform: translateY(-1px); }
 
   /* Entrada suave de la sección activa (fade-up) */
   @keyframes argonSectionIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-  #results-screen .section.active { animation: argonSectionIn .35s ease both; }
+  #results-screen .section.active { animation: argonSectionIn var(--mov-base) var(--mov-curva) both; }
 
   /* Animación de nota deslizando desde la izquierda */
   @keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
@@ -25151,7 +25158,7 @@ function debugOSModelos() {
     height: 100%;
     border-radius: 999px;
     background: var(--text-light);
-    transition: width .4s ease;
+    transition: width var(--mov-lento) var(--mov-curva);
   }
   .section div.kpi-circular-widget.status-success .kpi-barra > i { background: var(--kpi-ok); }
   .section div.kpi-circular-widget.status-warning .kpi-barra > i { background: var(--kpi-aviso); }
@@ -25263,6 +25270,73 @@ function debugOSModelos() {
     font-size: var(--fs-title) !important;
     font-weight: 600 !important;
     color: var(--text) !important;
+  }
+</style>
+
+<!-- ════════════════════════════════════════════════════════════════
+     SISTEMA DE MOVIMIENTO
+     Antes: 8 duraciones de transición, 9 curvas, 29 elementos con
+     `transition: all` y 82 declaraciones de animación en bucle. Ahora hay
+     tres duraciones y dos curvas (en :root), las transiciones nombran sus
+     propiedades, y ninguna animación se repite para siempre salvo las que
+     dicen "estoy trabajando".
+     ════════════════════════════════════════════════════════════════ -->
+<style id="motion-system">
+  /* ── Fuera las animaciones en bucle decorativas ──────────────────────
+     Una animación infinita nunca deja de repintar: gasta batería en un
+     portátil y CPU en un equipo de tienda, y en una pantalla ya llena
+     compite por la atención de forma permanente. Un pulso eterno además
+     deja de leerse como alarma a los dos minutos. */
+
+  /* El robot de la pantalla de carga y sus veinte piezas */
+  .robot-stage *, .robot-svg, .robot-svg *,
+  /* El splash de marca */
+  #app-splash, #app-splash::before, #app-splash::after,
+  .splash-dot, .splash-particle,
+  /* Pulsos de estado: el color ya dice el estado */
+  .status-badge, .status-badge::before,
+  .badge::before, .sidebar-critical-badge, .anomaly-badge,
+  .metric-card.is-critical::after, .metric-updated::before,
+  .kiosk-indicator::before, .filter-counter, .chip-dot,
+  .plaza-pill-badge, .stock-banner-icon,
+  .dropzone-v2 .dz-sub::before,
+  /* Flotes y rebotes decorativos */
+  .upload-icon, .empty-state-illustrated svg,
+  .estado-table-empty .material-symbols-outlined,
+  .dashboard-card h3 .material-symbols-outlined,
+  .tab:hover .tab-icon-svg, .step-bubble.active,
+  /* Restos del aro de KPI, que ya no existe */
+  .kpi-circular-widget .kpi-circle-container::before,
+  .kpi-circular-widget .kpi-circle-container::after,
+  .kpi-circular-widget .progress-circle,
+  .kpi-circular-widget .kpi-number {
+    animation: none !important;
+  }
+
+  /* ── Lo que SÍ sigue moviéndose, porque informa ──────────────────────
+     Estas dicen "hay trabajo en curso" y paran solas al terminar. */
+  .spinner,
+  .loading::after,
+  .skeleton-line,
+  .dashboard-card.is-loading .chart-wrap::before,
+  .dropzone-v2.loading .robot-svg,
+  .dropzone-v2.loading .robot-svg * {
+    animation-play-state: running !important;
+  }
+  .dropzone-v2.loading .robot-svg,
+  .dropzone-v2.loading .robot-svg * {
+    animation: robotLoadingFidget 1.2s ease-in-out infinite !important;
+  }
+
+  /* ── Quien pide menos movimiento, no recibe ninguno ──────────────────
+     Cubre también lo añadido aquí, no solo lo que había antes. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 </style>
 

@@ -2,6 +2,9 @@
 
 ## Sin publicar
 
+- Sistema de movimiento: tres duraciones y dos curvas, fuera `transition: all`
+  y las animaciones en bucle decorativas. La vista queda quieta en 200 ms.
+
 - Se elimina el login: la aplicación abre directa al dashboard.
 - Un contrato único de tarjeta: de 15 combinaciones distintas de borde,
   radio, sombra y degradado a 8, con la mayoría ya en la misma superficie.
