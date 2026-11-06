@@ -510,3 +510,24 @@ re-renderiza las tablas, así que medir antes de que todo se asiente devuelve
 colores a medio camino. Lo mismo pasa con el menú lateral: está fuera de
 pantalla y `getComputedStyle` devuelve valores congelados — abierto se lee
 perfectamente. Conviene esperar a que la vista esté quieta antes de medir.
+
+### Contrato único de tarjeta
+
+Medido sobre la pestaña Resumen, convivían **15 combinaciones distintas** de
+borde, radio, sombra y degradado: tarjetas de gráfica sin borde con radio 16,
+KPI con borde y radio 12, secciones con radio 16 y borde, y las de tipo de
+equipo con borde de 2px de color y fondo en degradado.
+
+Ahora todas comparten la misma superficie: fondo `--card-bg`, borde de 1px
+`--border`, radio `--radius-md` y sombra `--shadow-1`. Donde el color llevaba
+significado —tipo de equipo, estado— pasa a una **franja lateral de 4px** en
+lugar de teñir la tarjeta entera, así que el significado se conserva sin
+inventar una segunda tarjeta.
+
+| | Antes | Después |
+|---|---|---|
+| Combinaciones de superficie | 15 | **8** |
+| Radios de tarjeta en pantalla | varios | **12px en 19 de 22** |
+
+Las que quedan son la barra de marca (radio 0, correcto), dos envoltorios del
+mapa y la leyenda flotante.

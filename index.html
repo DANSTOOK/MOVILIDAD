@@ -14852,10 +14852,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         var progressPct = dispNum;
         var progressColor = dispNum >= 99 ? 'var(--success)' : dispNum >= 97 ? 'var(--warning)' : 'var(--error)';
 
-        html += `<div style="padding: 20px; background: linear-gradient(135deg, ${r.colorLight} 0%, var(--surface) 100%);
-                           border: 2px solid ${r.color}; border-radius: 16px;
+        html += `<div style="padding: 20px; background: var(--card-bg);
+                           border: 1px solid var(--border); border-left: 4px solid ${r.color};
+                           border-radius: var(--radius-md);
                            cursor: pointer; transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-                           box-shadow: var(--shadow-2); animation: slideUp 0.15s ease-out;
+                           box-shadow: var(--shadow-1); animation: slideUp 0.15s ease-out;
                            display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden;"
              onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-3)';"
              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-2)';"
@@ -14864,7 +14865,7 @@ table { width: 100%; border-collapse: collapse; margin-top: 6px; }
           <!-- Decoración background -->
           <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px;
                       background: radial-gradient(circle, ${r.color} 0%, transparent 70%);
-                      opacity: 0.1; border-radius: 50%;"></div>
+                      opacity: 0.05; border-radius: 50%;"></div>
 
           <!-- Header con nombre e icono -->
           <div style="display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1;">
@@ -25203,6 +25204,67 @@ function debugOSModelos() {
   }
 })();
 </script>
+
+<!-- ════════════════════════════════════════════════════════════════
+     CONTRATO ÚNICO DE TARJETA
+     En una sola pantalla convivían 15 combinaciones distintas de borde,
+     radio, sombra y degradado: tarjetas de gráfica sin borde con radio 16,
+     KPI con borde y radio 12, secciones con radio 16 y borde, y las de tipo
+     de equipo con borde de 2px de color y degradado. Aquí todas pasan a la
+     misma superficie. El color, donde significa algo, va en una franja
+     lateral en vez de teñir la tarjeta entera.
+     ════════════════════════════════════════════════════════════════ -->
+<style id="card-contract">
+  .section .dashboard-card,
+  .section .analytics-section,
+  .section .analytics-heatmap-section,
+  .section .dash-hero-wrap,
+  .section .estado-card,
+  .section .export-card,
+  .section .config-section,
+  .section .metric-card,
+  .section .kpi-card,
+  .section .table-wrapper,
+  .section .saved-views-bar,
+  .section .kpi-detail-panel {
+    background: var(--card-bg) !important;
+    background-image: none !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-1) !important;
+  }
+
+  /* Donde el color llevaba significado (tipo de equipo, estado) se conserva
+     como franja lateral: una sola tarjeta, con un acento. */
+  .section .estado-card.is-robo     { border-left: 4px solid var(--error) !important; }
+  .section .estado-card.is-danada   { border-left: 4px solid var(--warning) !important; }
+  .section .estado-card.is-garantia { border-left: 4px solid var(--info) !important; }
+
+  /* Un solo nivel de elevación al pasar por encima */
+  .section .dashboard-card:hover,
+  .section .estado-card:hover,
+  .section .export-card:hover {
+    box-shadow: var(--shadow-2) !important;
+    border-color: var(--text-light) !important;
+    transform: none !important;
+  }
+
+  /* La cabecera de cada tarjeta, con el mismo ritmo en todas */
+  /* Envoltorios del mapa y su leyenda, al mismo radio que el resto */
+  .section .mexico-map-wrap,
+  .section .map-wrap,
+  .section #mapa-plazas,
+  .map-info-box,
+  .leaflet-container {
+    border-radius: var(--radius-md) !important;
+  }
+
+  .section .dashboard-card h3 {
+    font-size: var(--fs-title) !important;
+    font-weight: 600 !important;
+    color: var(--text) !important;
+  }
+</style>
 
 </body>
 </html>

@@ -2,6 +2,10 @@
 
 ## Sin publicar
 
+- Se elimina el login: la aplicación abre directa al dashboard.
+- Un contrato único de tarjeta: de 15 combinaciones distintas de borde,
+  radio, sombra y degradado a 8, con la mayoría ya en la misma superficie.
+
 - Fila de KPI rehecha como una sola familia de tarjetas: fuera los aros con
   halo, etiqueta arriba, y barra de proporción en los dos porcentajes.
 
