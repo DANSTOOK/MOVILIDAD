@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.2.0 — 2026-11-06
+
+- style: tabla de Detalle, ocho columnas por defecto
+- style: coherencia de color y texto
+- style: sistema de botón y escala de espaciado
+- style: sistema de movimiento
+- docs: auditoría de coherencia visual
+- style: un contrato único de tarjeta
+- feat: quitar el login
+- style: Fase 4 y rehacer la fila de KPI
+- fix(ci): el job de Docker comprueba el build en vez de publicar
+- fix(ci): auditar solo producción y arreglar el CHANGELOG del release
+
 ## Sin publicar
 
 - Tabla de Detalle: ocho columnas por defecto y las otras cinco tras el botón
