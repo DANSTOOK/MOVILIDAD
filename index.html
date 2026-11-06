@@ -7062,7 +7062,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
   /* el ícono del título en círculo rojo suave (toque Argon) */
   .dashboard-card h3 .material-symbols-outlined {
     background: rgba(226,0,26,0.10);
-    color: #E2001A !important;
+    color: var(--primary) !important;
     border-radius: 8px;
     padding:   4px;
     font-size: 20px !important;
@@ -10126,7 +10126,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <!-- KPI: Disponibilidad Promedio -->
               <div class="kpi-card" style="background:linear-gradient(135deg, rgba(31,122,78,0.08) 0%, transparent 100%); border:1px solid rgba(31,122,78,0.2); border-radius:12px; padding:  20px; text-align:center;">
                 <div style="font-size:11px; font-weight: 600; color:var(--text-light); letter-spacing:0; margin-bottom:  8px;">Disponibilidad Global</div>
-                <div style="font-size:36px; font-weight:800; color:#1F7A4E; margin-bottom:  4px;" id="analytics-avg-avail">—</div>
+                <div style="font-size:36px; font-weight:800; color:var(--success); margin-bottom:  4px;" id="analytics-avg-avail">—</div>
                 <div style="font-size:11px; color:var(--text-light);">promedio del parque</div>
               </div>
 
@@ -10140,7 +10140,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <!-- KPI: Equipos Online -->
               <div class="kpi-card" style="background:linear-gradient(135deg, rgba(0,100,200,0.08) 0%, transparent 100%); border:1px solid rgba(0,100,200,0.2); border-radius:12px; padding:  20px; text-align:center;">
                 <div style="font-size:11px; font-weight: 600; color:var(--text-light); letter-spacing:0; margin-bottom:  8px;">Operativos</div>
-                <div style="font-size:36px; font-weight:800; color:#0066CC; margin-bottom:  4px;" id="analytics-online">—</div>
+                <div style="font-size:36px; font-weight:800; color:var(--tipo-tt); margin-bottom:  4px;" id="analytics-online">—</div>
                 <div style="font-size:11px; color:var(--text-light);">equipos activos ahora</div>
               </div>
 
@@ -14135,7 +14135,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         var dispPct = totalPlaza > 0 ? ((totalPlaza - critPlaza) / totalPlaza * 100) : 100;
 
         // Color dinámico según disponibilidad
-        var statusColor = dispPct >= 98 ? '#1F7A4E' : dispPct >= 95 ? '#F5A623' : '#B3261E';
+        var statusColor = dispPct >= 98 ? 'var(--success)' : dispPct >= 95 ? 'var(--warning)' : 'var(--error)';
         var statusLabel = dispPct >= 98 ? 'Operativo' : dispPct >= 95 ? 'Atención' : 'Crítico';
         var fillOpacity = dispPct >= 98 ? 0.10 : dispPct >= 95 ? 0.15 : 0.20;
 
@@ -25619,6 +25619,166 @@ function debugOSModelos() {
   // La tabla se pinta después de cargar datos: se reintenta al cambiar de pestaña.
   document.addEventListener('click', function () { setTimeout(arrancar, 600); });
 })();
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════
+     PIEL DE CRISTAL (glassmorphism + aura)
+     El cristal necesita un fondo oscuro para que el difuminado se vea, así
+     que vive en el tema oscuro, que pasa a ser el de arranque. El tema claro
+     sigue disponible y no se toca.
+     Dos ajustes respecto a la guía, para no perder legibilidad en una tabla
+     de 190 filas que se lee en tienda:
+       · los paneles van a 0.07–0.10 de opacidad en vez de 0.05;
+       · el aura solo aparece al pasar por encima, nunca en reposo, para no
+         repintar sin parar (misma regla que el resto del movimiento).
+     ════════════════════════════════════════════════════════════════ -->
+<style id="glass-skin">
+  [data-theme="dark"] {
+    --glass-bg:       rgba(255, 255, 255, 0.07);
+    --glass-bg-alto:  rgba(255, 255, 255, 0.10);
+    --glass-borde:    rgba(255, 255, 255, 0.16);
+    --glass-blur:     20px;
+
+    /* Los tokens que ya usaba toda la aplicación pasan a ser de cristal,
+       así que las tarjetas se convierten solas. */
+    --bg:            transparent;
+    --surface:       rgba(255, 255, 255, 0.04);
+    --card-bg:       var(--glass-bg);
+    --border:        var(--glass-borde);
+    --input-bg:      rgba(255, 255, 255, 0.06);
+    --table-bg:      transparent;
+    --table-row-alt: rgba(255, 255, 255, 0.03);
+    --table-head-bg: rgba(255, 255, 255, 0.06);
+    --hover-bg:      rgba(255, 255, 255, 0.08);
+    --text:          #ffffff;
+    --text-light:    rgba(255, 255, 255, 0.68);
+  }
+
+  /* ── El lienzo ──────────────────────────────────────────────────── */
+  [data-theme="dark"] body,
+  [data-theme="dark"] #results-screen {
+    background: linear-gradient(to bottom right, #0f172a, #1e293b, #1e1b4b) !important;
+    background-attachment: fixed !important;
+    min-height: 100vh;
+  }
+
+  /* ── El material ────────────────────────────────────────────────── */
+  [data-theme="dark"] .glass-panel,
+  [data-theme="dark"] .section div.kpi-circular-widget,
+  [data-theme="dark"] .section .dashboard-card,
+  [data-theme="dark"] .section .analytics-section,
+  [data-theme="dark"] .section .analytics-heatmap-section,
+  [data-theme="dark"] .section .dash-hero-wrap,
+  [data-theme="dark"] .section .estado-card,
+  [data-theme="dark"] .section .export-card,
+  [data-theme="dark"] .section .config-section,
+  [data-theme="dark"] .section .metric-card,
+  [data-theme="dark"] .section .kpi-card,
+  [data-theme="dark"] .section .table-wrapper,
+  [data-theme="dark"] .tabs,
+  [data-theme="dark"] .filter-toolbar,
+  [data-theme="dark"] .sidebar,
+  [data-theme="dark"] .sound-toggle,
+  [data-theme="dark"] .map-info-box {
+    background: var(--glass-bg) !important;
+    background-image: none !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+    border: 1px solid var(--glass-borde) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  /* La barra de marca se queda roja, que es la identidad, pero también de
+     cristal: rojo translúcido sobre el degradado. */
+  [data-theme="dark"] .app-bar {
+    background: rgba(226, 0, 26, 0.88) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+    border-bottom: 1px solid var(--glass-borde) !important;
+  }
+
+  /* Los paneles anidados (las casillas dentro de una tarjeta) suben un paso
+     para que se distingan del panel que los contiene. */
+  [data-theme="dark"] .section .dashboard-card .chart-wrap,
+  [data-theme="dark"] .section .kpi-detail-panel {
+    background: var(--glass-bg-alto) !important;
+    border: 1px solid var(--glass-borde) !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  /* ── El aura ────────────────────────────────────────────────────────
+     Solo en lo que se puede pulsar, y solo al pasar por encima: si todo
+     brilla, no destaca nada. Anclada en el rojo de marca para que siga
+     pareciendo esta aplicación y no otra. */
+  [data-theme="dark"] .siri-wrapper,
+  [data-theme="dark"] .section div.kpi-circular-widget,
+  [data-theme="dark"] .section .dashboard-card,
+  [data-theme="dark"] .section .estado-card,
+  [data-theme="dark"] .section .export-card {
+    position: relative;
+    z-index: 1;
+  }
+  [data-theme="dark"] .siri-wrapper::before,
+  [data-theme="dark"] .section div.kpi-circular-widget::before,
+  [data-theme="dark"] .section .dashboard-card::before,
+  [data-theme="dark"] .section .estado-card::before,
+  [data-theme="dark"] .section .export-card::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    z-index: -1;
+    border-radius: calc(var(--radius-md) + 4px);
+    background: linear-gradient(-45deg, #00D4FF, #E2001A, #7C5CFF, #FF3B5C);
+    background-size: 300% 300%;
+    filter: blur(14px);
+    opacity: 0;
+    transition: opacity var(--mov-lento) var(--mov-curva);
+    pointer-events: none;
+    display: block !important;
+  }
+  [data-theme="dark"] .siri-wrapper:hover::before,
+  [data-theme="dark"] .section div.kpi-circular-widget:hover::before,
+  [data-theme="dark"] .section .dashboard-card:hover::before,
+  [data-theme="dark"] .section .estado-card:hover::before,
+  [data-theme="dark"] .section .export-card:hover::before {
+    opacity: 0.85;
+    animation: siri-waves 3s ease infinite;
+  }
+  @keyframes siri-waves {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  [data-theme="dark"] .siri-wrapper:hover,
+  [data-theme="dark"] .section div.kpi-circular-widget:hover,
+  [data-theme="dark"] .section .dashboard-card:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Quien pide menos movimiento no recibe ni el aura ni el desplazamiento */
+  @media (prefers-reduced-motion: reduce) {
+    [data-theme="dark"] *:hover::before { animation: none !important; }
+    [data-theme="dark"] *:hover { transform: none !important; }
+  }
+
+  /* El icono de cada tarjeta de gráfica iba rojo sobre una teja roja: sobre
+     cristal oscuro daba 2.39:1. Con la teja neutra, el rojo claro destaca. */
+  [data-theme="dark"] .dashboard-card h3 .material-symbols-outlined {
+    background: rgba(0, 0, 0, 0.28) !important;
+    color: var(--primary) !important;
+  }
+
+  /* Utilidad suelta, por si se escribe marcado nuevo con la guía */
+  .glass-panel { border-radius: var(--radius-md); }
+</style>
+<script>
+  // El cristal necesita fondo oscuro: el tema oscuro pasa a ser el de
+  // arranque. El claro sigue disponible desde el conmutador de siempre.
+  (function () {
+    if (!document.documentElement.getAttribute('data-theme')) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
 </script>
 
 </body>

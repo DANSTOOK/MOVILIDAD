@@ -499,3 +499,56 @@ cabecera verde en una aplicación roja.
 
 Era estilo muerto desde hacía tiempo: solo se manifestaba como fallo. Retirado;
 la cabecera usa el token como el resto de tablas.
+---
+
+## Piel de cristal (glassmorphism + aura)
+
+Se aplica el modelo de la guía a toda la aplicación. El cristal necesita fondo
+oscuro para que el difuminado se vea, así que vive en el tema oscuro, **que
+pasa a ser el de arranque**. El tema claro sigue intacto y disponible.
+
+**Qué se convirtió.** Los tokens que ya usaba toda la interfaz (`--card-bg`,
+`--border`, `--surface`, `--table-*`) pasan a valores de cristal, así que las
+tarjetas, tablas, pestañas, barra de filtros, menú lateral y modales se
+convierten solos. La barra de marca se queda roja —es la identidad— pero
+también translúcida sobre el degradado.
+
+**Dos ajustes respecto a la guía, y por qué.**
+
+1. **Paneles a 0.07–0.10 de opacidad en vez de 0.05.** A 0.05, sobre una tabla
+   de 190 filas que se lee en tienda, el panel desaparece y el texto flota.
+2. **El aura solo al pasar por encima, nunca en reposo.** La guía la define con
+   `animation: siri-waves 3s infinite`; aquí la animación arranca con el hover
+   y la opacidad en reposo es 0. Es la misma regla que el resto del
+   movimiento: nada repinta para siempre.
+
+También se cambió la paleta del aura: la guía propone cian/magenta/azul, que
+parecía otro producto. Ahora va anclada en el rojo de marca
+(`#00D4FF → #E2001A → #7C5CFF → #FF3B5C`).
+
+**Y se reservó, como pide la propia guía.** El aura solo está en lo que se
+puede pulsar: tarjetas de KPI, de gráfica, de estado y de exportación. Los
+contenedores grandes llevan cristal sin resplandor.
+
+### Lo que costó en contraste
+
+Era el riesgo que anticipé, y hubo que perseguirlo:
+
+| | Fallos de contraste |
+|---|---|
+| Primera versión del cristal | 27 |
+| Tras enrutar colores a tokens | 15 (10 iconos) |
+| Final | **5, ninguno icono** |
+
+Lo que salió a la luz es que varios colores seguían escritos a pelo con los
+tonos del tema **claro** —el icono de cada tarjeta de gráfica en `#E2001A`, los
+estados del mapa en `#1F7A4E`/`#F5A623`, las cifras de analytics en `#1F7A4E` y
+`#0066CC`— y sobre cristal oscuro se hundían. Ahora pasan por tokens.
+
+Un intento salió al revés y conviene anotarlo: para subir el contraste del
+icono de gráfica aclaré su teja, y el contraste **bajó** de 2.39 a 1.95. El
+rojo `#FF3B5C` es de luminancia media, así que necesita fondo oscuro detrás,
+no claro. Con la teja a `rgba(0,0,0,0.28)` sube a 4.59:1.
+
+Los 5 que quedan están entre 3.45 y 4.25: texto pequeño algo por debajo del
+mínimo, no ilegible.

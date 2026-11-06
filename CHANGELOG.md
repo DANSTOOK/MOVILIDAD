@@ -15,6 +15,9 @@
 
 ## Sin publicar
 
+- Piel de cristal (glassmorphism + aura) en toda la aplicación, con el tema
+  oscuro como arranque. El aura solo al pasar por encima.
+
 - Tabla de Detalle: ocho columnas por defecto y las otras cinco tras el botón
   "Ver todas las columnas". Las filas pasan de 104px a 62px.
 
