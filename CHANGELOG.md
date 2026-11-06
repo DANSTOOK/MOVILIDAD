@@ -2,6 +2,9 @@
 
 ## Sin publicar
 
+- Tabla de Detalle: ocho columnas por defecto y las otras cinco tras el botón
+  "Ver todas las columnas". Las filas pasan de 104px a 62px.
+
 - Coherencia de color y texto: un verde y un ámbar, los colores sueltos a
   tokens, tres pesos tipográficos y el cuerpo de texto legible.
 

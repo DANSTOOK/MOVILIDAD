@@ -5507,10 +5507,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       border-spacing: 0;
     }
     
-    #detalle .table-wrapper thead tr {
-      background: linear-gradient(135deg, #2E7D32, #1B5E20);
-      color: white;
-    }
+    /* Había aquí un degradado verde para la cabecera de esta tabla. En claro
+       quedaba tapado por el fondo opaco de los th, así que no se veía; en
+       oscuro, donde el th es translúcido, asomaba y dejaba la cabecera verde
+       en una aplicación roja. Se retira: la cabecera usa el token como el
+       resto de tablas. */
     
     #detalle .table-wrapper thead th {
       padding:   16px 16px;
@@ -25513,6 +25514,112 @@ function debugOSModelos() {
     color: var(--text-light) !important;
   }
 </style>
+
+<!-- ════════════════════════════════════════════════════════════════
+     TABLA DE DETALLE
+     13 columnas en 983px de ancho: la tabla medía 1226px, las cabeceras 91px
+     de alto y las filas entre 85 y 104px, porque cada celda partía sus
+     palabras. Con 190 equipos se veían cinco por pantalla.
+     Ahora hay ocho columnas por defecto y las otras cinco están detrás del
+     botón "Columnas". Nada se borra: se deja de enseñar todo a la vez.
+     ════════════════════════════════════════════════════════════════ -->
+<style id="detalle-table">
+  /* Columnas secundarias ocultas por defecto.
+     5 Plaza (ya hay filtro de plaza arriba) · 9 Serie · 10 Modelo ·
+     12 Nota · 13 Historial */
+  #detalle .tabla-compacta table tr > *:nth-child(5),
+  #detalle .tabla-compacta table tr > *:nth-child(9),
+  #detalle .tabla-compacta table tr > *:nth-child(10),
+  #detalle .tabla-compacta table tr > *:nth-child(12),
+  #detalle .tabla-compacta table tr > *:nth-child(13) {
+    display: none !important;
+  }
+
+  /* Una fila, una línea. El valor completo queda en el title. */
+  #detalle table tbody td {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 180px;
+    vertical-align: middle !important;
+  }
+  #detalle table thead th {
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+  }
+
+  /* Los números se comparan mejor a la derecha y con cifras de ancho fijo */
+  #detalle table tbody td:nth-child(3),
+  #detalle table thead th:nth-child(3) {
+    text-align: center !important;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* El control de columnas */
+  .columnas-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: var(--btn-md);
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .columnas-control:hover { border-color: var(--text-light); }
+  .columnas-control .material-symbols-outlined { font-size: 18px; }
+</style>
+<script>
+(function () {
+  // Ocho columnas por defecto; el resto, a un clic. No se borra nada.
+  function montarControlColumnas() {
+    var cont = document.querySelector('#detalle .table-wrapper');
+    if (!cont || document.getElementById('btn-columnas')) return;
+    cont.classList.add('tabla-compacta');
+
+    var btn = document.createElement('button');
+    btn.id = 'btn-columnas';
+    btn.className = 'columnas-control';
+    btn.type = 'button';
+    btn.innerHTML = '<span class="material-symbols-outlined">view_column</span><span id="btn-columnas-txt">Ver todas las columnas</span>';
+    btn.addEventListener('click', function () {
+      var compacta = cont.classList.toggle('tabla-compacta');
+      document.getElementById('btn-columnas-txt').textContent =
+        compacta ? 'Ver todas las columnas' : 'Ver solo lo esencial';
+    });
+
+    var barra = document.createElement('div');
+    barra.style.cssText = 'display:flex; justify-content:flex-end; margin: 0 0 8px 0;';
+    barra.appendChild(btn);
+    cont.parentElement.insertBefore(barra, cont);
+  }
+
+  // El valor completo, en el title de cada celda recortada.
+  function ponerTitulos() {
+    document.querySelectorAll('#detalle table tbody td').forEach(function (td) {
+      if (td.title || td.querySelector('select, input, button')) return;
+      var t = (td.textContent || '').trim();
+      if (t) td.title = t;
+    });
+  }
+
+  function arrancar() {
+    montarControlColumnas();
+    ponerTitulos();
+    var tb = document.querySelector('#detalle table tbody');
+    if (tb) new MutationObserver(ponerTitulos).observe(tb, { childList: true });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arrancar);
+  else arrancar();
+  // La tabla se pinta después de cargar datos: se reintenta al cambiar de pestaña.
+  document.addEventListener('click', function () { setTimeout(arrancar, 600); });
+})();
+</script>
 
 </body>
 </html>

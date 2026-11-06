@@ -26,7 +26,7 @@ Lo que todavía no habla un mismo idioma, por orden de impacto:
 | **Botones** | 12 variantes y **8 alturas distintas** para 39 botones | ~~REHACER~~ **hecho** |
 | **Espacio** | 11 valores de padding, 10 de gap, sin escala | ~~REHACER~~ **hecho** |
 | **Color** | 16 colores de texto, 2 verdes y 3 ámbares para lo mismo | ~~MEJORAR~~ **hecho** |
-| **Colocación del texto** | 3 formas de alinear, 7 interlineados, tabla que parte todo | ~~MEJORAR~~ **hecho** (salvo la tabla) |
+| **Colocación del texto** | 3 formas de alinear, 7 interlineados, tabla que parte todo | ~~MEJORAR~~ **hecho** |
 | **Adornos** | aurora de fondo, pulsos infinitos, robot animado | **ELIMINAR** |
 
 ---
@@ -461,3 +461,41 @@ El hallazgo de fondo sí se sostiene, y es más simple de enunciar: hay **144
 reglas que centran frente a 44 que alinean a la izquierda**. La aplicación
 centra por defecto, y eso en una interfaz de datos es justo lo que hace que el
 texto parezca mal colocado.
+---
+
+## Resultado: la tabla de Detalle
+
+Resultó peor de lo que decía el capítulo 5: no eran 11 columnas sino **13**, y
+la tabla medía **1226px dentro de un contenedor de 983**.
+
+| | Antes | Después |
+|---|---|---|
+| Columnas visibles | 13 | **8** |
+| Ancho de la tabla | 1226px (no cabía) | **981px en 983** |
+| Alto de la cabecera | 91px | **52px** |
+| Alto de fila | 85–104px | **62px** |
+| Registros por pantalla | ~5 | **~8** |
+
+**Las ocho de por defecto:** selección, Última conexión, Días offline, CR,
+Tienda, Asesor, Equipo y Comentario. Son las que se usan para decidir a quién
+llamar.
+
+**Las cinco que se esconden:** Plaza (ya hay un filtro de plaza justo encima),
+Serie, Modelo, Nota e Historial. No se borran: el botón **"Ver todas las
+columnas"** las devuelve, y vuelve a lo esencial con otro clic.
+
+Además, cada celda ocupa **una sola línea**: antes "Alicia Jaqueline Piña
+Bretado" se partía en cuatro y dejaba filas de 104px. Ahora se recorta con
+puntos suspensivos y el valor completo queda en el `title`, al pasar por
+encima.
+
+### Un fallo que apareció al mirarlo en oscuro
+
+La cabecera de esta tabla salía **verde** en modo oscuro. La causa era una
+regla propia de `#detalle` con un degradado verde (`#2E7D32 → #1B5E20`) que en
+modo claro quedaba **tapada** por el fondo opaco de los `th`, así que nunca se
+había visto. En oscuro, donde el `th` es translúcido, asomaba y dejaba una
+cabecera verde en una aplicación roja.
+
+Era estilo muerto desde hacía tiempo: solo se manifestaba como fallo. Retirado;
+la cabecera usa el token como el resto de tablas.
