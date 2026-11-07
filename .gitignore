@@ -25,3 +25,7 @@ backend/npm-debug.log
 *.swp
 *.swo
 _test_data.csv
+
+# Auditoria de accesibilidad (axe-core + Playwright)
+tests/a11y/node_modules/
+tests/a11y/report/

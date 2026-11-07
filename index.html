@@ -4444,8 +4444,9 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       font-weight: 600;
       letter-spacing: 0.12em;
 
+      /* Llevaba opacity:0.78, y eso dejaba el gris en 3.4:1 sobre blanco. El
+         color ya es gris de por si: la opacidad solo lo aclaraba de mas. */
       color: var(--text-light);
-      opacity: 0.78;
     }
     .plaza-pill-label .value {
       font-size: 13px;
@@ -7324,8 +7325,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       <div class="app-bar-actions">
         <div style="position:relative;">
           <button class="app-bar-icon-btn" id="notif-bell-btn" aria-label="Notificaciones" title="Notificaciones" onclick="toggleNotifPanel()">
-            <span class="material-symbols-outlined" id="notif-bell-icon">notifications</span>
-            <span class="badge" id="hdr-notif-count" style="display:none;">0</span>
+            <span class="material-symbols-outlined" id="notif-bell-icon" aria-hidden="true">notifications</span>
+            <span class="badge" id="hdr-notif-count" aria-hidden="true" style="display:none;">0</span>
           </button>
           <!-- Panel de notificaciones dropdown -->
           <div id="notif-panel" style="display:none; position:absolute; top:48px; right:0; width:380px; max-height:480px; border-radius:16px; z-index:9999; overflow:hidden;">
@@ -9627,7 +9628,9 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       display: inline-block; min-width: 26px; padding:   2px 8px; border-radius: 12px;
       font-size: 12px; font-weight: 800; text-align: center;
     }
-    .days-cell.sev-warning .days-badge { background: rgba(245,166,35,0.18); color: #B35F00; }
+    /* #B35F00 sobre el tinte ambar al 18% da 4.07:1, por debajo del minimo:
+       la tinta ambar del sistema (#8A5A00) sube a 5.23 y dice lo mismo. */
+    .days-cell.sev-warning .days-badge { background: rgba(245,166,35,0.18); color: var(--ink-ambar); }
     .days-cell.sev-critical .days-badge { background: rgba(229,57,53,0.16); color: var(--ink-critico-medio); }
     [data-theme="dark"] tbody#cruce-table tr.sev-warning { background: rgba(245,166,35,0.10); }
     [data-theme="dark"] tbody#cruce-table tr.sev-critical { background: rgba(229,57,53,0.12); }
@@ -10691,19 +10694,19 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 </div>
                 <div>
                   <label style="display:block; font-size:11px; font-weight:600; color:var(--text-light); margin-bottom:  6px;">📱 HH</label>
-                  <input type="number" id="stock-hh" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:  12px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
+                  <input type="number" id="stock-hh" aria-label="Existencias de HH" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:  12px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
                 </div>
                 <div>
                   <label style="display:block; font-size:11px; font-weight:600; color:var(--text-light); margin-bottom:  6px;">📱 TT</label>
-                  <input type="number" id="stock-tt" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:  12px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
+                  <input type="number" id="stock-tt" aria-label="Existencias de TT" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:  12px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
                 </div>
                 <div>
                   <label style="display:block; font-size:11px; font-weight:600; color:var(--text-light); margin-bottom:  6px;">🖨️ Impresoras</label>
-                  <input type="number" id="stock-imp" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:  12px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
+                  <input type="number" id="stock-imp" aria-label="Existencias de impresoras" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:  12px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
                 </div>
                 <div>
                   <label style="display:block; font-size:11px; font-weight:600; color:var(--text-light); margin-bottom:  6px;">🔌 Cargadores</label>
-                  <input type="number" id="stock-cargadores" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:  12px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
+                  <input type="number" id="stock-cargadores" aria-label="Existencias de cargadores" value="0" min="0" onchange="updateStockDashboard()" style="width:100%; padding:  12px 12px; border:1px solid var(--border); border-radius:8px; font-size:12px; background:var(--input-bg); text-align:center;">
                 </div>
               </div>
 
@@ -11170,7 +11173,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div class="config-item">
                 <label>Vista inicial al entrar a resultados</label>
                 <span class="config-hint">Abre automáticamente esta pestaña</span>
-                <select id="cfg-initial-tab" onchange="saveConfig()">
+                <select id="cfg-initial-tab" aria-label="Pestana que se abre al arrancar" onchange="saveConfig()">
                   <option value="cruce">Cruce</option>
                   <option value="resumen">Resumen</option>
                   <option value="detalle">Detalle</option>
@@ -11195,21 +11198,21 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                   <label>Auto carga al iniciar</label>
                   <span class="config-hint">Carga automáticamente archivos de ejemplo</span>
                 </div>
-                <input type="checkbox" id="cfg-autoload" onchange="saveConfig()">
+                <input type="checkbox" id="cfg-autoload" aria-label="Cargar archivos de ejemplo automaticamente" onchange="saveConfig()">
               </div>
               <div class="config-toggle">
                 <div>
                   <label>Scroll automático a resultados</label>
                   <span class="config-hint">Salta a la parte superior al terminar análisis</span>
                 </div>
-                <input type="checkbox" id="cfg-autoscroll" onchange="saveConfig()" checked>
+                <input type="checkbox" id="cfg-autoscroll" aria-label="Saltar arriba al terminar el analisis" onchange="saveConfig()" checked>
               </div>
               <div class="config-toggle">
                 <div>
                   <label>Animaciones en dropzone</label>
                   <span class="config-hint">Muestra efectos visuales al cargar</span>
                 </div>
-                <input type="checkbox" id="cfg-dropzone-anim" onchange="saveConfig()" checked>
+                <input type="checkbox" id="cfg-dropzone-anim" aria-label="Mostrar efectos visuales al cargar" onchange="saveConfig()" checked>
               </div>
             </div>
           </details>
@@ -11231,7 +11234,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <label>PLAZA ESTE</label>
                 <span class="config-hint">Base de tiendas de Tijuana Este</span>
                 <div style="display: flex; gap:   8px; align-items: center;">
-                  <input type="file" id="plaza-este-input" accept=".csv" onchange="loadPlazaFile('Tijuana Este', event)" style="flex: 1; padding:   6px;">
+                  <input type="file" id="plaza-este-input" aria-label="Archivo de la plaza Tijuana Este" accept=".csv" onchange="loadPlazaFile('Tijuana Este', event)" style="flex: 1; padding:   6px;">
                   <span id="plaza-este-status" style="font-size: 11px; color: var(--text-light);">—</span>
                 </div>
               </div>
@@ -11239,7 +11242,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <label>PLAZA CENTRO</label>
                 <span class="config-hint">Base de tiendas de Tijuana Centro</span>
                 <div style="display: flex; gap:   8px; align-items: center;">
-                  <input type="file" id="plaza-centro-input" accept=".csv" onchange="loadPlazaFile('Tijuana Centro', event)" style="flex: 1; padding:   6px;">
+                  <input type="file" id="plaza-centro-input" aria-label="Archivo de la plaza Tijuana Centro" accept=".csv" onchange="loadPlazaFile('Tijuana Centro', event)" style="flex: 1; padding:   6px;">
                   <span id="plaza-centro-status" style="font-size: 11px; color: var(--text-light);">—</span>
                 </div>
               </div>
@@ -11247,7 +11250,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <label>PLAZA ENSENADA</label>
                 <span class="config-hint">Base de tiendas de Ensenada</span>
                 <div style="display: flex; gap:   8px; align-items: center;">
-                  <input type="file" id="plaza-ensenada-input" accept=".csv" onchange="loadPlazaFile('Ensenada', event)" style="flex: 1; padding:   6px;">
+                  <input type="file" id="plaza-ensenada-input" aria-label="Archivo de la plaza Ensenada" accept=".csv" onchange="loadPlazaFile('Ensenada', event)" style="flex: 1; padding:   6px;">
                   <span id="plaza-ensenada-status" style="font-size: 11px; color: var(--text-light);">—</span>
                 </div>
               </div>
@@ -11255,7 +11258,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <label>PLAZA PLAYAS</label>
                 <span class="config-hint">Base de tiendas de Playas</span>
                 <div style="display: flex; gap:   8px; align-items: center;">
-                  <input type="file" id="plaza-playas-input" accept=".csv" onchange="loadPlazaFile('Playas', event)" style="flex: 1; padding:   6px;">
+                  <input type="file" id="plaza-playas-input" aria-label="Archivo de la plaza Playas" accept=".csv" onchange="loadPlazaFile('Playas', event)" style="flex: 1; padding:   6px;">
                   <span id="plaza-playas-status" style="font-size: 11px; color: var(--text-light);">—</span>
                 </div>
               </div>
@@ -11277,21 +11280,21 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                   <label>Conteo animado de números</label>
                   <span class="config-hint">Anima los valores al mostrarlos</span>
                 </div>
-                <input type="checkbox" id="cfg-kpi-animate" onchange="saveConfig()" checked>
+                <input type="checkbox" id="cfg-kpi-animate" aria-label="Animar los valores de los KPI" onchange="saveConfig()" checked>
               </div>
               <div class="config-toggle">
                 <div>
                   <label>Tooltips en KPIs</label>
                   <span class="config-hint">Muestra descripciones al pasar el mouse</span>
                 </div>
-                <input type="checkbox" id="cfg-kpi-tooltips" onchange="saveConfig()" checked>
+                <input type="checkbox" id="cfg-kpi-tooltips" aria-label="Mostrar descripciones al pasar el raton" onchange="saveConfig()" checked>
               </div>
               <div class="config-toggle">
                 <div>
                   <label>Subtítulos contextuales</label>
                   <span class="config-hint">Muestra textos descriptivos bajo métricas</span>
                 </div>
-                <input type="checkbox" id="cfg-kpi-subtitles" onchange="saveConfig()" checked>
+                <input type="checkbox" id="cfg-kpi-subtitles" aria-label="Mostrar textos descriptivos bajo las metricas" onchange="saveConfig()" checked>
               </div>
             </div>
           </details>
@@ -11309,7 +11312,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div class="config-item">
                 <label>Espaciado de filas</label>
                 <span class="config-hint">Elige cómo se distribuyen las filas visualmente</span>
-                <select id="cfg-row-spacing" onchange="saveConfig()">
+                <select id="cfg-row-spacing" aria-label="Distribucion de las filas" onchange="saveConfig()">
                   <option value="compact">Compacto</option>
                   <option value="normal" selected>Normal</option>
                   <option value="amplio">Amplio</option>
@@ -11318,7 +11321,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div class="config-item">
                 <label>Orden predeterminado</label>
                 <span class="config-hint">Cómo se ordena la tabla al cargar</span>
-                <select id="cfg-table-sort" onchange="saveConfig()">
+                <select id="cfg-table-sort" aria-label="Orden de la tabla al cargar" onchange="saveConfig()">
                   <option value="dias" selected>Por Días Offline (DESC)</option>
                   <option value="cr">Por CR</option>
                   <option value="tienda">Por Tienda</option>
@@ -11329,7 +11332,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                   <label>"Última Conexión" centrada</label>
                   <span class="config-hint">Alinea la columna de fecha al centro</span>
                 </div>
-                <input type="checkbox" id="cfg-centered-date" onchange="saveConfig()">
+                <input type="checkbox" id="cfg-centered-date" aria-label="Alinear la columna de fecha al centro" onchange="saveConfig()">
               </div>
             </div>
           </details>
@@ -11348,7 +11351,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <label>Días para marcar como APAGADO (crítico)</label>
                 <span class="config-hint">Días sin conexión para considerarlo crítico</span>
                 <div style="display: flex; gap:   12px; align-items: center;">
-                  <input type="number" id="cfg-offline-days" min="1" max="30" onchange="saveConfig()" value="4" style="width: 80px;">
+                  <input type="number" id="cfg-offline-days" aria-label="Dias sin conexion para considerarlo critico" min="1" max="30" onchange="saveConfig()" value="4" style="width: 80px;">
                   <span style="color: var(--text-light); font-size: 13px;">días</span>
                 </div>
               </div>
@@ -11356,7 +11359,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <label>Días para considerar crítico (general)</label>
                 <span class="config-hint">Fallback si no defines uno por tipo</span>
                 <div style="display: flex; gap:   12px; align-items: center;">
-                  <input type="number" id="cfg-critical-days" min="1" max="30" onchange="saveConfig()" value="4" style="width: 80px;">
+                  <input type="number" id="cfg-critical-days" aria-label="Dias criticos por defecto" min="1" max="30" onchange="saveConfig()" value="4" style="width: 80px;">
                   <span style="color: var(--text-light); font-size: 13px;">días</span>
                 </div>
               </div>
@@ -11364,7 +11367,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <label>Umbral crítico HH (Handheld)</label>
                 <span class="config-hint">Días offline ≥ este valor → HH crítico</span>
                 <div style="display: flex; gap:   12px; align-items: center;">
-                  <input type="number" id="cfg-critical-days-hh" min="1" max="30" onchange="saveConfig()" value="4" style="width: 80px;">
+                  <input type="number" id="cfg-critical-days-hh" aria-label="Dias offline para considerar un HH critico" min="1" max="30" onchange="saveConfig()" value="4" style="width: 80px;">
                   <span style="color: var(--text-light); font-size: 13px;">días</span>
                 </div>
               </div>
@@ -11372,7 +11375,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <label>Umbral crítico TABLET</label>
                 <span class="config-hint">Días offline ≥ este valor → TABLET crítico</span>
                 <div style="display: flex; gap:   12px; align-items: center;">
-                  <input type="number" id="cfg-critical-days-tt" min="1" max="30" onchange="saveConfig()" value="4" style="width: 80px;">
+                  <input type="number" id="cfg-critical-days-tt" aria-label="Dias offline para considerar una TABLET critica" min="1" max="30" onchange="saveConfig()" value="4" style="width: 80px;">
                   <span style="color: var(--text-light); font-size: 13px;">días</span>
                 </div>
               </div>
@@ -11498,7 +11501,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div class="config-item">
                 <label>Nomenclatura de equipos</label>
                 <span class="config-hint">Cómo se llaman los tipos en la UI</span>
-                <select id="cfg-equipment-names" onchange="saveConfig()">
+                <select id="cfg-equipment-names" aria-label="Nombres de los tipos de equipo" onchange="saveConfig()">
                   <option value="hh-tablet" selected>HH / TABLET</option>
                   <option value="hh-tt">HH / TT</option>
                 </select>
@@ -11519,7 +11522,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div class="config-item">
                 <label>Tema</label>
                 <span class="config-hint">Claro u oscuro · se aplica al instante</span>
-                <select id="cfg-theme" onchange="saveConfig()">
+                <select id="cfg-theme" aria-label="Tema de la interfaz" onchange="saveConfig()">
                   <option value="light">Claro</option>
                   <option value="dark">Oscuro</option>
                 </select>
@@ -11529,12 +11532,12 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                   <label>Animaciones suaves</label>
                   <span class="config-hint">Activa transiciones y movimientos</span>
                 </div>
-                <input type="checkbox" id="cfg-animations" onchange="saveConfig()" checked>
+                <input type="checkbox" id="cfg-animations" aria-label="Activar transiciones y movimientos" onchange="saveConfig()" checked>
               </div>
               <div class="config-item">
                 <label>Modo de visualización</label>
                 <span class="config-hint">Afecta el espaciado general del dashboard</span>
-                <select id="cfg-display-mode" onchange="saveConfig()">
+                <select id="cfg-display-mode" aria-label="Espaciado general del tablero" onchange="saveConfig()">
                   <option value="normal" selected>Normal</option>
                   <option value="compact">Compacto</option>
                   <option value="expanded">Expandido</option>
@@ -11543,7 +11546,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div class="config-item">
                 <label>Intensidad de sombras</label>
                 <span class="config-hint">Efecto de profundidad en las cards</span>
-                <select id="cfg-shadow-intensity" onchange="saveConfig()">
+                <select id="cfg-shadow-intensity" aria-label="Intensidad de las sombras" onchange="saveConfig()">
                   <option value="low">Baja</option>
                   <option value="medium" selected>Media</option>
                   <option value="high">Alta</option>
@@ -13860,7 +13863,17 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         countBadge.textContent = alertCount;
         countBadge.style.display = show ? 'inline-flex' : 'none';
       }
-      if (bellBtn) bellBtn.classList.toggle('has-alerts', show);
+      if (bellBtn) {
+        bellBtn.classList.toggle('has-alerts', show);
+        /* El nombre del boton lleva el numero, y no solo la palabra: lo que
+           se ve dentro del boton es la cifra, y un nombre que no la incluye
+           anuncia algo distinto de lo que hay en pantalla. El ligado del
+           icono ("notifications") va aria-hidden, que no es texto: es como
+           esta tipografia dibuja el dibujo. */
+        var nombre = show ? 'Notificaciones: ' + alertCount : 'Notificaciones';
+        bellBtn.setAttribute('aria-label', nombre);
+        bellBtn.setAttribute('title', nombre);
+      }
     }
 
     /* ============ LEAFLET MAP — Interactive Baja California ============ */
@@ -17196,8 +17209,14 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       var key = getCommentKey(d);
       var current = getComment(d);
       var hasValue = !!current;
+      /* Sin aria-label son 66 desplegables sin nombre accesible: un lector de
+         pantalla los lee todos igual y no hay manera de saber de que equipo
+         es cada uno. El texto que lo identifica esta en la fila, no dentro
+         del control. */
+      var nombre = String(key).replace(/"/g,'&quot;');
       return '<select class="comment-select' + (hasValue?' cm-set':'') + '" data-key="' +
-             String(key).replace(/"/g,'&quot;') + '" onchange="updateComment(this.dataset.key, this.value)">' +
+             nombre + '" aria-label="Comentario del equipo ' + nombre +
+             '" onchange="updateComment(this.dataset.key, this.value)">' +
              commentOptionsHtml(current) + '</select>';
     }
 
@@ -17733,7 +17752,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <td style="padding:   8px; border-bottom: 1px solid var(--border);">${d['Last Name'] || '—'}</td>
           <td style="padding:   8px; border-bottom: 1px solid var(--border);">${d.TIENDA || '—'}</td>
           <td style="padding:   8px; border-bottom: 1px solid var(--border);">
-            <select onchange="savePlazaOverride('${key.replace(/'/g, "\\'")}', this.value); renderAll();" style="padding:   4px; border: 1px solid var(--border); border-radius: 6px;">
+            <select aria-label="Plaza de ${key.replace(/"/g, '&quot;')}" onchange="savePlazaOverride('${key.replace(/'/g, "\\'")}', this.value); renderAll();" style="padding:   4px; border: 1px solid var(--border); border-radius: 6px;">
               <option value="">— sin asignar —</option>
               <option value="Tijuana Este" ${overriddenPlaza === 'Tijuana Este' ? 'selected' : ''}>Tijuana Este</option>
               <option value="Ensenada" ${overriddenPlaza === 'Ensenada' ? 'selected' : ''}>Ensenada</option>
@@ -20864,7 +20883,10 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             btn.style.fontWeight = '700';
             btn.style.boxShadow = '0 4px 12px rgba(226,0,26,0.2)';
           } else {
-            btn.style.opacity = '0.6';
+            /* Sin seleccionar no significa ilegible: con 0.6 el texto de
+               estos chips bajaba a 2.5-2.9:1. La diferencia la dicen ya el
+               peso, la escala y la sombra del que esta activo. */
+            btn.style.opacity = '1';
             btn.style.transform = 'scale(0.95)';
             btn.style.fontWeight = '600';
             btn.style.boxShadow = 'none';
@@ -20932,7 +20954,9 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       var buttons = document.querySelectorAll('button[onclick*="filterGarantiaByEstado"]') // Animar todos los botones hacia estado base
       buttons.forEach(function(btn) {
         btn.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        btn.style.opacity = '0.6';
+        /* Ver el comentario de arriba: la opacidad no es la que marca
+           cual esta seleccionado, y dejaba el texto por debajo del minimo. */
+        btn.style.opacity = '1';
         btn.style.transform = 'scale(0.95)';
         btn.style.fontWeight = '600';
       }) // Animar el botón seleccionado
@@ -22365,8 +22389,20 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
            movimiento. Se puede: ningun sitio usa lo que devuelve switchTab
            (37 llamadas, todas de usar y tirar) y lo unico que corre justo
            despues -cerrar el menu lateral, subir el scroll- no mira el
-           contenido nuevo. Sin gota, o sin movimiento, se pinta ya. */
-        if (btn && !reduce) { requestAnimationFrame(pintar); return; }
+           contenido nuevo. Sin gota, o sin movimiento, se pinta ya.
+
+           El temporizador no sobra: si el navegador no esta pintando -la
+           pestaña en segundo plano, la ventana minimizada, el panel oculto-
+           requestAnimationFrame no llega NUNCA, y la navegacion se quedaria
+           colgada hasta que alguien mire. Navegar no puede depender de que
+           haya un fotograma; el adorno si. Gana el que llegue primero. */
+        if (btn && !reduce) {
+          var pintado = false;
+          var unaVez = function(){ if (pintado) return; pintado = true; pintar(); };
+          requestAnimationFrame(unaVez);
+          setTimeout(unaVez, 32);
+          return;
+        }
         return pintar();
       };
     }
@@ -22537,9 +22573,15 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       widget.dataset.kbReady = '1';
       if (!widget.hasAttribute('tabindex')) widget.setAttribute('tabindex', '0');
       widget.setAttribute('role', 'button');
-      const label = widget.querySelector('.kpi-label');
-      if (label && !widget.hasAttribute('aria-label')) {
-        widget.setAttribute('aria-label', 'Ver detalle: ' + label.textContent.trim());
+      /* El nombre accesible sale del contenido de la tarjeta, no de un
+         aria-label aparte. Con "Ver detalle: Total (BD)" el nombre no
+         contenia lo que se ve -ni la cifra ni el pie-, y un lector anunciaba
+         una cosa distinta de la que hay en pantalla. Con role="button" el
+         nombre se toma del contenido, que es exacto por definicion; la
+         accion se dice en una descripcion aparte. */
+      widget.removeAttribute('aria-label');
+      if (!widget.hasAttribute('aria-description')) {
+        widget.setAttribute('aria-description', 'Abre el detalle de este indicador');
       }
       widget.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {

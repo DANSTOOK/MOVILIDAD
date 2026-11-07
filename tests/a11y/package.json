@@ -1,0 +1,16 @@
+{
+  "name": "oxxo-movilidad-a11y",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Auditoria de accesibilidad y contraste del tablero con axe-core",
+  "type": "module",
+  "scripts": {
+    "audit": "node audit.mjs",
+    "fixture": "node fixtures/make-dataset.mjs"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "axe-core": "^4.10.3",
+    "playwright": "^1.50.1"
+  }
+}

@@ -1,0 +1,115 @@
+# Auditoría de accesibilidad y contraste, con axe-core.
+#
+# Por qué existe: el contraste del tablero se estuvo midiendo a mano, con un
+# script dentro del navegador, y falló de cuatro maneras distintas — se saltó
+# la barra de marca entera, dio 137 fallos fantasma por medir durante la
+# animación de entrada, cantó cero con tres sitios rotos delante, y no vio una
+# regresión visual completa porque texto oscuro sobre blanco contrasta de
+# maravilla. La primera pasada de axe-core encontró 202 nodos con impacto
+# serio o crítico donde la medición a mano daba cero.
+#
+# Lo que corre está en tests/a11y/audit.mjs: levanta el backend, carga el
+# concentrado de prueba (sin fichero el tablero no existe), recorre las ocho
+# pestañas en tema claro y oscuro, y pasa axe-core en cada una de las
+# dieciséis vistas.
+
+name: Accesibilidad y contraste
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'index.html'
+      - 'backend/**'
+      - 'tests/a11y/**'
+      - '.github/workflows/a11y.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'index.html'
+      - 'backend/**'
+      - 'tests/a11y/**'
+  workflow_dispatch:
+
+# Una ejecución por rama: empujar tres veces seguidas no deja tres auditorías
+# compitiendo por el mismo puerto.
+concurrency:
+  group: a11y-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  auditar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Instalar el backend
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Instalar el auditor
+        working-directory: ./tests/a11y
+        run: npm ci
+
+      # Solo Chromium: axe mide lo mismo en los tres motores y bajar los otros
+      # dos cuesta minuto y medio de nada.
+      - name: Bajar Chromium
+        working-directory: ./tests/a11y
+        run: npx playwright install --with-deps chromium
+
+      - name: Levantar el backend
+        working-directory: ./backend
+        run: |
+          npm start > "$RUNNER_TEMP/backend.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/backend.pid"
+
+      # El backend arranca PGlite la primera vez y tarda; esperar un número
+      # fijo de segundos es justo el error que esta auditoría existe para no
+      # repetir. Se espera a que conteste.
+      - name: Esperar a que conteste
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3001/ -o /dev/null; then
+              echo "el backend contesta al intento $i"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "el backend no contestó en 60 s"
+          cat "$RUNNER_TEMP/backend.log" || true
+          exit 1
+
+      - name: Pasar axe-core
+        id: axe
+        working-directory: ./tests/a11y
+        env:
+          A11Y_BASE_URL: http://127.0.0.1:3001
+        run: node audit.mjs
+
+      # El informe se guarda pase lo que pase: cuando falla es cuando hace
+      # falta, y el resumen en Markdown dice fichero y selector de cada cosa.
+      - name: Guardar el informe
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-${{ github.run_number }}
+          path: tests/a11y/report/
+          retention-days: 30
+
+      - name: Resumen en la ejecución
+        if: always()
+        run: cat tests/a11y/report/resumen.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Registro del backend si algo falló
+        if: failure()
+        run: cat "$RUNNER_TEMP/backend.log" || true
+
+      - name: Parar el backend
+        if: always()
+        run: kill "$(cat "$RUNNER_TEMP/backend.pid")" 2>/dev/null || true
