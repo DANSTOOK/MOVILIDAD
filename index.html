@@ -7218,37 +7218,51 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         <div class="sidebar-section-title"><span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:4px;">analytics</span>Análisis de Datos</div>
         <ul class="sidebar-nav">
           <li class="sidebar-nav-item">
-            <button class="sidebar-nav-link active" onclick="switchTab('cruce'); toggleSidebar();">
+            <button class="sidebar-nav-link active" data-tab="cruce" onclick="switchTab('cruce'); toggleSidebar();">
               <span class="sidebar-nav-icon material-symbols-outlined">compare_arrows</span>
               <span>Cruce</span>
               <span class="sidebar-nav-arrow">→</span>
             </button>
           </li>
           <li class="sidebar-nav-item">
-            <button class="sidebar-nav-link" onclick="switchTab('resumen'); toggleSidebar();">
+            <button class="sidebar-nav-link" data-tab="resumen" onclick="switchTab('resumen'); toggleSidebar();">
               <span class="sidebar-nav-icon material-symbols-outlined">summarize</span>
               <span>Resumen</span>
               <span class="sidebar-nav-arrow">→</span>
             </button>
           </li>
           <li class="sidebar-nav-item">
-            <button class="sidebar-nav-link" onclick="switchTab('detalle'); toggleSidebar();">
+            <button class="sidebar-nav-link" data-tab="detalle" onclick="switchTab('detalle'); toggleSidebar();">
               <span class="sidebar-nav-icon material-symbols-outlined">description</span>
               <span>Detalle</span>
               <span class="sidebar-nav-arrow">→</span>
             </button>
           </li>
           <li class="sidebar-nav-item">
-            <button class="sidebar-nav-link" onclick="switchTab('asesor'); toggleSidebar();">
+            <button class="sidebar-nav-link" data-tab="asesor" onclick="switchTab('asesor'); toggleSidebar();">
               <span class="sidebar-nav-icon material-symbols-outlined">groups</span>
               <span>Por Asesor</span>
               <span class="sidebar-nav-arrow">→</span>
             </button>
           </li>
           <li class="sidebar-nav-item">
-            <button class="sidebar-nav-link" onclick="switchTab('garantia'); toggleSidebar();">
+            <button class="sidebar-nav-link" data-tab="garantia" onclick="switchTab('garantia'); toggleSidebar();">
               <span class="sidebar-nav-icon material-symbols-outlined">verified</span>
-              <span>Stock/Garantía</span>
+              <span>Stock</span>
+              <span class="sidebar-nav-arrow">→</span>
+            </button>
+          </li>
+          <li class="sidebar-nav-item">
+            <button class="sidebar-nav-link" data-tab="inconsistencias" onclick="switchTab('inconsistencias'); toggleSidebar();">
+              <span class="sidebar-nav-icon material-symbols-outlined">rule</span>
+              <span>Inconsistencias</span>
+              <span class="sidebar-nav-arrow">→</span>
+            </button>
+          </li>
+          <li class="sidebar-nav-item">
+            <button class="sidebar-nav-link" data-tab="os-modelos" onclick="switchTab('os-modelos'); toggleSidebar();">
+              <span class="sidebar-nav-icon material-symbols-outlined">devices</span>
+              <span>OS &amp; Modelos</span>
               <span class="sidebar-nav-arrow">→</span>
             </button>
           </li>
@@ -7260,7 +7274,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         <div class="sidebar-section-title"><span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:4px;">save</span>Salida de Datos</div>
         <ul class="sidebar-nav">
           <li class="sidebar-nav-item">
-            <button class="sidebar-nav-link" onclick="switchTab('exportacion'); toggleSidebar();">
+            <button class="sidebar-nav-link" data-tab="exportacion" onclick="switchTab('exportacion'); toggleSidebar();">
               <span class="sidebar-nav-icon material-symbols-outlined">download</span>
               <span>Exportación</span>
               <span class="sidebar-nav-arrow">→</span>
@@ -7274,7 +7288,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         <div class="sidebar-section-title"><span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:4px;">settings</span>Sistema</div>
         <ul class="sidebar-nav">
           <li class="sidebar-nav-item">
-            <button class="sidebar-nav-link" onclick="switchTab('configuracion'); toggleSidebar();">
+            <button class="sidebar-nav-link" data-tab="configuracion" onclick="switchTab('configuracion'); toggleSidebar();">
               <span class="sidebar-nav-icon material-symbols-outlined">settings</span>
               <span>Configuración</span>
               <span class="sidebar-nav-arrow">→</span>
@@ -7615,6 +7629,12 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             <path d="M4 7h16M4 12h16M4 17h16M2 7h.01M2 12h.01M2 17h.01"/>
           </svg>
           Detalle
+        </button>
+        <button class="tab" onclick="switchTab('asesor')">
+          <svg class="tab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          </svg>
+          Por Asesor
         </button>
         <button class="tab" onclick="switchTab('garantia')">
           <svg class="tab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -10491,7 +10511,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                  style="flex: 1; min-width: 160px; padding:   8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--input-bg); color: var(--text); font-size: 12px;">
 
           <!-- BOTÓN LIMPIAR -->
-          <button onclick="clearAsesorFilters()" style="display:inline-flex; align-items:center; gap:  4px; padding:   8px 12px; background: rgba(226,0,26,0.1); color: var(--primary-ink, var(--primary)); border: 1px solid rgba(226,0,26,0.25); border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600;" title="Limpiar todos los filtros">
+          <button onclick="clearAsesorFilters()" style="display:inline-flex; align-items:center; gap:  4px; padding:   8px 12px; background: rgba(226,0,26,0.1); color: var(--ink-critico); border: 1px solid rgba(226,0,26,0.25); border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600;" title="Limpiar todos los filtros">
             <span class="material-symbols-outlined" style="font-size:14px;">close</span> Limpiar
           </button>
 
@@ -13570,26 +13590,24 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       if (tab !== 'cruce' && typeof closeKpiDetail === 'function') closeKpiDetail();
 
       // Actualizar tabs primero (sin fade, para que la barra roja sea correcta)
-      var tabNames = {
-        'cruce': 'cruce',
-        'resumen': 'resumen',
-        'detalle': 'detalle',
-        'inconsistencias': 'inconsistencias',
-        'os-modelos': 'os & modelos',
-        'garantia': 'stock',
-        'exportacion': 'exportación',
-        'configuracion': 'configuración',
-        'analytics': 'analytics'
-      };
-
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      /* La pestaña activa se busca por el destino que lleva en su onclick, no
+         por su texto.
+         Antes había una tabla que traducía cada destino a la etiqueta que se
+         ve ('garantia' -> 'stock', 'os-modelos' -> 'os & modelos') y se
+         comparaba con el textContent. Eso falla de dos maneras: si a alguien
+         le falta una entrada, esa pestaña no se marca nunca -le pasaba a
+         'asesor', que no estaba en la tabla-, y cualquier cambio de redacción
+         rompe el emparejamiento en silencio. El onclick dice exactamente a
+         dónde va cada botón y no depende de cómo se llame. */
       document.querySelectorAll('.tab').forEach(t => {
-        var tabLabel = tabNames[tab];
-        if (tabLabel && t.textContent.toLowerCase().includes(tabLabel)) {
-          t.classList.add('active');
-          // En móvil la barra es deslizable: traer la pestaña activa a la vista
+        var m = /switchTab\(\s*['"]([^'"]+)/.exec(t.getAttribute('onclick') || '');
+        var esLaSuya = m && m[1] === tab;
+        t.classList.toggle('active', esLaSuya);
+        // La barra es deslizable: traer la pestaña activa a la vista.
+        if (esLaSuya) {
           try {
-            if (window.innerWidth <= 768 && t.scrollIntoView) {
+            var barra = t.parentElement;
+            if (barra && barra.scrollWidth > barra.clientWidth + 2 && t.scrollIntoView) {
               t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
             }
           } catch(e) {}
@@ -22398,7 +22416,10 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
   (function(){
     'use strict';
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var TAB_ORDER = ['cruce','resumen','detalle','garantia','inconsistencias','exportacion','configuracion'];
+    /* Los nueve destinos, en el mismo orden en que se ven en la barra.
+       Faltaban 'asesor' y 'os-modelos': para esos indexOf daba -1 y la
+       seccion entraba por el lado que tocara. */
+    var TAB_ORDER = ['cruce','resumen','detalle','asesor','garantia','inconsistencias','os-modelos','exportacion','configuracion'];
     var lastIdx = 0;
 
     /* --- Indicador deslizante de pestaña --- */
@@ -22475,6 +22496,13 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             setTimeout(function(){ sec.classList.remove('anim-rows'); }, 1000);
           }
           lastIdx = newIdx;
+          /* El menu lateral marcaba Cruce para siempre: su funcion de
+             resaltado solo se llamaba desde switchTabFromSidebar, que no
+             usa nadie, y leia un data-tab que los enlaces no llevaban. Se
+             llama desde aqui, que es por donde pasan los tres caminos. */
+          if (typeof updateSidebarActiveState === 'function') {
+            try { updateSidebarActiveState(tab); } catch (e) {}
+          }
           requestAnimationFrame(function(){ moveSlider(); });
           return r;
         }
@@ -23171,7 +23199,10 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     { id:'tab-cruce',     icon:'📊', title:'Ir a Cruce de Datos',   meta:'Pestaña principal', action: () => switchTab && switchTab('cruce') },
     { id:'tab-resumen',   icon:'📈', title:'Ir a Resumen',           meta:'Vista ejecutiva',   action: () => switchTab && switchTab('resumen') },
     { id:'tab-detalle',   icon:'📋', title:'Ir a Detalle',           meta:'Vista por equipo',  action: () => switchTab && switchTab('detalle') },
-    { id:'tab-stock',     icon:'📦', title:'Ir a Stock/Garantía',    meta:'Inventario',        action: () => switchTab && switchTab('garantia') },
+    { id:'tab-asesor',    icon:'🧑', title:'Ir a Por Asesor',        meta:'Vista por persona', action: () => switchTab && switchTab('asesor') },
+    { id:'tab-stock',     icon:'📦', title:'Ir a Stock',             meta:'Inventario y garantía', action: () => switchTab && switchTab('garantia') },
+    { id:'tab-incon',     icon:'⚠️', title:'Ir a Inconsistencias',   meta:'Datos por revisar', action: () => switchTab && switchTab('inconsistencias') },
+    { id:'tab-os',        icon:'📱', title:'Ir a OS & Modelos',      meta:'Parque de equipos', action: () => switchTab && switchTab('os-modelos') },
     { id:'tab-export',    icon:'⬇️', title:'Ir a Exportación',       meta:'PDF, Excel, CSV',   action: () => switchTab && switchTab('exportacion') },
     { id:'tab-config',    icon:'⚙️', title:'Ir a Configuración',     meta:'Ajustes',           action: () => switchTab && switchTab('configuracion') },
     { id:'sound',         icon:'🔊', title:'Activar/desactivar sonido', meta:'Sound toggle',   action: () => window.toggleSound && window.toggleSound() },
@@ -26464,9 +26495,21 @@ function debugOSModelos() {
     margin-left: auto !important;
     margin-right: auto !important;
   }
+  /* Con nueve destinos la barra ya no cabe en una ventana mediana, y solo
+     se podia deslizar por debajo de 768px: entre medias se desbordaba y las
+     ultimas pestañas quedaban fuera de alcance. Se desliza siempre que haga
+     falta, a cualquier ancho, y sin barra de desplazamiento a la vista. */
+  .tabs {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs .tab { flex: 0 0 auto; }
+
   @media (max-width: 768px) {
-    /* En movil la barra no cabe y se desliza: fit-content la deja en su
-       ancho real y el max-width la recorta a la ventana. */
     .tabs { max-width: calc(100% - 24px) !important; }
   }
 

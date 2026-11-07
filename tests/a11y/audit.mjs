@@ -49,6 +49,9 @@ const TABS = [
   { id: 'cruce', label: 'Cruce' },
   { id: 'resumen', label: 'Resumen' },
   { id: 'detalle', label: 'Detalle' },
+  /* 'asesor' existia como seccion desde siempre, pero solo se llegaba a ella
+     por el menu lateral, asi que nadie la habia auditado nunca. */
+  { id: 'asesor', label: 'Por Asesor' },
   { id: 'garantia', label: 'Stock' },
   { id: 'inconsistencias', label: 'Inconsistencias' },
   { id: 'os-modelos', label: 'OS & Modelos' },
