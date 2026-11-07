@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.4.0 — 2026-11-07
+
+- fix: el panel de notificaciones sale a la capa superior del navegador
+- ci: axe-core en cada push, y los 202 fallos que encontro
+- style: la escala tipografica deja de ser un comentario y se usa
+- style: la barra de pestanas se encoge y el rojo pasa a ser una gota
+
 ## v1.3.2 — 2026-11-07
 
 - style: el aura de Siri, visible por fin en las dos tarjetas
