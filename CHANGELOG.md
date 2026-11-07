@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.1 — 2026-11-07
+
+- style: la fila de KPI toma el molde de las tarjetas de Stock
+
 ## v1.3.0 — 2026-11-07
 
 - style: tintas semanticas, un color por tema en las ocho pestañas
