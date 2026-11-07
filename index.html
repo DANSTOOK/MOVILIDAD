@@ -6789,7 +6789,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .map-plaza-chip:active { transform: translateY(-1px); }
     .mpc-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--chip-color, #999); box-shadow: 0 0 0 3px rgba(128,128,128,0.22); }
     .mpc-name { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .mpc-pct { font-size: 14px; font-weight: 800; color: var(--chip-color, #333); font-variant-numeric: tabular-nums; grid-row: 1 / 3; }
+    .mpc-pct { font-size: 14px; font-weight: 800; color: var(--chip-ink, var(--chip-color, #333)); font-variant-numeric: tabular-nums; grid-row: 1 / 3; }
     .mpc-meta { grid-column: 1 / 3; font-size: 11px; color: var(--text-light); }
     .ref-tooltip {
       background: rgba(255,255,255,0.9) !important;
@@ -9866,7 +9866,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             </div>
 
             <!-- KPI 2: HH Apagadas -->
-            <div class="kpi-circular-widget kpi-sin-anillo" style="cursor:default;">
+            <div data-kpi="apagados-hh" class="kpi-circular-widget kpi-sin-anillo" style="cursor:default;">
               <div class="kpi-circle-container">
                 <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                   <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
@@ -9881,7 +9881,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             </div>
 
             <!-- KPI 3: TT Apagadas -->
-            <div class="kpi-circular-widget kpi-sin-anillo" style="cursor:default;">
+            <div data-kpi="apagados-tt" class="kpi-circular-widget kpi-sin-anillo" style="cursor:default;">
               <div class="kpi-circle-container">
                 <svg class="kpi-circle-svg" viewBox="0 0 160 160">
                   <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(100,100,100,0.08)" stroke-width="6"/>
@@ -14138,6 +14138,9 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
         // Color dinámico según disponibilidad
         var statusColor = dispPct >= 98 ? 'var(--success)' : dispPct >= 95 ? 'var(--warning)' : 'var(--error)';
+        // El mismo color no sirve para el punto y para la cifra: el ambar de
+        // relleno sobre blanco da 2.03:1.
+        var statusInk = dispPct >= 98 ? 'var(--ink-ok)' : dispPct >= 95 ? 'var(--ink-ambar)' : 'var(--ink-critico)';
         var statusLabel = dispPct >= 98 ? 'Operativo' : dispPct >= 95 ? 'Atención' : 'Crítico';
         var fillOpacity = dispPct >= 98 ? 0.10 : dispPct >= 95 ? 0.15 : 0.20;
 
@@ -14180,7 +14183,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         }
 
         // Chip resumen de la plaza (clickeable)
-        chipsHtml += '<button class="map-plaza-chip" onclick="flyToPlaza(\'' + plazaName + '\')" style="--chip-color:' + statusColor + ';">' +
+        chipsHtml += '<button class="map-plaza-chip" onclick="flyToPlaza(\'' + plazaName + '\')" style="--chip-color:' + statusColor + '; --chip-ink:' + statusInk + ';">' +
           '<span class="mpc-dot"></span>' +
           '<span class="mpc-name">' + (geo.label || plazaName) + '</span>' +
           '<span class="mpc-pct">' + dispPct.toFixed(1) + '%</span>' +
@@ -14866,6 +14869,9 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         // Barra de progreso visual
         var progressPct = dispNum;
         var progressColor = dispNum >= 99 ? 'var(--success)' : dispNum >= 97 ? 'var(--warning)' : 'var(--error)';
+      // Para TEXTO hace falta la tinta, no el relleno: el ambar de relleno
+      // sobre blanco da 2.03:1. El borde y la barra siguen con el saturado.
+      var statusInk = dispNum >= 99 ? 'var(--ink-ok)' : dispNum >= 97 ? 'var(--ink-ambar)' : 'var(--ink-critico)';
 
         html += `<div style="padding:   20px; background: var(--card-bg);
                            border: 1px solid var(--border); border-left: 4px solid ${r.color};
@@ -14920,7 +14926,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <div style="position: relative; z-index: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom:   8px;">
               <div style="font-size: 11px; font-weight: 600; color: var(--text-light); letter-spacing:0;">Disponibilidad</div>
-              <div style="font-size: 18px; font-weight: 800; color: ${progressColor};">${r.disp}%</div>
+              <div style="font-size: 18px; font-weight: 800; color: ${statusInk};">${r.disp}%</div>
             </div>
             <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
               <div style="width: ${progressPct}%; height: 100%; background: linear-gradient(90deg, ${progressColor} 0%, ${progressColor}dd 100%);
@@ -14931,7 +14937,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <!-- Badge de estado -->
           <div style="display: flex; gap:   8px; position: relative; z-index: 1;">
             <div style="flex: 1; padding:   8px 12px; background: ${statusBg}; border-radius: 8px; border: 1px solid ${statusColor}; text-align: center;">
-              <div style="font-size: 11px; font-weight: 600; color: ${statusColor}; letter-spacing:0;">
+              <div style="font-size: 11px; font-weight: 600; color: ${statusInk}; letter-spacing:0;">
                 ${dispNum >= 99 ? '✓ Excelente' : dispNum >= 97 ? '⚠ Bueno' : '⛔ Crítico'}
               </div>
             </div>
@@ -25783,15 +25789,146 @@ function debugOSModelos() {
   /* Utilidad suelta, por si se escribe marcado nuevo con la guía */
   .glass-panel { border-radius: var(--radius-md); }
 </style>
-<script>
-  // El cristal necesita fondo oscuro: el tema oscuro pasa a ser el de
-  // arranque. El claro sigue disponible desde el conmutador de siempre.
-  (function () {
-    if (!document.documentElement.getAttribute('data-theme')) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-  })();
-</script>
+<style id="kpi-molde-estado">
+  /* ==========================================================
+     LA FILA DE KPI, CON EL MOLDE DE LAS TARJETAS DE STOCK
+
+     Dos cosas estaban mal hechas y se ven en cuanto te fijas:
+
+     · Debajo de cada numero habia una rayita de 22x2 px (un ::after
+       decorativo) que no decia nada y que chocaba con el texto de
+       abajo: en "Total (BD)" la nota de dos lineas le caia encima.
+     · Ese texto era un .kpi-tooltip con opacity:0 pero dentro del
+       flujo, asi que reservaba 43 px de hueco en una tarjeta y nada
+       en las demas, y al pasar el raton aparecia justo sobre la raya.
+
+     La raya se va. El texto deja de ser un tooltip a medias y pasa a
+     ser el pie de la tarjeta, que es lo que ya hacen las tarjetas de
+     Robo / Danada / Garantia en Stock. De ahi sale tambien el resto:
+     acento de color por estado, punto junto a la etiqueta, el circulo
+     suave de la esquina que crece al pasar por encima, y el empujon
+     de 3 px hacia arriba.
+     ========================================================== */
+
+  .section div.kpi-circular-widget {
+    --kpi-acento: var(--text);
+    --kpi-anillo: rgba(0, 0, 0, 0.08);
+    position: relative !important;
+    overflow: hidden !important;
+    gap: 4px !important;
+  }
+  [data-theme="dark"] .section div.kpi-circular-widget {
+    --kpi-anillo: rgba(255, 255, 255, 0.12);
+  }
+
+  /* El acento dice de que va la tarjeta: las apagadas son una falta,
+     la disponibilidad depende de como vaya, y los conteos de contexto
+     (total de la base, tiendas) se quedan neutros a proposito. */
+  .section div.kpi-circular-widget[data-kpi="apagados-hh"],
+  .section div.kpi-circular-widget[data-kpi="apagados-tt"] { --kpi-acento: var(--ink-critico); }
+  .section div.kpi-circular-widget.status-success { --kpi-acento: var(--kpi-ok); }
+  .section div.kpi-circular-widget.status-warning { --kpi-acento: var(--ink-ambar); }
+  .section div.kpi-circular-widget.status-error   { --kpi-acento: var(--ink-critico); }
+
+  /* El circulo de la esquina: el mismo gesto que en Stock. */
+  .section div.kpi-circular-widget::after {
+    content: "" !important;
+    display: block !important;
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: var(--kpi-acento);
+    opacity: 0.06;
+    transition: transform var(--mov-lento) var(--mov-curva),
+                opacity   var(--mov-lento) var(--mov-curva);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .section div.kpi-circular-widget > * { position: relative; z-index: 1; }
+  .section div.kpi-circular-widget:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: var(--shadow-3) !important;
+  }
+  .section div.kpi-circular-widget:hover::after {
+    transform: scale(1.2);
+    opacity: 0.12;
+  }
+  /* Quien no quiere movimiento no lo tiene. */
+  @media (prefers-reduced-motion: reduce) {
+    .section div.kpi-circular-widget:hover { transform: none !important; }
+    .section div.kpi-circular-widget:hover::after { transform: none; }
+  }
+
+  /* El punto de la etiqueta, como en las tarjetas de estado. */
+  .section div.kpi-circular-widget .kpi-label::before {
+    content: "";
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--kpi-acento);
+    box-shadow: 0 0 0 3px var(--kpi-anillo);
+    flex: 0 0 auto;
+  }
+  /* "Disponibilidad HH" ocupa dos lineas y las demas etiquetas una, asi
+     que los numeros quedaban a dos alturas distintas (16 px de desnivel).
+     Reservando dos lineas en todas, la fila se lee recta. */
+  .section div.kpi-circular-widget .kpi-label {
+    letter-spacing: 0.06em !important;
+    align-items: flex-start !important;
+    min-height: calc(1.3em * 2);
+  }
+  .section div.kpi-circular-widget .kpi-label::before { margin-top: 0.15em; }
+
+  /* El numero toma el acento, y se va la rayita de debajo. */
+  .section div.kpi-circular-widget .kpi-number {
+    color: var(--kpi-acento) !important;
+    font-variant-numeric: tabular-nums;
+  }
+  .section div.kpi-circular-widget .kpi-number::after,
+  .section div.kpi-circular-widget .kpi-number::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  /* El tooltip a medias pasa a ser el pie de la tarjeta. */
+  .section div.kpi-circular-widget .kpi-tooltip {
+    position: static !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    margin: auto 0 0 !important;
+    padding: 8px 0 0 !important;
+    inset: auto !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    font-size: var(--fs-micro) !important;
+    font-weight: 400 !important;
+    line-height: 1.35 !important;
+    color: var(--text-light) !important;
+    white-space: normal !important;
+    max-width: none !important;
+    width: auto !important;
+    text-align: left !important;
+    pointer-events: none;
+  }
+  .section div.kpi-circular-widget .kpi-tooltip::before,
+  .section div.kpi-circular-widget .kpi-tooltip::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  /* La barra de proporcion se queda, pero con el color del acento y
+     al fondo del todo, que es donde no estorba. */
+  .section div.kpi-circular-widget .kpi-barra { margin-top: 10px !important; }
+  .section div.kpi-circular-widget .kpi-barra > i { background: var(--kpi-acento) !important; }
+</style>
+
+<!-- El tema de arranque vuelve a ser el claro de siempre. La piel de cristal
+     sigue ahi, en el tema oscuro, pero se entra a ella desde el conmutador:
+     no se le impone a nadie al abrir la aplicacion. -->
 
 <style id="ink-system">
   /* ==========================================================
@@ -25817,6 +25954,10 @@ function debugOSModelos() {
     --ink-cabecera:#D1001B;
     --ink-ambar:#8A5A00;
     --warning-ink:#8A5A00;
+    /* El rojo de marca como TEXTO: #E2001A sobre las tejas rosa palidas
+       da 4.14:1. Ocho por ciento mas oscuro y pasa, sin tocar rellenos. */
+    --primary-ink:#D1001B;
+    --error-ink:#B3261E;
 
     --estado-off-bg:#FFEBEE;             --estado-off-fg:#C62828;
     --estado-rec-bg:#FFF3E0;             --estado-rec-fg:#E65100;
@@ -25890,6 +26031,10 @@ function debugOSModelos() {
     --ink-cabecera:#D1001B;
     --ink-ambar:#8A5A00;
     --warning-ink:#8A5A00;
+    /* El rojo de marca como TEXTO: #E2001A sobre las tejas rosa palidas
+       da 4.14:1. Ocho por ciento mas oscuro y pasa, sin tocar rellenos. */
+    --primary-ink:#D1001B;
+    --error-ink:#B3261E;
     --primary-ink:#E2001A;         --error-ink:#B3261E;
     --card-bg:#FFFFFF;             --surface:#F8F1F5;
     --text:#1C1B1F;                --text-light:#49454F;
