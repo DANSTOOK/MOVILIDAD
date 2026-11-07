@@ -22289,14 +22289,39 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       if(!tabs) return null;
       var sl = tabs.querySelector('.tab-slider');
       if(!sl){ sl = document.createElement('div'); sl.className = 'tab-slider'; tabs.appendChild(sl); }
+      if(!tabs.__gotaRO && typeof ResizeObserver !== 'undefined'){
+        tabs.__gotaRO = new ResizeObserver(function(){ moveSlider(); });
+        tabs.__gotaRO.observe(tabs);
+      }
       return sl;
     }
-    function moveSlider(){
+    function moveSlider(destino){
       var tabs = document.querySelector('.tabs'); if(!tabs) return;
-      var active = tabs.querySelector('.tab.active'); var sl = ensureSlider();
+      var active = destino || tabs.querySelector('.tab.active'); var sl = ensureSlider();
       if(!active || !sl) return;
-      sl.style.left = active.offsetLeft + 'px';
+      /* Con las pestañas aun ocultas offsetWidth es 0: colocar la gota ahi
+         la deja en nada y, como la pestaña activa ya no se pinta sola, no
+         quedaria ningun indicador hasta el primer clic. */
+      if(!active.offsetWidth) return;
+      var antes = parseFloat(sl.style.left) || 0;
+      var meta = active.offsetLeft;
+      /* La gota se estira mientras viaja y se asienta al llegar: se le pone
+         la clase al salir y se le quita a mitad de camino, asi la
+         deformacion se relaja antes de que termine el desplazamiento. */
+      if (!reduce && tabs.classList.contains('gota-lista') && Math.abs(meta - antes) > 1) {
+        tabs.classList.add('gota-viaja');
+        clearTimeout(tabs.__gota);
+        tabs.__gota = setTimeout(function(){ tabs.classList.remove('gota-viaja'); }, 190);
+      }
+      sl.style.left = meta + 'px';
       sl.style.width = active.offsetWidth + 'px';
+      /* El blanco del texto viaja con la gota, no con .active: entre el clic
+         y el final del render hay casi un segundo, y en ese hueco la pestaña
+         activa sigue siendo la anterior. */
+      var previas = tabs.querySelectorAll('.tab.gota-aqui');
+      for (var i = 0; i < previas.length; i++) previas[i].classList.remove('gota-aqui');
+      active.classList.add('gota-aqui');
+      tabs.classList.add('gota-lista');
     }
 
     /* --- Envolver switchTab: dirección + filas + slider --- */
@@ -22307,24 +22332,59 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       window.switchTab = function(tab){
         var newIdx = TAB_ORDER.indexOf(tab); if(newIdx < 0) newIdx = lastIdx;
         var dir = newIdx >= lastIdx ? 'from-right' : 'from-left';
-        var r = orig.apply(this, arguments);
-        var sec = document.getElementById(tab);
-        if(sec && !reduce){
-          sec.classList.remove('from-left','from-right'); void sec.offsetWidth;
-          sec.classList.add(dir);
-          sec.classList.add('anim-rows');
-          setTimeout(function(){ sec.classList.remove('anim-rows'); }, 1000);
+        var ctx = this, args = arguments;
+
+        /* La gota sale ANTES de pintar la seccion. Pintar una pestaña entera
+           (tablas, graficas) bloquea el hilo cerca de un segundo, y mientras
+           el hilo esta ocupado el navegador no dibuja un solo fotograma: con
+           el orden de antes la gota aparecia ya puesta en su destino, sin
+           viaje. Se busca el boton por su propio onclick en vez de esperar a
+           que la aplicacion marque .active, que lo hace dentro del render. */
+        var btn = null, bs = document.querySelectorAll('.tabs .tab');
+        for (var i = 0; i < bs.length; i++) {
+          var m = /switchTab\(\s*['\"]([^'\"]+)/.exec(bs[i].getAttribute('onclick') || '');
+          if (m && m[1] === tab) { btn = bs[i]; break; }
         }
-        lastIdx = newIdx;
-        requestAnimationFrame(moveSlider);
-        return r;
+        if (btn) moveSlider(btn);
+
+        function pintar(){
+          var r = orig.apply(ctx, args);
+          var sec = document.getElementById(tab);
+          if(sec && !reduce){
+            sec.classList.remove('from-left','from-right'); void sec.offsetWidth;
+            sec.classList.add(dir);
+            sec.classList.add('anim-rows');
+            setTimeout(function(){ sec.classList.remove('anim-rows'); }, 1000);
+          }
+          lastIdx = newIdx;
+          requestAnimationFrame(function(){ moveSlider(); });
+          return r;
+        }
+
+        /* Un fotograma de respiro para que la gota llegue a dibujarse en
+           movimiento. Se puede: ningun sitio usa lo que devuelve switchTab
+           (37 llamadas, todas de usar y tirar) y lo unico que corre justo
+           despues -cerrar el menu lateral, subir el scroll- no mira el
+           contenido nuevo. Sin gota, o sin movimiento, se pinta ya. */
+        if (btn && !reduce) { requestAnimationFrame(pintar); return; }
+        return pintar();
       };
     }
     hookSwitch();
     window.addEventListener('load', function(){ ensureSlider(); moveSlider(); });
     window.addEventListener('resize', moveSlider);
-    setTimeout(moveSlider, 800);
-    setTimeout(moveSlider, 1600);
+    /* La barra pasa de oculta a visible cuando se cargan los datos, y eso no
+       dispara load, ni resize, ni switchTab. Se insiste hasta que la gota
+       encuentra sitio, y se deja de insistir en cuanto lo encuentra: sin
+       esto la pestaña activa se queda sin marcar hasta el primer clic. */
+    (function(){
+      var intentos = 0;
+      var reloj = setInterval(function(){
+        moveSlider();
+        var t = document.querySelector('.tabs');
+        if((t && t.classList.contains('gota-lista')) || ++intentos > 40) clearInterval(reloj);
+      }, 300);
+    })();
 
     /* --- Ripple en pestañas y botones clave --- */
     document.addEventListener('click', function(e){
@@ -26224,6 +26284,112 @@ function debugOSModelos() {
     .section div.kpi-circular-widget:hover,
     .section .estado-card:hover,
     .section .dashboard-card:hover { top: 0 !important; }
+  }
+</style>
+
+<style id="pestanas-gota">
+  /* ==========================================================
+     LA BARRA DE PESTANAS Y LA GOTA
+
+     Dos cosas, y la segunda sale de la primera.
+
+     La barra ocupaba todo el ancho con las pestanas apretadas a la
+     izquierda: ocho elementos y medio metro de hueco muerto a la derecha.
+     margin:auto no la centraba porque un contenedor de bloque ya mide
+     todo el ancho disponible; sin width:fit-content no hay nada que
+     centrar. Ahora la banda mide lo que miden sus pestanas.
+
+     Y el indicador: habia una rayita de 3px abajo que no se veia, porque
+     la pestana activa se pintaba ella misma de rojo. Eso hace que el rojo
+     aparezca y desaparezca de golpe en dos sitios distintos. Ahora el rojo
+     es UNA sola pastilla que viaja: sale de la pestana que dejas, se
+     estira por el camino y se asienta en la que abres.
+     ========================================================== */
+
+  :root {
+    --gota-viaje: 0.44s;
+    --gota-curva: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --gota-hueco: 8px;            /* el padding de la barra */
+  }
+
+  /* --- La banda se encoge y se centra -------------------------------- */
+  .tabs {
+    width: fit-content !important;
+    max-width: calc(100% - 28px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  @media (max-width: 768px) {
+    /* En movil la barra no cabe y se desliza: fit-content la deja en su
+       ancho real y el max-width la recorta a la ventana. */
+    .tabs { max-width: calc(100% - 24px) !important; }
+  }
+
+  /* --- La gota -------------------------------------------------------- */
+  .tabs .tab-slider {
+    top: var(--gota-hueco);
+    bottom: var(--gota-hueco);
+    height: auto;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #E2001A, #B80018);
+    box-shadow: 0 6px 16px -2px rgba(226, 0, 26, 0.28);
+    z-index: 0;
+    transform-origin: center;
+    transition: left var(--gota-viaje) var(--gota-curva),
+                width var(--gota-viaje) var(--gota-curva),
+                transform 0.3s var(--gota-curva);
+  }
+  /* El estiramiento del viaje: un pelo mas ancha y un pelo mas baja, que
+     es como se deforma algo con peso cuando arranca. */
+  .tabs.gota-viaja .tab-slider { transform: scaleX(1.06) scaleY(0.9); }
+
+  /* El contenido de cada pestana va por encima de la gota. */
+  .tabs .tab { position: relative; z-index: 1; }
+
+  /* La pestana activa deja de pintarse de rojo ella misma: ese rojo es ya
+     la gota. Se condiciona a gota-lista para que, si el indicador no llega
+     a colocarse, la pestana activa siga marcandose como antes. */
+  .tabs.gota-lista .tab.active {
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+  /* El texto y el icono en blanco van donde este la gota, no donde este la
+     clase .active: durante el viaje son pestañas distintas. */
+  .tabs.gota-lista .tab.gota-aqui,
+  .tabs.gota-lista .tab.gota-aqui .material-symbols-outlined,
+  .tabs.gota-lista .tab.gota-aqui .tab-icon-svg {
+    color: #ffffff !important;
+    stroke: #ffffff !important;
+  }
+  /* Y la que deja de tener la gota vuelve al gris aunque siga siendo la
+     activa para la aplicacion. */
+  .tabs.gota-lista .tab.active:not(.gota-aqui),
+  .tabs.gota-lista .tab.active:not(.gota-aqui) .material-symbols-outlined,
+  .tabs.gota-lista .tab.active:not(.gota-aqui) .tab-icon-svg {
+    color: var(--text-light) !important;
+    stroke: var(--text-light) !important;
+  }
+
+  /* El texto de la pestaña activa se quedaba en blanco al 68% sobre el rojo
+     (3.27:1). La causa: .tab lleva una transicion de color de 0.12s que se
+     queda a medias, y una transicion en curso gana al !important, asi que
+     el blanco declarado no llegaba a aplicarse nunca.
+     Dos candados: el color deja de transicionar en la barra -lo que se
+     mueve ya es la gota, no hace falta desvanecer nada- y el relleno del
+     texto se fija aparte, que no esta en la lista de transiciones. */
+  .tabs .tab { transition-property: transform, box-shadow !important; }
+  .tabs.gota-lista .tab.gota-aqui,
+  .tabs.gota-lista .tab.gota-aqui .material-symbols-outlined {
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  .tabs.gota-lista .tab.active:not(.gota-aqui),
+  .tabs.gota-lista .tab.active:not(.gota-aqui) .material-symbols-outlined {
+    -webkit-text-fill-color: var(--text-light) !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tabs.gota-viaja .tab-slider { transform: none !important; }
   }
 </style>
 
