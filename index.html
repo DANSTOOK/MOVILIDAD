@@ -7331,7 +7331,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       <input type="file" id="logo-file-input" accept="image/*" style="display:none" onchange="onLogoSelected(event)">
 
       <div class="app-bar-title">
-        <h1>Sistema de Reportes de Movilidad</h1>
+        <h1>OXXO Movilidad</h1>
         <p>Análisis de equipos y conexiones en tiempo real</p>
       </div>
 
@@ -16580,7 +16580,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       var dom = document.getElementById(containerId);
       if (!dom) return;
       if (!points || points.length < 2) {
-        dom.parentElement.innerHTML = '<div class="dashboard-empty">Aun no hay snapshots suficientes. Guarda al menos uno desde Detalle para ver tendencia.</div>';
+        dom.parentElement.innerHTML = '<div class="dashboard-empty">Sin histórico todavía. Guarda al menos un snapshot desde Detalle para ver la tendencia.</div>';
         return;
       }
       var chart = initEChart(containerId);
@@ -16660,7 +16660,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       var dom = document.getElementById(containerId);
       if (!dom) return;
       if (!labels.length) {
-        dom.parentElement.innerHTML = '<div class="dashboard-empty">Sin datos para graficar</div>';
+        dom.parentElement.innerHTML = '<div class="dashboard-empty">Sin datos para esta gráfica. Prueba con otra plaza o quita los filtros.</div>';
         return;
       }
       var chart = initEChart(containerId);
@@ -16767,7 +16767,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       var dom = document.getElementById(containerId);
       if (!dom) return;
       if (!labels.length || !valuesA.length || !valuesB.length) {
-        dom.parentElement.innerHTML = '<div class="dashboard-empty">Sin datos para graficar</div>';
+        dom.parentElement.innerHTML = '<div class="dashboard-empty">Sin datos para esta gráfica. Prueba con otra plaza o quita los filtros.</div>';
         return;
       }
       var chart = initEChart(containerId);
@@ -16850,7 +16850,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       if (!dom) return;
       var sum = values.reduce(function(a,b){ return a+b; }, 0);
       if (!sum) {
-        dom.parentElement.innerHTML = '<div class="dashboard-empty">Sin datos para graficar</div>';
+        dom.parentElement.innerHTML = '<div class="dashboard-empty">Sin datos para esta gráfica. Prueba con otra plaza o quita los filtros.</div>';
         return;
       }
       var chart = initEChart(containerId);
@@ -16903,7 +16903,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       var dom = document.getElementById(containerId);
       if (!dom) return;
       if (!labels.length) {
-        dom.parentElement.innerHTML = '<div class="dashboard-empty">Sin datos para graficar</div>';
+        dom.parentElement.innerHTML = '<div class="dashboard-empty">Sin datos para esta gráfica. Prueba con otra plaza o quita los filtros.</div>';
         return;
       }
       var chart = initEChart(containerId);
@@ -17874,7 +17874,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           </td>
         </tr>`;
       });
-      document.getElementById('plaza-issues-table').innerHTML = html || '<tr><td colspan="4" style="text-align: center; padding:   20px;">No hay equipos sin plaza</td></tr>';
+      document.getElementById('plaza-issues-table').innerHTML = html || '<tr><td colspan="4" style="text-align: center; padding:   20px;">Todos los equipos tienen plaza asignada</td></tr>';
     }
 
     /* EXPORT FUNCTIONS */
@@ -23219,7 +23219,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     const q = (filter||'').toLowerCase();
     const items = COMMANDS.filter(c => !q || c.title.toLowerCase().includes(q) || (c.meta||'').toLowerCase().includes(q));
     if (!items.length) {
-      results.innerHTML = '<div class="cmd-empty">No hay resultados</div>';
+      results.innerHTML = '<div class="cmd-empty">Sin resultados para esa búsqueda</div>';
       return;
     }
     active = Math.min(active, items.length - 1);
