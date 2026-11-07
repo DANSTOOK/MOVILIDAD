@@ -16,19 +16,13 @@
 name: Accesibilidad y contraste
 
 on:
+  # Sin filtros de ramas ni de rutas, a propósito: corre en cada push y en cada
+  # pull request. El contraste se rompe desde sitios que no parecen tocar el
+  # tablero — una variable de color, un opacity heredado, un pseudo-elemento —
+  # así que filtrar por ruta sería volver a elegir qué se mide, que es la clase
+  # de atajo que ya dejó pasar cuatro regresiones.
   push:
-    branches: [ main, develop ]
-    paths:
-      - 'index.html'
-      - 'backend/**'
-      - 'tests/a11y/**'
-      - '.github/workflows/a11y.yml'
   pull_request:
-    branches: [ main, develop ]
-    paths:
-      - 'index.html'
-      - 'backend/**'
-      - 'tests/a11y/**'
   workflow_dispatch:
 
 # Una ejecución por rama: empujar tres veces seguidas no deja tres auditorías
