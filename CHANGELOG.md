@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.2 — 2026-11-07
+
+- style: el aura de Siri, visible por fin en las dos tarjetas
+
 ## v1.3.1 — 2026-11-07
 
 - style: la fila de KPI toma el molde de las tarjetas de Stock
