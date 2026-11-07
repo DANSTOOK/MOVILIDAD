@@ -24903,6 +24903,21 @@ function renderOSModelos() {
   renderModelsTable(data);
 }
 
+  /* La pastilla se rellena con un color de la paleta y el texto iba en
+     blanco fijo. Sobre el ambar #F5A623 eso da 2.03:1, y sobre el teal y
+     el naranja tampoco llega. La tinta se decide por la luminancia del
+     relleno: negra sobre los claros, blanca sobre los oscuros. */
+  function tintaSobre(hex) {
+    var m = String(hex).replace("#", "");
+    if (m.length === 3) m = m[0] + m[0] + m[1] + m[1] + m[2] + m[2];
+    var c = [0, 2, 4].map(function (i) {
+      var v = parseInt(m.substr(i, 2), 16) / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    var L = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    /* contraste contra negro frente a contraste contra blanco */
+    return (L + 0.05) / 0.05 >= 1.05 / (L + 0.05) ? "#1A1A1A" : "#FFFFFF";
+  }
 function renderOSVersionTable(data) {
   var osStats = {};
   var i;
@@ -24931,7 +24946,7 @@ function renderOSVersionTable(data) {
 
     html += '<tr style="background:' + bgColor + '; border-bottom:1px solid var(--border);">' +
       '<td style="padding:  12px 16px;"><strong>' + escHTML(item.os) + '</strong></td>' +
-      '<td style="padding:  12px 16px; text-align:right;"><span style="background:' + color + '; color:white; padding:  4px 8px; border-radius:6px; font-weight: 600; display:inline-block;">' + item.count + '</span></td>' +
+      '<td style="padding:  12px 16px; text-align:right;"><span style="background:' + color + '; color:' + tintaSobre(color) + '; padding:  4px 8px; border-radius:6px; font-weight: 600; display:inline-block;">' + item.count + '</span></td>' +
       '<td style="padding:  12px 16px; text-align:right; font-weight: 600; color:var(--text);">' + pct + '%</td>' +
       '<td style="padding:  12px 16px;"><div style="background:var(--surface); border-radius:6px; height:8px; width:150px;"><div style="background:' + color + '; height:100%; width:' + pct + '%; border-radius:6px;"></div></div></td>' +
       '</tr>';
@@ -25003,7 +25018,7 @@ function renderModelsTable(data) {
 
     html += '<tr style="border-bottom:1px solid var(--border);">' +
       '<td style="padding:  12px 16px;"><strong>' + escHTML(item.model) + '</strong></td>' +
-      '<td style="padding:  12px 16px; text-align:right;"><span style="background:' + color + '; color:white; padding:  4px 8px; border-radius:6px; font-weight: 600;">' + item.count + '</span></td>' +
+      '<td style="padding:  12px 16px; text-align:right;"><span style="background:' + color + '; color:' + tintaSobre(color) + '; padding:  4px 8px; border-radius:6px; font-weight: 600;">' + item.count + '</span></td>' +
       '<td style="padding:  12px 16px; text-align:right; font-weight: 600; color:var(--text);">' + pct + '%</td>' +
       '<td style="padding:  12px 16px;"><div style="background:var(--surface); border-radius:6px; height:6px; width:120px; overflow:hidden;"><div style="background:' + color + '; height:100%; width:' + pct + '%;"></div></div></td>' +
       '</tr>';
@@ -25724,60 +25739,9 @@ function debugOSModelos() {
     border-radius: var(--radius-md) !important;
   }
 
-  /* ── El aura ────────────────────────────────────────────────────────
-     Solo en lo que se puede pulsar, y solo al pasar por encima: si todo
-     brilla, no destaca nada. Anclada en el rojo de marca para que siga
-     pareciendo esta aplicación y no otra. */
-  [data-theme="dark"] .siri-wrapper,
-  [data-theme="dark"] .section div.kpi-circular-widget,
-  [data-theme="dark"] .section .dashboard-card,
-  [data-theme="dark"] .section .estado-card,
-  [data-theme="dark"] .section .export-card {
-    position: relative;
-    z-index: 1;
-  }
-  [data-theme="dark"] .siri-wrapper::before,
-  [data-theme="dark"] .section div.kpi-circular-widget::before,
-  [data-theme="dark"] .section .dashboard-card::before,
-  [data-theme="dark"] .section .estado-card::before,
-  [data-theme="dark"] .section .export-card::before {
-    content: "";
-    position: absolute;
-    inset: -4px;
-    z-index: -1;
-    border-radius: calc(var(--radius-md) + 4px);
-    background: linear-gradient(-45deg, #00D4FF, #E2001A, #7C5CFF, #FF3B5C);
-    background-size: 300% 300%;
-    filter: blur(14px);
-    opacity: 0;
-    transition: opacity var(--mov-lento) var(--mov-curva);
-    pointer-events: none;
-    display: block !important;
-  }
-  [data-theme="dark"] .siri-wrapper:hover::before,
-  [data-theme="dark"] .section div.kpi-circular-widget:hover::before,
-  [data-theme="dark"] .section .dashboard-card:hover::before,
-  [data-theme="dark"] .section .estado-card:hover::before,
-  [data-theme="dark"] .section .export-card:hover::before {
-    opacity: 0.85;
-    animation: siri-waves 3s ease infinite;
-  }
-  @keyframes siri-waves {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  [data-theme="dark"] .siri-wrapper:hover,
-  [data-theme="dark"] .section div.kpi-circular-widget:hover,
-  [data-theme="dark"] .section .dashboard-card:hover {
-    transform: translateY(-4px);
-  }
-
-  /* Quien pide menos movimiento no recibe ni el aura ni el desplazamiento */
-  @media (prefers-reduced-motion: reduce) {
-    [data-theme="dark"] *:hover::before { animation: none !important; }
-    [data-theme="dark"] *:hover { transform: none !important; }
-  }
+  /* El aura vive ahora en <style id="aura-cards">, al final del documento:
+     estaba aquí atada al tema oscuro y recortada por el overflow de las
+     tarjetas, así que no se veía nunca. */
 
   /* El icono de cada tarjeta de gráfica iba rojo sobre una teja roja: sobre
      cristal oscuro daba 2.39:1. Con la teja neutra, el rojo claro destaca. */
@@ -26056,6 +26020,211 @@ function debugOSModelos() {
     border:1px solid var(--border);
   }
   [data-theme="dark"] .btn-secondary:hover:not(:disabled) { background:rgba(255,255,255,0.14); }
+</style>
+
+<style id="aura-cards">
+  /* ==========================================================
+     EL AURA DE LAS TARJETAS
+
+     Estaba escrita, pero no se veía nunca, por tres motivos a la vez:
+
+     · Vivía dentro de [data-theme="dark"], y la aplicación arranca en
+       claro. Al quitar el arranque oscuro forzado, el efecto se quedó
+       en un tema que casi nadie abre.
+     · Las tarjetas llevan overflow:hidden para recortar el círculo de la
+       esquina, y eso recorta también el aura, que por definición vive
+       fuera del borde.
+     · El aura iba en un ::before con z-index:-1 sobre una tarjeta con
+       z-index:1. Al declarar z-index, la tarjeta crea contexto de apilado,
+       y entonces un hijo negativo ya no pinta DETRAS del fondo de la
+       tarjeta, sino ENCIMA: en vez de un halo alrededor queda una neblina
+       de colores sobre la cara.
+
+     Los tres arreglos: el aura sale del tema oscuro, el círculo de la
+     esquina pasa a ser un lavado de fondo contenido en la tarjeta (y así
+     sobra el overflow), y la tarjeta se queda en z-index:auto.
+     ========================================================== */
+
+  /* El aura, anclada en el rojo de marca para que siga pareciendo esta
+     aplicación. En claro pide color más cerrado y menos opacidad: sobre
+     blanco un halo claro no se ve, y uno fuerte ensucia. */
+  :root {
+    --aura-1: rgba(0, 150, 200, 0.85);
+    --aura-2: rgba(209, 0, 27, 0.80);
+    --aura-3: rgba(104, 70, 230, 0.75);
+    --aura-4: rgba(226, 0, 110, 0.75);
+    --aura-op: 0.55;
+    --aura-difuso: 15px;
+    --aura-anillo: 12px;
+  }
+  [data-theme="dark"] {
+    --aura-1: #00D4FF;
+    --aura-2: #E2001A;
+    --aura-3: #7C5CFF;
+    --aura-4: #FF3B5C;
+    --aura-op: 0.85;
+    --aura-difuso: 14px;
+    --aura-anillo: 12px;
+  }
+
+  /* --- El lavado de la esquina ---------------------------------------
+     El mismo gesto que tenían las tarjetas de Stock (un acento que asoma
+     por la esquina de arriba a la derecha y crece al pasar por encima),
+     pero pintado como fondo de una capa que ocupa la tarjeta entera: así
+     no se sale nunca y no hace falta recortar nada.
+     En las de Stock esta misma capa lleva además el tiñe de estado, que
+     antes iba en el ::before; ese hueco lo necesita el aura. */
+  .section div.kpi-circular-widget,
+  .section .estado-card {
+    overflow: visible !important;
+    position: relative !important;
+    z-index: auto !important;
+    /* isolation:isolate tambien crea contexto de apilado, y las de KPI lo
+       traian de antes. Mismo efecto que el transform: el aura acababa
+       pintada sobre la cara de la tarjeta en vez de detras. */
+    isolation: auto !important;
+  }
+  .section div.kpi-circular-widget::after,
+  .section .estado-card::after {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: inherit !important;
+    opacity: 1 !important;
+    /* El ::after llevaba background: var(--acento) como atajo, es decir un
+       color de fondo solido. Al pasar de circulo de 110px a capa que ocupa
+       la tarjeta entera, ese color la pintaba por completo. */
+    background-color: transparent !important;
+    transform: none !important;
+    background-repeat: no-repeat !important;
+    transition: background-size var(--mov-lento) var(--mov-curva) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+  .section div.kpi-circular-widget::after {
+    background-image: radial-gradient(ellipse 46% 56% at 100% 0%,
+      color-mix(in srgb, var(--kpi-acento) 12%, transparent) 0 62%,
+      transparent 63%) !important;
+    background-position: 100% 0% !important;
+    background-size: 112% 118% !important;
+  }
+  .section .estado-card::after {
+    background-image:
+      radial-gradient(ellipse 46% 56% at 100% 0%,
+        color-mix(in srgb, var(--ec-accent) 12%, transparent) 0 62%,
+        transparent 63%),
+      var(--ec-bg, linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))) !important;
+    background-position: 100% 0%, 0% 0% !important;
+    background-size: 112% 118%, 100% 100% !important;
+  }
+  .section div.kpi-circular-widget:hover::after { background-size: 145% 158% !important; }
+  .section .estado-card:hover::after { background-size: 145% 158%, 100% 100% !important; }
+
+  /* El ::before de las de Stock ya no pinta el tiñe: lo hace el ::after. */
+  .section .estado-card::before { background: none !important; }
+
+  /* Las de Stock traen el acento de la esquina como un <div> absoluto que
+     vivia del overflow:hidden de la tarjeta. Al quitar el recorte se salia
+     al hueco entre tarjetas. Sobra: ese mismo acento lo pinta el ::after,
+     y asi las dos familias lo hacen igual. */
+  .section .estado-card > div[style*="border-radius:50%"] { display: none !important; }
+
+  /* --- El aura --------------------------------------------------------
+     Solo en lo que invita a pasar por encima, y solo al pasar: si todo
+     brilla, no destaca nada. */
+  .section .dashboard-card,
+  .section .export-card,
+  .siri-wrapper {
+    position: relative;
+    z-index: auto !important;
+  }
+
+  .section div.kpi-circular-widget::before,
+  .section .estado-card::before,
+  .section .dashboard-card::before,
+  .section .export-card::before,
+  .siri-wrapper::before {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    inset: calc(var(--aura-anillo) * -1) !important;
+    z-index: 0 !important;
+    border-radius: calc(var(--radius-md) + var(--aura-anillo)) !important;
+    background-image: linear-gradient(-45deg,
+      var(--aura-1), var(--aura-2), var(--aura-3), var(--aura-4)) !important;
+    background-size: 300% 300% !important;
+    background-position: 0% 50%;
+    /* El aura es un ANILLO, no una capa que tape la tarjeta. La mascara se
+       come el centro y deja pintado solo el marco de fuera.
+       Esto no es un capricho: un ::before con z-index:-1 solo queda detras
+       del fondo de la tarjeta si la tarjeta no crea contexto de apilado, y
+       el cristal del tema oscuro lo crea por el backdrop-filter. Siendo
+       anillo da igual quien pinte antes: no hay nada que tapar.
+       El padding es el grosor; con mask-composite se resta el centro. */
+    padding: var(--aura-anillo) !important;
+    box-sizing: border-box !important;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+    -webkit-mask-composite: xor !important;
+            mask-composite: exclude !important;
+    filter: blur(var(--aura-difuso)) !important;
+    opacity: 0 !important;
+    transition: opacity var(--mov-lento) var(--mov-curva) !important;
+    pointer-events: none !important;
+  }
+  .section div.kpi-circular-widget:hover::before,
+  .section .estado-card:hover::before,
+  .section .dashboard-card:hover::before,
+  .section .export-card:hover::before,
+  .siri-wrapper:hover::before {
+    opacity: var(--aura-op) !important;
+    animation: siri-waves 3s ease infinite !important;
+  }
+  @keyframes siri-waves {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* El empujón de siempre, que es lo que hace que el aura se lea como
+     elevación y no como un borde de colores.
+     Va en top y no en transform a proposito: un transform crea contexto de
+     apilado, y entonces el ::before con z-index:-1 deja de pintar detras del
+     fondo de la tarjeta y le pinta el aura por encima de la cara. Con top la
+     tarjeta sube igual y el apilado se queda como estaba. */
+  .section div.kpi-circular-widget,
+  .section .estado-card,
+  .section .dashboard-card {
+    top: 0;
+    transition: top var(--mov-base) var(--mov-curva),
+                box-shadow var(--mov-base) var(--mov-curva),
+                border-color var(--mov-base) var(--mov-curva) !important;
+  }
+  .section div.kpi-circular-widget:hover,
+  .section .estado-card:hover,
+  .section .dashboard-card:hover {
+    transform: none !important;
+    top: -3px;
+    box-shadow: var(--shadow-3) !important;
+  }
+
+  /* Quien pide menos movimiento recibe el aura quieta, no nada: el color
+     sigue diciendo dónde está el ratón. */
+  @media (prefers-reduced-motion: reduce) {
+    .section div.kpi-circular-widget:hover::before,
+    .section .estado-card:hover::before,
+    .section .dashboard-card:hover::before,
+    .section .export-card:hover::before,
+    .siri-wrapper:hover::before { animation: none !important; }
+    .section div.kpi-circular-widget:hover::after,
+    .section .estado-card:hover::after { transition: none !important; }
+    .section div.kpi-circular-widget:hover,
+    .section .estado-card:hover,
+    .section .dashboard-card:hover { top: 0 !important; }
+  }
 </style>
 
 </body>
