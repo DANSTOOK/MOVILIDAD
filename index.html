@@ -7162,30 +7162,16 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     <span class="splash-particle"></span>
     <span class="splash-particle"></span>
     <div class="splash-content">
+      <!-- El mismo logo que el header, sobre la misma tarjeta blanca:
+           la pantalla de arranque y la barra tienen que presentar la
+           marca igual. Antes aqui habia la palabra OXXO escrita en
+           texto sobre una tarjeta roja translucida -roja sobre rojo, se
+           leia a duras penas- y un script que buscaba en localStorage
+           un logo subido a mano, mecanismo que ya no existe. -->
       <div class="splash-logo-card">
-        <img id="splash-logo-img" alt="Logo" style="display:none; max-height:110px; max-width:230px; width:auto; object-fit:contain; background:#ffffff; padding:  16px 20px; border-radius:16px; box-shadow:var(--shadow-4);">
-        <div class="splash-logo" id="splash-logo-text">OXXO</div>
-        <div class="splash-tagline" id="splash-tagline">Movilidad</div>
+        <img src="header/Oxxo_Logo.svg" alt="OXXO" width="200" height="101" decoding="async">
       </div>
-      <script>
-        /* Mostrar el logo personalizado (si existe) en la pantalla de carga */
-        (function(){
-          try {
-            var saved = localStorage.getItem('oxxo_custom_logo');
-            if (saved) {
-              var img = document.getElementById('splash-logo-img');
-              var txt = document.getElementById('splash-logo-text');
-              var tag = document.getElementById('splash-tagline');
-              var card = document.querySelector('.splash-logo-card');
-              if (img) { img.src = saved; img.style.display = 'block'; }
-              if (txt) txt.style.display = 'none';
-              if (tag) tag.style.display = 'none';
-              // La tarjeta roja estorba al logo: la hacemos transparente
-              if (card) { card.style.background = 'transparent'; card.style.boxShadow = 'none'; card.style.border = 'none'; }
-            }
-          } catch(e) {}
-        })();
-      </script>
+      <div class="splash-tagline">Movilidad</div>
       <div class="splash-loader">
         <span class="splash-dot"></span>
         <span class="splash-dot"></span>
@@ -7200,8 +7186,10 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
   <!-- SIDEBAR -->
   <div id="sidebar" class="sidebar">
     <div class="sidebar-header">
+      <!-- El logo, igual que en la barra y en el arranque. Antes habia un
+           icono generico de "dashboard" que no decia de quien es esto. -->
       <div class="sidebar-header-icon">
-        <span class="material-symbols-outlined">dashboard</span>
+        <img src="header/Oxxo_Logo.svg" alt="OXXO" width="78" height="40" decoding="async">
       </div>
       <div class="sidebar-header-text">
         <h3>OXXO Movilidad</h3>
@@ -7301,8 +7289,10 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     <!-- SIDEBAR FOOTER -->
     <div class="sidebar-footer">
       <button class="sidebar-footer-btn" onclick="toggleSidebar()">
-        <span class="material-symbols-outlined">logout</span>
-        Cerrar Menú
+        <!-- Llevaba el icono de "logout", la puerta con la flecha saliendo.
+             Esto no cierra la sesion, cierra el menu. -->
+        <span class="material-symbols-outlined">close</span>
+        Cerrar menú
       </button>
     </div>
   </div>
@@ -22012,11 +22002,41 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
   <script>
     /* ============ ENHANCEMENTS JS ============ */
     
-    // 21. SPLASH SCREEN - auto-remove
-    setTimeout(() => {
-      var s = document.getElementById('app-splash');
-      if (s) s.classList.add('gone');
-    }, 3000);
+    /* 21. LA PANTALLA DE ARRANQUE SE VA CUANDO LA APLICACION ESTA LISTA
+
+       Antes se iba a los 3000 ms exactos, sincronizados a mano con un
+       fundido en CSS que arrancaba a los 2400. Dos relojes que alguien
+       tenia que mantener de acuerdo, y que duraban lo mismo tanto si todo
+       estaba listo en doscientos milisegundos como si tardaba ocho
+       segundos: en el primer caso se hace esperar sin motivo y en el
+       segundo se descubre el tablero a medio montar.
+
+       Ahora se espera a lo que de verdad importa -que la pagina haya
+       cargado y que las tipografias esten listas, que si no el titulo
+       salta de fuente al aparecer-, con dos topes: un minimo para que no
+       pegue un parpadeo si todo va rapido, y un maximo para que un
+       recurso lento no deje a nadie encerrado mirando el logo. */
+    (function () {
+      var splash = document.getElementById('app-splash');
+      if (!splash) return;
+      var MINIMO = 850, TOPE = 4000;
+      var t0 = (window.performance && performance.now) ? performance.now() : Date.now();
+      var fuera = false;
+      function ahora() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
+      function quitar() {
+        if (fuera) return;
+        fuera = true;
+        setTimeout(function () { splash.classList.add('gone'); },
+                   Math.max(0, MINIMO - (ahora() - t0)));
+      }
+      var esperas = [new Promise(function (r) {
+        if (document.readyState === 'complete') r();
+        else window.addEventListener('load', r, { once: true });
+      })];
+      if (document.fonts && document.fonts.ready) esperas.push(document.fonts.ready);
+      Promise.all(esperas).then(quitar).catch(quitar);
+      setTimeout(quitar, TOPE);
+    })();
     
     // 17. SOUND SYSTEM
     var soundEnabled = localStorage.getItem('oxxoSound') === '1';
@@ -26913,6 +26933,164 @@ function debugOSModelos() {
   .map-plaza-chip { top: 0; position: relative; }
   .map-plaza-chip:hover { transform: none !important; top: -3px; }
   .map-plaza-chip:active { transform: none !important; top: -1px; }
+</style>
+
+<style id="arranque-y-lateral">
+  /* ==========================================================
+     LA PANTALLA DE ARRANQUE Y LA BARRA LATERAL
+     ========================================================== */
+
+  /* --- El arranque ----------------------------------------------------
+     La tarjeta era roja translucida sobre un fondo rojo, con la palabra
+     OXXO escrita en texto: la marca se leia a duras penas y no era el
+     logotipo, era una palabra en la tipografia de la interfaz. Ahora es
+     el logo de verdad sobre blanco, igual que en la barra. */
+  .splash-logo-card {
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28) !important;
+    border-radius: 18px !important;
+    padding: 22px 30px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .splash-logo-card img { display: block; width: 180px; height: auto; }
+  .splash-tagline { margin-top: 18px; }
+
+  /* El fundido de salida se dispara con la clase, no con un retardo fijo
+     escrito en la animacion. Asi lo decide el codigo cuando la aplicacion
+     esta lista, y no hay dos relojes que mantener de acuerdo. */
+  #app-splash {
+    animation: splashGradient 8s ease-in-out infinite !important;
+    transition: opacity 0.5s var(--mov-curva), visibility 0.5s var(--mov-curva);
+  }
+  #app-splash.gone {
+    display: flex !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #app-splash { transition: none; }
+    #app-splash.gone { display: none !important; }
+  }
+
+  /* --- La barra lateral ------------------------------------------------
+     El resplandor que pediste para las tarjetas vale aqui, pero no igual:
+     una lista de nueve filas con nueve auras de colores a la vez seria un
+     arbol de navidad. Se reparte el mismo lenguaje en dos intensidades:
+     al pasar por encima, una franja de color que crece y un fondo tenue;
+     en la fila donde estas, el aura entera. El resplandor marca donde
+     estas, no por donde pasa el raton. */
+  .sidebar-nav-link {
+    position: relative;
+    isolation: auto;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+    margin-right: 10px;
+    overflow: visible;
+  }
+  /* La franja de la izquierda: 0 de alto en reposo, completa al pasar. */
+  .sidebar-nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0; top: 50%;
+    width: 3px; height: 0;
+    transform: translateY(-50%);
+    background: var(--primary-fill, var(--primary));
+    border-radius: 0 3px 3px 0;
+    transition: height var(--mov-base) var(--mov-curva);
+  }
+  .sidebar-nav-link:hover::after { height: 60%; }
+  .sidebar-nav-link.active::after { height: 100%; }
+  .sidebar-nav-link:hover {
+    background: color-mix(in srgb, var(--primary) 7%, transparent) !important;
+  }
+
+  /* El aura, solo en la fila activa. */
+  .sidebar-nav-link.active::before {
+    content: "";
+    position: absolute;
+    inset: calc(var(--aura-anillo, 12px) * -1);
+    z-index: 0;
+    border-radius: calc(var(--radius-md) + var(--aura-anillo, 12px));
+    background-image: linear-gradient(-45deg,
+      var(--aura-1), var(--aura-2), var(--aura-3), var(--aura-4));
+    background-size: 300% 300%;
+    padding: var(--aura-anillo, 12px);
+    box-sizing: border-box;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    filter: blur(var(--aura-difuso, 14px));
+    opacity: var(--aura-op, 0.55);
+    animation: siri-waves 3s ease infinite;
+    pointer-events: none;
+  }
+  .sidebar-nav-link > * { position: relative; z-index: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .sidebar-nav-link.active::before { animation: none; }
+  }
+
+  /* La flecha solo estaba en la fila activa y aparecia de la nada. Ahora
+     se desliza al pasar por encima, en todas, que es lo que se espera. */
+  .sidebar-nav-arrow {
+    margin-left: auto;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva);
+  }
+  .sidebar-nav-link:hover .sidebar-nav-arrow,
+  .sidebar-nav-link.active .sidebar-nav-arrow { opacity: 0.75; transform: none; }
+
+  /* La cabecera, con el logo en su tarjeta blanca. */
+  .sidebar-header { padding: 18px 20px !important; }
+  .sidebar-header-icon {
+    background: #ffffff !important;
+    border-radius: 10px !important;
+    padding: 5px 9px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+  }
+  .sidebar-header-icon img { display: block; height: 24px; width: auto; }
+
+  /* Los rotulos de seccion: la rayita que les seguia se quedaba corta y
+     desigual segun el largo del texto. Que llegue hasta el final. */
+  .sidebar-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--fs-micro) !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .sidebar-section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Cerrar el menu no es una accion de riesgo: deja de pedir atencion con
+     el rojo de marca y se queda en un boton tranquilo. */
+  .sidebar-footer-btn {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    font-weight: 600;
+  }
+  .sidebar-footer-btn:hover { background: var(--border) !important; }
+
+  /* En oscuro la barra era blanca: la unica superficie opaca clara de toda
+     la aplicacion, al lado del cristal. */
+  [data-theme="dark"] .sidebar {
+    background: var(--glass-bg-alto, rgba(32, 30, 38, 0.92)) !important;
+    backdrop-filter: blur(var(--glass-blur, 20px));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
+    border-right: 1px solid var(--glass-borde, rgba(255, 255, 255, 0.12));
+  }
 </style>
 
 </body>
