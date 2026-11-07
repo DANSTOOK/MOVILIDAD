@@ -344,13 +344,13 @@
 
     .sidebar-nav-link:hover {
       background: rgba(226,0,26,0.08);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       padding-left:   20px;
     }
 
     .sidebar-nav-link.active {
       background: rgba(226,0,26,0.12);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       border-left-color: var(--primary);
       font-weight: 600;
       box-shadow: inset -2px 0 0 var(--primary);
@@ -369,7 +369,7 @@
     }
 
     .sidebar-nav-link.active .sidebar-nav-icon {
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
     }
 
     /* SIDEBAR CONTENT (scrollable area) */
@@ -490,13 +490,13 @@
     .sidebar-nav-link:hover .sidebar-nav-arrow {
       opacity: 1;
       transform: translateX(0);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
     }
 
     .sidebar-nav-link.active .sidebar-nav-arrow {
       opacity: 0.9;
       transform: translateX(0);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
     }
 
     /* SIDEBAR FOOTER */
@@ -511,7 +511,7 @@
       width: 100%;
       padding:   16px 16px;
       background: linear-gradient(135deg, rgba(226,0,26,0.08), rgba(226,0,26,0.04));
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       border: 1.5px solid rgba(226,0,26,0.2);
       border-radius: 12px;
       font-size: 13px;
@@ -539,7 +539,7 @@
     }
 
     .sidebar-footer-btn:hover {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: white;
       border-color: var(--primary);
       transform: translateY(-2px);
@@ -753,7 +753,7 @@
       width: 36px; height: 36px;
       border-radius: 50%;
       background: linear-gradient(135deg, #fff, #ffe5e8);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       font-weight: 600; font-size: 13px;
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer;
@@ -950,7 +950,7 @@
     }
 
     .tab.active {
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       background: rgba(226,0,26,0.12);
       font-weight: 600;
       box-shadow: 0 2px 8px rgba(226,0,26,0.2);
@@ -985,12 +985,12 @@
       left: 0;
       width: 4px;
       height: 100%;
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
 
     .metric-card.error::before {
-      background: var(--error);
+      background: var(--error-fill, var(--error));
     }
 
     .metric-card.warning::before {
@@ -1068,7 +1068,7 @@
 
     #disp-hh.error::after,
     #disp-tt.error::after {
-      background: var(--error) !important;
+      background: var(--error-fill, var(--error)) !important;
     }
 
     /* === LÍNEA DINÁMICA EN KPIs DE RESUMEN TAB === */
@@ -1139,7 +1139,7 @@
     [data-kpi="disp-tt"].warning .metric-value {
       font-size: 56px;
       font-weight: 900;
-      color: var(--warning);
+      color: var(--warning-ink, var(--warning));
     }
 
     /* COLORES DINÁMICOS PARA DISPONIBILIDAD - ERROR (ROJO) */
@@ -1150,13 +1150,13 @@
     }
     [data-kpi="disp-hh"].error::before,
     [data-kpi="disp-tt"].error::before {
-      background: var(--error);
+      background: var(--error-fill, var(--error));
     }
     [data-kpi="disp-hh"].error .metric-value,
     [data-kpi="disp-tt"].error .metric-value {
       font-size: 56px;
       font-weight: 900;
-      color: var(--error);
+      color: var(--error-ink, var(--error));
     }
 
     [data-kpi="disp-hh"] .metric-name,
@@ -1188,18 +1188,18 @@
       right: 12px;
       opacity: 0;
       transition: opacity var(--mov-rapido), transform var(--mov-rapido);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       font-weight: 800;
       font-size: 18px;
       transform: translateY(4px);
     }
 
     .metric-card.error::after {
-      color: var(--error);
+      color: var(--error-ink, var(--error));
     }
 
     .metric-card.warning::after {
-      color: var(--warning);
+      color: var(--warning-ink, var(--warning));
     }
 
     .metric-card:hover::after {
@@ -1212,16 +1212,16 @@
       font-weight: 800;
       line-height: 1.2;
       margin-bottom:   12px;
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       animation: numberCount 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
       text-shadow: 0 2px 6px rgba(226,0,26,0.15);
       letter-spacing: -0.5px;
       position: relative;
     }
 
-    .metric-value.primary { color: var(--primary); }
-    .metric-value.error { color: var(--error); }
-    .metric-value.warning { color: var(--warning); }
+    .metric-value.primary { color: var(--primary-ink, var(--primary)); }
+    .metric-value.error { color: var(--error-ink, var(--error)); }
+    .metric-value.warning { color: var(--warning-ink, var(--warning)); }
     .metric-value.success { color: var(--success); }
     .metric-value.info { color: var(--info); }
     .metric-value.neutral { color: #616161; }  /* Gris oscuro neutral */
@@ -1308,7 +1308,7 @@
     }
 
     .export-btn:hover {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: white;
       border-color: var(--primary);
       transform: scale(1.02);
@@ -1477,7 +1477,7 @@
     }
 
     input[type="checkbox"]:checked {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       border-color: var(--primary);
       animation: cbPulse 0.15s cubic-bezier(0.34,1.56,0.64,1);
     }
@@ -1517,7 +1517,7 @@
     .filter-toolbar button.btn-clear:hover {
       background: var(--surface);
       border-color: var(--primary);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
     }
     .filter-toolbar .filter-count {
       font-size: 12px;
@@ -1614,7 +1614,7 @@
     .dashboard-card .metric-value {
       font-size: 32px;
       font-weight: 600;
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       margin: 12px 0;
       animation: pulse 2s ease-in-out infinite;
     }
@@ -1653,7 +1653,7 @@
 
     .metric-change.negative {
       background: rgba(226, 0, 26, 0.1);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
     }
 
     .dashboard-card::after {
@@ -1740,7 +1740,7 @@
 
     .dashboard-card h3 .material-symbols-outlined {
       font-size: 28px;
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       animation: dashIconPulse 2.5s ease-in-out infinite;
     }
 
@@ -1825,7 +1825,7 @@
     }
     .chart-download-btn .material-symbols-outlined { font-size: 16px; }
     .chart-download-btn:hover {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: #fff;
       border-color: var(--primary);
     }
@@ -1861,7 +1861,7 @@
       border-bottom: none;
     }
     .chart-download-menu button:hover {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: white;
     }
     .dashboard-card h3 {
@@ -1883,12 +1883,12 @@
       width: 28px; height: 28px;
       border-radius: 8px;
       background: rgba(226,0,26,0.10);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       font-size: 16px !important;
       transition: background var(--mov-lento) var(--mov-curva), transform var(--mov-lento) var(--mov-curva);
     }
     .dashboard-card:hover h3 .material-symbols-outlined {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: #fff;
       transform: rotate(-6deg) scale(1.08);
     }
@@ -1925,8 +1925,8 @@
       letter-spacing: 0.02em;
       animation: trendFadeIn .5s ease-out backwards;
     }
-    .metric-trend.up   { color: var(--error); background: rgba(179,38,30,0.10); }
-    .metric-trend.down { color: #1F7A4E; background: rgba(31,122,78,0.10); }
+    .metric-trend.up   { color: var(--error-ink, var(--error)); background: rgba(179,38,30,0.10); }
+    .metric-trend.down { color: var(--ink-ok); background: rgba(31,122,78,0.10); }
     .metric-trend.flat { color: var(--text-light); background: rgba(0,0,0,0.05); }
     .metric-trend svg { width: 11px; height: 11px; }
     @keyframes trendFadeIn {
@@ -1958,7 +1958,7 @@
       top: 6px; right: 8px;
       width: 18px; height: 18px;
       border-radius: 50%;
-      background: var(--error);
+      background: var(--error-fill, var(--error));
       color: #fff;
       font-size: 11px;
       font-weight: 600;
@@ -1982,7 +1982,7 @@
     }
     .metric-updated::before {
       content: "● ";
-      color: #1F7A4E;
+      color: var(--ink-ok);
       animation: dotBlink 2s ease-in-out infinite;
     }
     @keyframes dotBlink {
@@ -2027,7 +2027,7 @@
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.08em;
-      color: #1F7A4E;
+      color: var(--ink-ok);
       text-transform: uppercase;
     }
     .dashboard-card .card-meta .live-dot::before {
@@ -2122,7 +2122,7 @@
       transition: opacity var(--mov-base) var(--mov-curva), background var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva);
     }
     .dashboard-card:hover .chart-expand-btn { opacity: 1; }
-    .chart-expand-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .chart-expand-btn:hover { background: var(--primary-fill, var(--primary)); color: #fff; border-color: var(--primary); }
     [data-theme="dark"] .chart-expand-btn { background: rgba(255,255,255,0.06); }
 
     /* Modal de gráfico a pantalla completa */
@@ -2217,7 +2217,7 @@
     .state-banner .mini-link {
       background: none;
       border: none;
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       cursor: pointer;
       font-size: 12px;
       font-weight: 600;
@@ -2320,8 +2320,8 @@
 
 table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .snap-cmp td, .snap-cmp th { border: 1px solid var(--border); padding:   4px 8px; }
-    .delta-pos { color: var(--error); font-weight: 600; }
-    .delta-neg { color: #1F7A4E; font-weight: 600; }
+    .delta-pos { color: var(--error-ink, var(--error)); font-weight: 600; }
+    .delta-neg { color: var(--ink-ok); font-weight: 600; }
     .delta-zero { color: var(--text-light); }
 
     /* MODE SELECTOR (Modo Coordinador) */
@@ -2384,7 +2384,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     }
     .mode-option input[type="radio"]:checked + .mode-option-card .material-symbols-outlined,
     .mode-option input[type="radio"]:checked + .mode-option-card strong {
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
     }
     .app-mode-pill {
       margin-left: 8px;
@@ -2434,7 +2434,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       cursor: pointer;
       transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
-    .btn-view:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+    .btn-view:hover:not(:disabled) { border-color: var(--primary); color: var(--primary-ink, var(--primary)); }
     .btn-view:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* NOTA LIBRE EN DETALLE (Fase 9) */
@@ -2487,7 +2487,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     select.comment-select.cm-set {
       background: rgba(226,0,26,0.08);
       border-color: #E2001A;
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       font-weight: 600;
     }
 
@@ -2538,7 +2538,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       line-height: 1.55;
       color: #202124;
     }
-    .modal-body .email-preview h2 { margin: 0 0 10px 0; font-size: 16px; color: var(--primary); }
+    .modal-body .email-preview h2 { margin: 0 0 10px 0; font-size: 16px; color: var(--primary-ink, var(--primary)); }
     .modal-body .email-preview h3 { margin: 14px 0 6px 0; font-size: 13px; }
     .modal-body .email-preview table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 12px; }
     .modal-body .email-preview th,
@@ -2553,7 +2553,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       background: var(--card-bg);
       cursor: pointer;
     }
-    .btn-modal.primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .btn-modal.primary { background: var(--primary-fill, var(--primary)); color: white; border-color: var(--primary); }
     .btn-modal:hover { opacity: 0.9; }
 
     /* SECTION */
@@ -2943,7 +2943,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .badge.unknown {
       background: rgba(0,0,0,0.04);
       border-color: rgba(0,0,0,0.10);
-      color: #5f6368;
+      color: var(--ink-gris);
     }
     .badge.unknown::before {
       background: #9aa0a6;
@@ -3010,7 +3010,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
     .upload-icon {
       font-size: 56px;
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       margin-bottom:   20px;
       animation: float 3s ease-in-out infinite;
       display: inline-block;
@@ -3074,7 +3074,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       font-size: 20px;
     }
     .step-bubble.active {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: #fff;
       box-shadow: 0 0 0 0 rgba(226,0,26,0.55);
       animation: stepRing 1.8s ease-out infinite;
@@ -3322,7 +3322,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       gap:   6px;
       font-size: 11px;
       font-weight: 600;
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       background: rgba(226, 0, 26, 0.08);
       border: 1px solid rgba(226, 0, 26, 0.18);
       padding:   4px 12px;
@@ -3336,7 +3336,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       content: "";
       width: 6px; height: 6px;
       border-radius: 50%;
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       box-shadow: 0 0 0 3px rgba(226,0,26,0.18);
       animation: dzPulse 1.6s ease-in-out infinite;
     }
@@ -3365,7 +3365,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       line-height: 1.4;
     }
     .dropzone-v2 .dz-link {
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       font-weight: 600;
       text-decoration: underline;
       text-decoration-thickness: 1.5px;
@@ -3401,7 +3401,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       box-shadow: var(--shadow-1);
       transition: transform var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva);
     }
-    .dropzone-v2 .dz-chip svg { color: var(--primary); flex-shrink: 0; }
+    .dropzone-v2 .dz-chip svg { color: var(--primary-ink, var(--primary)); flex-shrink: 0; }
     .dropzone-v2 .dz-chip-size svg { color: var(--text-light); }
     .dropzone-v2 .dz-chip-size { color: var(--text-light); }
     .dropzone-v2:hover .dz-chip {
@@ -3415,7 +3415,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       opacity: 0.4;
     }
     .dropzone-v2.dragover .dz-desc {
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       font-weight: 600;
     }
     /* Success - swap content style */
@@ -3629,7 +3629,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
     .dropzone-icon {
       font-size: 40px;
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       margin-bottom:   12px;
       transition: background-color var(--mov-rapido) var(--mov-curva), color var(--mov-rapido) var(--mov-curva), border-color var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva), opacity var(--mov-rapido) var(--mov-curva);
     }
@@ -3792,7 +3792,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     }
 
     .btn-primary {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: white;
       box-shadow: 0 4px 12px rgba(226,0,26,0.25);
       animation: slideUp 0.15s ease-out 0.15s backwards;
@@ -3828,8 +3828,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
     /* Estilos de color de texto */
     .text-success { color: var(--success); }
-    .text-warning { color: var(--warning); }
-    .text-error { color: var(--error); }
+    .text-warning { color: var(--warning-ink, var(--warning)); }
+    .text-error { color: var(--error-ink, var(--error)); }
 
     /* LOADING */
     .loading {
@@ -4357,7 +4357,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       transform: none;
     }
     #cruce .metric-card.kpi-clickable:hover::after { opacity: 0.85; transform: none; }
-    #cruce .metric-card.kpi-active::after { content: 'expand_less'; opacity: 1; color: var(--primary, #E2001A); }
+    #cruce .metric-card.kpi-active::after { content: 'expand_less'; opacity: 1; color: var(--primary-ink, var(--primary, #E2001A)); }
 
     .kpi-detail-panel {
       margin: 10px 0 12px 0;
@@ -4419,7 +4419,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .plaza-pill-badge {
       width: 32px; height: 32px;
       border-radius: 50%;
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: #fff;
       display: inline-flex;
       align-items: center;
@@ -4486,7 +4486,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       width: 22px; height: 22px;
       border-radius: 50%;
       background: rgba(226,0,26,0.10);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -4497,14 +4497,14 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .plaza-pill-chevron .material-symbols-outlined { font-size: 18px; }
     .plaza-pill:focus-within .plaza-pill-chevron {
       transform: rotate(180deg);
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: #fff;
     }
     .plaza-pill.has-value {
       background: linear-gradient(135deg, rgba(226,0,26,0.06), rgba(226,0,26,0.10));
       border-color: var(--primary);
     }
-    .plaza-pill.has-value .plaza-pill-label .value { color: var(--primary); }
+    .plaza-pill.has-value .plaza-pill-label .value { color: var(--primary-ink, var(--primary)); }
     .plaza-pill.has-value .plaza-pill-badge {
       animation: plazaBadgeBeat 1.8s ease-in-out infinite;
     }
@@ -4560,7 +4560,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .stock-banner-icon {
       width: 36px; height: 36px;
       border-radius: 50%;
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: #fff;
       display: inline-flex;
       align-items: center; justify-content: center;
@@ -4675,9 +4675,9 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
       padding:   8px 16px; box-shadow: var(--shadow-2);
     }
-    .incon-badge span { display: block; font-size: 24px; font-weight: 800; color: #E2001A; line-height: 1.2; font-variant-numeric: tabular-nums; }
+    .incon-badge span { display: block; font-size: 24px; font-weight: 800; color: var(--ink-marca); line-height: 1.2; font-variant-numeric: tabular-nums; }
     .incon-badge small { font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: .06em; }
-    .incon-badge.zero span { color: #1F7A4E; }
+    .incon-badge.zero span { color: var(--ink-ok); }
 
     .incon-card {
       margin: 0 14px 18px; background: var(--card-bg);
@@ -4690,7 +4690,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       padding:   16px 20px; border-bottom: 1px solid var(--border);
       background: linear-gradient(135deg, rgba(226,0,26,0.05), transparent);
     }
-    .incon-card-head .material-symbols-outlined { font-size: 20px; color: #E2001A; }
+    .incon-card-head .material-symbols-outlined { font-size: 20px; color: var(--ink-marca); }
     .incon-card-head h3 { margin: 0; font-size: 14.5px; font-weight: 600; color: var(--text); }
     .incon-card-head p { margin: 2px 0 0; font-size: 12px; color: var(--text-light); }
     .incon-card thead th {
@@ -5110,7 +5110,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .config-summary .material-symbols-outlined {
       font-size: 20px;
       transition: transform 200ms var(--mov-curva);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       flex-shrink: 0;
     }
     .config-details[open] .config-summary .material-symbols-outlined {
@@ -5178,7 +5178,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     }
     .btn-secondary:hover:not(:disabled) {
       border-color: var(--primary);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       background: rgba(226, 0, 26, 0.05);
     }
 
@@ -5356,7 +5356,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       height: 40px;
       border-radius: 8px;
       background: rgba(226,0,26,0.12);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -5367,7 +5367,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       z-index: 1;
     }
     .summary-card:hover .summary-card-icon {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: #fff;
       transform: scale(1.12) rotate(-6deg);
     }
@@ -5384,7 +5384,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .summary-card-count {
       font-size: 24px;
       font-weight: 800;
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       margin-bottom:   2px;
       position: relative;
       z-index: 1;
@@ -5424,7 +5424,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
     .filter-badge {
       display: inline-block;
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: white;
       padding:   2px 8px;
       border-radius: 12px;
@@ -5457,7 +5457,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       pointer-events: none;
     }
     .toast-item {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: white;
       padding:   12px 16px;
       border-radius: 8px;
@@ -6193,7 +6193,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .empty-state-cta {
       display: inline-block;
       padding:   8px 16px;
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       color: white;
       border-radius: 6px;
       font-size: 12px;
@@ -6681,7 +6681,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       transform: translateY(-2px);
       box-shadow: var(--shadow-3);
     }
-    .sound-toggle.on { background: var(--primary); color: white; border-color: var(--primary); }
+    .sound-toggle.on { background: var(--primary-fill, var(--primary)); color: white; border-color: var(--primary); }
     
     /* 13. MAPA INTERACTIVO (Leaflet) */
     .mexico-map-wrap {
@@ -6758,15 +6758,15 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; font-size: 16px;
     }
-    .notif-item .notif-icon.critical { background: rgba(179,38,30,0.1); color: var(--error); }
-    .notif-item .notif-icon.warning { background: rgba(245,166,35,0.1); color: #F5A623; }
-    .notif-item .notif-icon.info { background: rgba(25,118,210,0.1); color: #1976D2; }
-    .notif-item .notif-icon.success { background: rgba(31,122,78,0.1); color: #1F7A4E; }
+    .notif-item .notif-icon.critical { background: rgba(179,38,30,0.1); color: var(--error-ink, var(--error)); }
+    .notif-item .notif-icon.warning { background: rgba(245,166,35,0.1); color: var(--ink-ambar); }
+    .notif-item .notif-icon.info { background: rgba(25,118,210,0.1); color: var(--ink-info); }
+    .notif-item .notif-icon.success { background: rgba(31,122,78,0.1); color: var(--ink-ok); }
     .notif-item-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom:   2px; }
     .notif-item-desc { font-size: 11px; color: var(--text-light); line-height: 1.4; }
     /* Solo las notificaciones con acción muestran cursor/realce de clic */
     .notif-item:not(.notif-clickable) { cursor: default; }
-    .notif-item-cta { font-size: 11px; font-weight: 600; color: var(--primary); margin-top:   4px; opacity: 0; transition: opacity var(--mov-base); }
+    .notif-item-cta { font-size: 11px; font-weight: 600; color: var(--primary-ink, var(--primary)); margin-top:   4px; opacity: 0; transition: opacity var(--mov-base); }
     .notif-clickable:hover .notif-item-cta { opacity: 1; }
     .notif-clickable:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
@@ -7003,7 +7003,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .dashboard-card .chart-expand-btn {
       background: rgba(226,0,26,0.08) !important;
       border-color: rgba(226,0,26,0.25) !important;
-      color: #E2001A !important;
+      color: var(--ink-marca) !important;
     }
   }
 
@@ -7062,7 +7062,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
   /* el ícono del título en círculo rojo suave (toque Argon) */
   .dashboard-card h3 .material-symbols-outlined {
     background: rgba(226,0,26,0.10);
-    color: var(--primary) !important;
+    color: var(--primary-ink, var(--primary)) !important;
     border-radius: 8px;
     padding:   4px;
     font-size: 20px !important;
@@ -7311,7 +7311,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         <span class="logo-placeholder" id="logo-placeholder">
           <span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle; opacity:0.9;">add_photo_alternate</span>
         </span>
-        <button id="logo-remove-btn" onclick="event.stopPropagation(); removeLogo()" title="Quitar logo" style="display:none; position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; background:var(--primary); color:#fff; border:2px solid #fff; cursor:pointer; font-size:11px; line-height: 1.2; padding:  0; align-items:center; justify-content:center;">×</button>
+        <button id="logo-remove-btn" onclick="event.stopPropagation(); removeLogo()" title="Quitar logo" style="display:none; position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; background:var(--primary-fill, var(--primary)); color:#fff; border:2px solid #fff; cursor:pointer; font-size:11px; line-height: 1.2; padding:  0; align-items:center; justify-content:center;">×</button>
       </div>
       <input type="file" id="logo-file-input" accept="image/*" style="display:none" onchange="onLogoSelected(event)">
 
@@ -7331,7 +7331,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <div id="notif-panel" style="display:none; position:absolute; top:48px; right:0; width:380px; max-height:480px; border-radius:16px; z-index:9999; overflow:hidden;">
             <div style="padding:  16px 16px; border-bottom:1px solid var(--border, #e0e0e0); display:flex; align-items:center; justify-content:space-between;">
               <div style="display:flex; align-items:center; gap:  8px;">
-                <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary, #E2001A);">notifications_active</span>
+                <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary-ink, var(--primary, #E2001A));">notifications_active</span>
                 <strong style="font-size:14px; color:var(--text, #1c1b1f);">Notificaciones</strong>
               </div>
               <span id="notif-panel-count" style="font-size:11px; background:var(--primary, #E2001A); color:white; padding:  2px 8px; border-radius:12px; font-weight: 600;">0</span>
@@ -7343,7 +7343,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               </div>
             </div>
             <div style="padding:  12px 16px; border-top:1px solid var(--border, #e0e0e0); display:flex; justify-content:flex-end; background:var(--surface, #fafafa);">
-              <button onclick="markNotifsRead()" style="display:inline-flex; align-items:center; gap:  4px; background:none; border:none; color:var(--primary, #E2001A); font-size:12px; font-weight: 600; cursor:pointer; padding:  4px 6px; border-radius:6px;">
+              <button onclick="markNotifsRead()" style="display:inline-flex; align-items:center; gap:  4px; background:none; border:none; color:var(--primary-ink, var(--primary, #E2001A)); font-size:12px; font-weight: 600; cursor:pointer; padding:  4px 6px; border-radius:6px;">
                 <span class="material-symbols-outlined" style="font-size:14px;">done_all</span>Marcar como leídas
               </button>
             </div>
@@ -7357,7 +7357,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="font-size:13px; font-weight:600; color:#1C1B1F;" id="user-menu-name">Admin</div>
             </div>
             <div style="padding:  4px;">
-              <button onclick="handleLogout()" style="display:block; width:100%; text-align:left; padding:  12px 16px; border:none; background:none; color:#E2001A; font-size:12px; font-weight:600; cursor:pointer; transition: background var(--mov-base);" onmouseover="this.style.background='rgba(226,0,26,0.05)'" onmouseout="this.style.background='transparent'">
+              <button onclick="handleLogout()" style="display:block; width:100%; text-align:left; padding:  12px 16px; border:none; background:none; color:var(--ink-marca); font-size:12px; font-weight:600; cursor:pointer; transition: background var(--mov-base);" onmouseover="this.style.background='rgba(226,0,26,0.05)'" onmouseout="this.style.background='transparent'">
                 <span class="material-symbols-outlined" style="font-size:16px; vertical-align:middle; margin-right:6px;">logout</span>Cerrar Sesión
               </button>
             </div>
@@ -7650,7 +7650,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       <!-- CRUCE TAB -->
       <div id="cruce" class="section active">
         <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  20px; padding:  0 16px;">
-          <span class="material-symbols-outlined" style="font-size:28px; color:var(--primary);">compare_arrows</span>
+          <span class="material-symbols-outlined" style="font-size:28px; color:var(--primary-ink, var(--primary));">compare_arrows</span>
           <h2 style="font-size:20px; font-weight: 600; margin:0; color:var(--text);">Cruce de Datos</h2>
         </div>
         <!-- CIRCULAR KPI WIDGETS - DISEÑO PREMIUM PROFESIONAL -->
@@ -7976,7 +7976,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             align-items: center;
             gap:   6px;
             padding:   8px 16px;
-            background: var(--primary);
+            background: var(--primary-fill, var(--primary));
             color: #fff;
             border: none;
             border-radius: 8px;
@@ -8041,11 +8041,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           }
           .bulk-btn:hover { background: var(--hover-bg); }
           .bulk-btn-primary {
-            background: var(--primary);
+            background: var(--primary-fill, var(--primary));
             color: #fff;
             border-color: var(--primary);
           }
-          .bulk-btn-primary:hover { filter: brightness(1.08); background: var(--primary); }
+          .bulk-btn-primary:hover { filter: brightness(1.08); background: var(--primary-fill, var(--primary)); }
           .bulk-btn-ghost { color: var(--text-light); }
           @media (prefers-reduced-motion: reduce) {
             .bulk-action-bar { transition: opacity var(--mov-base) var(--mov-curva); }
@@ -8352,7 +8352,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       background: rgba(226,0,26,0.04);
     }
     #configuracion .config-summary > .material-symbols-outlined:first-child {
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       transition: transform var(--mov-rapido) var(--mov-curva);
       font-size: 24px !important;
     }
@@ -8450,7 +8450,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       box-shadow: var(--shadow-1);
     }
     #configuracion .config-toggle input[type="checkbox"]:checked {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
     }
     #configuracion .config-toggle input[type="checkbox"]:checked::after {
       transform: translateX(20px);
@@ -8568,11 +8568,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .filter-chip-primary:has(input:checked) {
       background: linear-gradient(135deg, rgba(226,0,26,0.12), rgba(226,0,26,0.06));
       border-color: rgba(226,0,26,0.4);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       box-shadow: 0 4px 14px rgba(226,0,26,0.15);
     }
     .filter-chip-primary:has(input:checked) .chip-dot {
-      background: var(--primary);
+      background: var(--primary-fill, var(--primary));
       box-shadow: 0 0 0 4px rgba(226,0,26,0.15);
     }
 
@@ -8612,7 +8612,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       transition: color var(--mov-rapido) var(--mov-curva), transform var(--mov-rapido) var(--mov-curva);
     }
     .filter-search:focus-within .filter-search-icon {
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       transform: scale(1.1);
     }
     .filter-search-input {
@@ -8661,7 +8661,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     }
     .filter-search-clear:hover {
       background: rgba(226,0,26,0.1);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       transform: scale(1.1);
     }
     .filter-search-clear .material-symbols-outlined {
@@ -8685,7 +8685,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       border-radius: 999px;
       background: linear-gradient(135deg, rgba(226,0,26,0.08), rgba(226,0,26,0.04));
       border: 1.5px solid rgba(226,0,26,0.25);
-      color: var(--primary);
+      color: var(--primary-ink, var(--primary));
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
@@ -9075,7 +9075,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       animation: deltaIn 0.15s ease;
     }
     .kpi-delta.up   { color: #16A34A; background: rgba(22,163,74,0.1); }
-    .kpi-delta.down { color: #DC2626; background: rgba(220,38,38,0.1); }
+    .kpi-delta.down { color: var(--ink-critico-claro); background: rgba(220,38,38,0.1); }
     .kpi-delta.flat { color: #6B7280; background: rgba(107,114,128,0.1); }
     @keyframes deltaIn { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform: translateY(0); } }
     .kpi-sparkline {
@@ -9352,8 +9352,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       margin: 6px 0;
       letter-spacing: -1px;
     }
-    .health-gauge.warning .health-gauge-num { color: #F5A623; }
-    .health-gauge.critical .health-gauge-num { color: #DC2626; }
+    .health-gauge.warning .health-gauge-num { color: var(--ink-ambar); }
+    .health-gauge.critical .health-gauge-num { color: var(--ink-critico-claro); }
     .health-gauge-label {
       font-size: 11px;
       letter-spacing: 0;
@@ -9489,7 +9489,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
        apagados-hh / apagados-tt quedan en gris neutral (sin color de estado). */
     .kpi-circular-widget[data-kpi="disp-hh"].status-error .kpi-number,
     .kpi-circular-widget[data-kpi="disp-tt"].status-error .kpi-number {
-      color: var(--error) !important;
+      color: var(--error-ink, var(--error)) !important;
       text-shadow: 0 0 12px rgba(255,23,68,0.35);
     }
     .kpi-circular-widget.status-warning .kpi-number {
@@ -9622,13 +9622,13 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     /* Celda de días offline destacada por severidad */
     .days-cell { font-weight: 600; }
     .days-cell.sev-warning { color: #C77700; }
-    .days-cell.sev-critical { color: #C62828; }
+    .days-cell.sev-critical { color: var(--ink-critico-medio); }
     .days-cell .days-badge {
       display: inline-block; min-width: 26px; padding:   2px 8px; border-radius: 12px;
       font-size: 12px; font-weight: 800; text-align: center;
     }
     .days-cell.sev-warning .days-badge { background: rgba(245,166,35,0.18); color: #B35F00; }
-    .days-cell.sev-critical .days-badge { background: rgba(229,57,53,0.16); color: #C62828; }
+    .days-cell.sev-critical .days-badge { background: rgba(229,57,53,0.16); color: var(--ink-critico-medio); }
     [data-theme="dark"] tbody#cruce-table tr.sev-warning { background: rgba(245,166,35,0.10); }
     [data-theme="dark"] tbody#cruce-table tr.sev-critical { background: rgba(229,57,53,0.12); }
 
@@ -9640,7 +9640,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     }
     tbody#cruce-table tr.sev-extreme:hover,
     tbody#detalle-table tr.sev-extreme:hover { background: rgba(179,38,30,0.18); }
-    .days-cell.sev-extreme { color:var(--error); }
+    .days-cell.sev-extreme { color:var(--error-ink, var(--error)); }
     .days-cell.sev-extreme .days-badge,
     tbody#detalle-table tr.sev-extreme .days-extreme-badge {
       background:#B3261E; color:#fff; font-weight:800;
@@ -9821,13 +9821,13 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       <!-- RESUMEN TAB -->
       <div id="resumen" class="section" style="position:relative;">
         <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  12px; padding:  0 12px;">
-          <span class="material-symbols-outlined" style="font-size:24px; color:var(--primary);">summarize</span>
+          <span class="material-symbols-outlined" style="font-size:24px; color:var(--primary-ink, var(--primary));">summarize</span>
           <h2 style="font-size:16px; font-weight: 600; margin:0; color:var(--text);">Resumen Ejecutivo</h2>
         </div>
 
 <!-- Botón flotante compacto en la esquina superior derecha (no estorba) -->
         <button id="export-resumen-btn" onclick="toggleExportMenu()" title="Descargar resumen"
-          style="position:absolute; top:0; right:12px; z-index:30; background:var(--primary); color:white; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(226,0,26,.32); transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"
+          style="position:absolute; top:0; right:12px; z-index:30; background:var(--primary-fill, var(--primary)); color:white; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(226,0,26,.32); transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"
           onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='';">
           <span class="material-symbols-outlined" style="font-size:20px;">download</span>
         </button>
@@ -9845,7 +9845,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <!-- ZONA SUPERIOR: Círculos KPI -->
           <div style="padding:   16px 20px 16px 20px; background: linear-gradient(135deg, rgba(226,0,26,0.04) 0%, transparent 60%);">
             <div style="display:flex; align-items:center; gap:  8px; margin-bottom:  16px;">
-              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">compare_arrows</span>
+              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary-ink, var(--primary));">compare_arrows</span>
               <span style="font-size:12px; font-weight: 600; color:var(--text); letter-spacing:0;">Cruce de Datos</span>
             </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:  12px;">
@@ -9953,7 +9953,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <div style="display:flex; align-items:center; gap:  12px; padding:  0 20px; margin: 0;">
             <div style="flex:1; height:1px; background:var(--border);"></div>
             <div style="display:flex; align-items:center; gap:  6px; padding:  6px 12px; background:var(--surface); border:1px solid var(--border); border-radius:16px; white-space:nowrap;">
-              <span class="material-symbols-outlined" style="font-size:14px; color:var(--primary);">summarize</span>
+              <span class="material-symbols-outlined" style="font-size:14px; color:var(--primary-ink, var(--primary));">summarize</span>
               <span style="font-size:11px; font-weight: 600; color:var(--text); letter-spacing:0;">Resumen por Tipo</span>
             </div>
             <div style="flex:1; height:1px; background:var(--border);"></div>
@@ -9973,7 +9973,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <!-- Header del bloque de gráficas -->
           <div style="display:flex; align-items:center; justify-content:space-between; padding:  16px 20px 0 20px;">
             <div style="display:flex; align-items:center; gap:  8px;">
-              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">bar_chart</span>
+              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary-ink, var(--primary));">bar_chart</span>
               <span style="font-size:12px; font-weight: 600; color:var(--text); letter-spacing:0;">Dashboards Analíticos</span>
             </div>
           </div>
@@ -9987,7 +9987,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-asesores-llamadas', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-asesores-llamadas', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">phone</span>Asesores con Más Llamadas</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">phone</span>Asesores con Más Llamadas</h3>
             <div class="dash-sub">Top 10 asesores por cantidad de equipos</div>
             <div class="chart-wrap"><div id="chart-asesores-llamadas" style="width:100%;height:100%"></div></div>
           </div>
@@ -10000,7 +10000,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-top5-tiendas', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-top5-tiendas', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">store</span>Top 5 Tiendas</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">store</span>Top 5 Tiendas</h3>
             <div class="dash-sub">Tiendas con mayor número de equipos críticos</div>
             <div class="chart-wrap"><div id="chart-top5-tiendas" style="width:100%;height:100%"></div></div>
           </div>
@@ -10013,7 +10013,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-hh-tt-offline', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-hh-tt-offline', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">donut_large</span>HH vs TT Offline</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">donut_large</span>HH vs TT Offline</h3>
             <div class="dash-sub">Distribución de equipos offline por tipo</div>
             <div class="chart-wrap"><div id="chart-hh-tt-offline" style="width:100%;height:100%"></div></div>
           </div>
@@ -10026,7 +10026,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-criticidad-cr', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-criticidad-cr', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">warning</span>Distribución Criticidad por CR</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">warning</span>Distribución Criticidad por CR</h3>
             <div class="dash-sub">CRs con mayor concentración de equipos offline</div>
             <div class="chart-wrap"><div id="chart-criticidad-cr" style="width:100%;height:100%"></div></div>
           </div>
@@ -10039,7 +10039,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-criticidad-pago', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-criticidad-pago', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">paid</span>Criticidad por Estado de Pago</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">paid</span>Criticidad por Estado de Pago</h3>
             <div class="dash-sub">Distribución por estado de pago del servicio</div>
             <div class="chart-wrap"><div id="chart-criticidad-pago" style="width:100%;height:100%"></div></div>
           </div>
@@ -10052,7 +10052,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-dias-tienda', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-dias-tienda', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">calendar_today</span>Distribución Días Offline por Tienda</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">calendar_today</span>Distribución Días Offline por Tienda</h3>
             <div class="dash-sub">Análisis de rango de días offline por tienda</div>
             <div class="chart-wrap"><div id="chart-dias-tienda" style="width:100%;height:100%"></div></div>
           </div>
@@ -10065,7 +10065,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-modelos-equipos', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-modelos-equipos', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">devices</span>Modelos de Equipos</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">devices</span>Modelos de Equipos</h3>
             <div class="dash-sub">Distribución de Top 10 modelos en base de datos</div>
             <div class="chart-wrap"><div id="chart-modelos-equipos" style="width:100%;height:100%"></div></div>
           </div>
@@ -10078,7 +10078,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-responsabilidad', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-responsabilidad', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">trending_up</span>Responsabilidad Global</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">trending_up</span>Responsabilidad Global</h3>
             <div class="dash-sub">Disponibilidad global del parque de equipos</div>
             <div class="chart-wrap"><div id="chart-responsabilidad" style="width:100%;height:100%"></div></div>
           </div>
@@ -10091,7 +10091,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-top5-criticidades', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-top5-criticidades', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">priority_high</span>Top 5 Criticidades</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">priority_high</span>Top 5 Criticidades</h3>
             <div class="dash-sub">Top 5 CRs por concentración de equipos críticos</div>
             <div class="chart-wrap"><div id="chart-top5-criticidades" style="width:100%;height:100%"></div></div>
           </div>
@@ -10104,7 +10104,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button onclick="downloadChart('chart-tendencia-historica', 'jpeg')">JPEG</button>
               <button onclick="downloadChart('chart-tendencia-historica', 'svg')">SVG</button>
             </div>
-            <h3 style="color:#E2001A;"><span class="material-symbols-outlined" style="font-size:18px">show_chart</span>Tendencia Histórica</h3>
+            <h3 style="color:var(--ink-marca);"><span class="material-symbols-outlined" style="font-size:18px">show_chart</span>Tendencia Histórica</h3>
             <div class="dash-sub">Evolución de equipos críticos en el tiempo</div>
             <div class="chart-wrap"><div id="chart-tendencia-historica" style="width:100%;height:100%"></div></div>
           </div>
@@ -10116,7 +10116,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         <div class="analytics-section" style="background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow-2); margin-bottom:  8px;">
           <div style="display:flex; align-items:center; justify-content:space-between; padding:  16px 20px 0 20px;">
             <div style="display:flex; align-items:center; gap:  8px;">
-              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">trending_up</span>
+              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary-ink, var(--primary));">trending_up</span>
               <span style="font-size:12px; font-weight: 600; color:var(--text); letter-spacing:0;">Analytics Adicionales</span>
             </div>
           </div>
@@ -10133,7 +10133,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <!-- KPI: Equipos Críticos -->
               <div class="kpi-card" style="background:linear-gradient(135deg, rgba(179,38,30,0.08) 0%, transparent 100%); border:1px solid rgba(179,38,30,0.2); border-radius:12px; padding:  20px; text-align:center;">
                 <div style="font-size:11px; font-weight: 600; color:var(--text-light); letter-spacing:0; margin-bottom:  8px;">Críticos (≥15 días)</div>
-                <div style="font-size:36px; font-weight:800; color:var(--error); margin-bottom:  4px;" id="analytics-critical">—</div>
+                <div style="font-size:36px; font-weight:800; color:var(--error-ink, var(--error)); margin-bottom:  4px;" id="analytics-critical">—</div>
                 <div style="font-size:11px; color:var(--text-light);">necesitan intervención</div>
               </div>
 
@@ -10153,7 +10153,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <!-- HEADER PREMIUM -->
           <div style="padding:  20px 24px; background:linear-gradient(135deg, rgba(25,118,210,0.08) 0%, rgba(25,118,210,0.03) 100%); border-bottom:2px solid var(--border);">
             <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  8px;">
-              <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">schedule</span>
+              <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary-ink, var(--primary));">schedule</span>
               <h3 style="margin:0; font-size:14px; font-weight: 600; color:var(--text); letter-spacing:-0.3px;">Horarios de Desconexión por Hora</h3>
             </div>
             <div style="font-size:12px; color:var(--text-light); margin-left:32px; font-weight: 600;">
@@ -10211,14 +10211,14 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                    onmouseover="document.getElementById('search-wrapper').style.borderColor='var(--primary)'; document.getElementById('search-wrapper').style.boxShadow='0 6px 24px rgba(25,118,210,0.12)';"
                    onmouseout="document.getElementById('search-wrapper').style.borderColor='var(--border)'; document.getElementById('search-wrapper').style.boxShadow='var(--shadow-2)';">
                 <div style="display:flex; align-items:center; padding:  4px;">
-                  <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px; padding:  12px 12px 12px 16px;">location_on</span>
+                  <span class="material-symbols-outlined" style="color:var(--primary-ink, var(--primary)); font-size:20px; padding:  12px 12px 12px 16px;">location_on</span>
                   <input type="text" id="oxxo-search-input" placeholder="🔍 Buscar tienda en el mapa (Maples, Centro, Playas...)"
                     style="flex:1; border:none; background:transparent; color:var(--text); font-size:13px; padding:  12px 12px 12px 6px;
                            outline:none; font-weight: 600;"
                     oninput="searchOxxoByName(this.value)">
                   <span id="search-clear-btn" style="display:none; cursor:pointer; color:var(--text-light); padding:  12px 16px;
                                                       font-size:18px; transition: color var(--mov-base);"
-                        onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-light)'"
+                        onmouseover="this.style.color='var(--primary-ink, var(--primary))'" onmouseout="this.style.color='var(--text-light)'"
                         onclick="document.getElementById('oxxo-search-input').value=''; searchOxxoByName(''); document.getElementById('search-clear-btn').style.display='none'; document.getElementById('search-results-container').style.display='none';">✕</span>
                 </div>
               </div>
@@ -10245,7 +10245,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             <!-- HEADER COMPACTO -->
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:  12px;">
               <div style="flex:1;">
-                <h3 id="oxxo-details-name" style="margin:0; font-size:14px; font-weight: 600; color:var(--primary);">Oxxo</h3>
+                <h3 id="oxxo-details-name" style="margin:0; font-size:14px; font-weight: 600; color:var(--primary-ink, var(--primary));">Oxxo</h3>
                 <div id="oxxo-location-label" style="font-size:11px; color:var(--text-light); margin-top:  2px;">📍 Ubicación</div>
               </div>
               <button onclick="closeOxxoDetails()" style="background:none; border:none; color:var(--text-light); cursor:pointer; font-size:18px;
@@ -10258,7 +10258,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             <div style="background:linear-gradient(135deg, rgba(25,118,210,0.08) 0%, rgba(25,118,210,0.03) 100%); padding:  8px 12px; border-radius:8px; margin-bottom:  12px;
                         border-left:3px solid var(--primary);">
               <div style="font-size:11px; font-weight: 600; color:var(--text-light); margin-bottom:  2px; letter-spacing:0;">📍 Coord</div>
-              <div id="oxxo-coords" style="font-size:11px; font-weight:600; color:var(--primary); font-family:'Courier New', monospace;">—</div>
+              <div id="oxxo-coords" style="font-size:11px; font-weight:600; color:var(--primary-ink, var(--primary)); font-family:'Courier New', monospace;">—</div>
             </div>
 
             <!-- ESTADÍSTICAS EN GRID COMPACTO 1x4 -->
@@ -10268,12 +10268,12 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <div id="oxxo-total-count" style="font-size:14px; font-weight: 600;">—</div>
               </div>
               <div style="background:rgba(31,122,78,0.1); padding:  8px 6px; border-radius:8px; border:1px solid rgba(31,122,78,0.2); text-align:center;">
-                <div style="font-size:11px; font-weight: 600; color:#1F7A4E; margin-bottom:  2px;">On</div>
-                <div id="oxxo-online-count" style="font-size:14px; font-weight: 600; color:#1F7A4E;">—</div>
+                <div style="font-size:11px; font-weight: 600; color:var(--ink-ok); margin-bottom:  2px;">On</div>
+                <div id="oxxo-online-count" style="font-size:14px; font-weight: 600; color:var(--ink-ok);">—</div>
               </div>
               <div style="background:rgba(226,0,26,0.1); padding:  8px 6px; border-radius:8px; border:1px solid rgba(226,0,26,0.15); text-align:center;">
-                <div style="font-size:11px; font-weight: 600; color:#E2001A; margin-bottom:  2px;">1-3d</div>
-                <div id="oxxo-offline-count" style="font-size:14px; font-weight: 600; color:#E2001A;">—</div>
+                <div style="font-size:11px; font-weight: 600; color:var(--ink-marca); margin-bottom:  2px;">1-3d</div>
+                <div id="oxxo-offline-count" style="font-size:14px; font-weight: 600; color:var(--ink-marca);">—</div>
               </div>
               <div style="background:rgba(139,0,0,0.1); padding:  8px 6px; border-radius:8px; border:1px solid rgba(139,0,0,0.2); text-align:center;">
                 <div style="font-size:11px; font-weight: 600; color:#8B0000; margin-bottom:  2px;">4+d</div>
@@ -10289,7 +10289,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           </div>
 
           <h3>
-            <span class="material-symbols-outlined" style="color:var(--primary);">map</span>
+            <span class="material-symbols-outlined" style="color:var(--primary-ink, var(--primary));">map</span>
             Mapa de Plazas — Baja California
             <span style="font-size:11px; font-weight:400; color:var(--text-light); margin-left:auto;">Zoom, arrastrar y clic en zonas</span>
           </h3>
@@ -10315,7 +10315,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       <!-- DETALLE TAB -->
       <div id="detalle" class="section">
         <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  20px; padding:  0 16px;">
-          <span class="material-symbols-outlined" style="font-size:28px; color:var(--primary);">description</span>
+          <span class="material-symbols-outlined" style="font-size:28px; color:var(--primary-ink, var(--primary));">description</span>
           <h2 style="font-size:20px; font-weight: 600; margin:0; color:var(--text);">Detalle de Equipos</h2>
         </div>
         <!-- BARRA DE FILTROS MEJORADA (Pretty) -->
@@ -10439,7 +10439,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <button class="btn btn-secondary" style="padding:   6px 12px; font-size: 13px;" onclick="exportSnapshotsJSON()" title="Descargar JSON con todos los snapshots">
                 <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">download</span> Exportar JSON
               </button>
-              <button class="btn btn-secondary" style="padding:   6px 12px; font-size: 13px; border-color:var(--error);color:var(--error);" onclick="clearAllSnapshots()" title="Borrar todos los snapshots">
+              <button class="btn btn-secondary" style="padding:   6px 12px; font-size: 13px; border-color:var(--error);color:var(--error-ink, var(--error));" onclick="clearAllSnapshots()" title="Borrar todos los snapshots">
                 <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">delete_forever</span> Borrar todos
               </button>
             </div>
@@ -10454,7 +10454,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       <!-- ASESOR TAB (FASE 2) -->
       <div id="asesor" class="section">
         <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  20px; padding:  0 16px;">
-          <span class="material-symbols-outlined" style="font-size:28px; color:var(--primary);">groups</span>
+          <span class="material-symbols-outlined" style="font-size:28px; color:var(--primary-ink, var(--primary));">groups</span>
           <h2 style="font-size:20px; font-weight: 600; margin:0; color:var(--text);">Equipos por Asesor</h2>
         </div>
 
@@ -10488,7 +10488,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                  style="flex: 1; min-width: 160px; padding:   8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--input-bg); color: var(--text); font-size: 12px;">
 
           <!-- BOTÓN LIMPIAR -->
-          <button onclick="clearAsesorFilters()" style="display:inline-flex; align-items:center; gap:  4px; padding:   8px 12px; background: rgba(226,0,26,0.1); color: var(--primary); border: 1px solid rgba(226,0,26,0.25); border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600;" title="Limpiar todos los filtros">
+          <button onclick="clearAsesorFilters()" style="display:inline-flex; align-items:center; gap:  4px; padding:   8px 12px; background: rgba(226,0,26,0.1); color: var(--primary-ink, var(--primary)); border: 1px solid rgba(226,0,26,0.25); border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600;" title="Limpiar todos los filtros">
             <span class="material-symbols-outlined" style="font-size:14px;">close</span> Limpiar
           </button>
 
@@ -10579,7 +10579,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             <!-- STOCK / GARANTÍA TAB -->
       <div id="garantia" class="section">
         <div style="display:flex; align-items:center; gap:  16px; margin-bottom:  24px; padding:  0 16px;">
-          <span class="material-symbols-outlined" style="font-size:32px; color:var(--primary);">inventory_2</span>
+          <span class="material-symbols-outlined" style="font-size:32px; color:var(--primary-ink, var(--primary));">inventory_2</span>
           <div>
             <h2 style="font-size:24px; font-weight: 600; margin:0 0 4px 0; color:var(--text);">Stock & Garantía</h2>
             <p style="font-size:13px; color:var(--text-light); margin:0;">Gestiona equipos y registra inventario por plaza</p>
@@ -10602,11 +10602,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  12px; position:relative; z-index:1;">
                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' style='width:40px;height:40px;'><circle cx='32' cy='32' r='28' fill='rgba(179,38,30,0.1)'/><path d='M32 12 L42 18 L42 28 Q42 38 32 44 Q22 38 22 28 L22 18 Z' fill='#B3261E' stroke='#B3261E' stroke-width='1'/><circle cx='32' cy='26' r='3' fill='white'/></svg>
                 <div>
-                  <div style="font-size:12px; font-weight:600; color:var(--error);">ROBO</div>
+                  <div style="font-size:12px; font-weight:600; color:var(--error-ink, var(--error));">ROBO</div>
                   <div style="font-size:11px; color:var(--text-light);">Equipos reportados</div>
                 </div>
               </div>
-              <div style="font-size:28px; font-weight: 600; color:var(--error); position:relative; z-index:1;" id="count-robo">0</div>
+              <div style="font-size:28px; font-weight: 600; color:var(--error-ink, var(--error)); position:relative; z-index:1;" id="count-robo">0</div>
             </div>
 
             <!-- DAÑADA -->
@@ -10615,11 +10615,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  12px; position:relative; z-index:1;">
                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' style='width:40px;height:40px;'><circle cx='32' cy='32' r='28' fill='rgba(245,166,35,0.1)'/><rect x='18' y='16' width='28' height='28' rx='2' fill='none' stroke='#F5A623' stroke-width='2'/><line x1='22' y1='20' x2='42' y2='40' stroke='#F5A623' stroke-width='2'/><line x1='42' y1='20' x2='22' y2='40' stroke='#F5A623' stroke-width='2'/></svg>
                 <div>
-                  <div style="font-size:12px; font-weight:600; color:#F5A623;">DAÑADA</div>
+                  <div style="font-size:12px; font-weight:600; color:var(--ink-ambar);">DAÑADA</div>
                   <div style="font-size:11px; color:var(--text-light);">Requiere reparación</div>
                 </div>
               </div>
-              <div style="font-size:28px; font-weight: 600; color:#F5A623; position:relative; z-index:1;" id="count-danada">0</div>
+              <div style="font-size:28px; font-weight: 600; color:var(--ink-ambar); position:relative; z-index:1;" id="count-danada">0</div>
             </div>
 
             <!-- GARANTÍA -->
@@ -10628,11 +10628,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  12px; position:relative; z-index:1;">
                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' style='width:40px;height:40px;'><circle cx='32' cy='32' r='28' fill='rgba(25,118,210,0.1)'/><path d='M32 12 L48 20 L48 32 Q48 44 32 50 Q16 44 16 32 L16 20 Z' fill='none' stroke='#1976D2' stroke-width='2'/><polyline points='26,34 30,38 38,28' fill='none' stroke='#1976D2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>
                 <div>
-                  <div style="font-size:12px; font-weight:600; color:#1976D2;">GARANTÍA</div>
+                  <div style="font-size:12px; font-weight:600; color:var(--ink-info);">GARANTÍA</div>
                   <div style="font-size:11px; color:var(--text-light);">En trámite con proveedor</div>
                 </div>
               </div>
-              <div style="font-size:28px; font-weight: 600; color:#1976D2; position:relative; z-index:1;" id="count-garantia">0</div>
+              <div style="font-size:28px; font-weight: 600; color:var(--ink-info); position:relative; z-index:1;" id="count-garantia">0</div>
             </div>
 
             <!-- APAGADA -->
@@ -10641,11 +10641,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  12px; position:relative; z-index:1;">
                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' style='width:40px;height:40px;'><circle cx='32' cy='32' r='28' fill='rgba(95,99,104,0.1)'/><circle cx='32' cy='28' r='8' fill='none' stroke='#5F6368' stroke-width='2'/><line x1='32' y1='20' x2='32' y2='12' stroke='#5F6368' stroke-width='2' stroke-linecap='round'/><path d='M24 42 Q32 48 40 42' fill='none' stroke='#5F6368' stroke-width='2' stroke-linecap='round'/></svg>
                 <div>
-                  <div style="font-size:12px; font-weight:600; color:#5F6368;">APAGADA</div>
+                  <div style="font-size:12px; font-weight:600; color:var(--ink-gris);">APAGADA</div>
                   <div style="font-size:11px; color:var(--text-light);">Sin uso reportado</div>
                 </div>
               </div>
-              <div style="font-size:28px; font-weight: 600; color:#5F6368; position:relative; z-index:1;" id="count-apagada">0</div>
+              <div style="font-size:28px; font-weight: 600; color:var(--ink-gris); position:relative; z-index:1;" id="count-apagada">0</div>
             </div>
 
           </div>
@@ -10653,11 +10653,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <!-- FILTROS + TABLA EQUIPOS -->
           <div class="estado-table-wrap" id="estado-table-wrap" style="margin-bottom:  28px;">
             <div class="estado-filters" style="margin-bottom:  16px; display:flex; gap:  8px; flex-wrap:wrap;">
-              <button class="estado-chip robo" onclick="filterGarantiaByEstado('ROBO')" style="padding:  8px 16px; border:1px solid rgba(179,38,30,0.3); background:rgba(179,38,30,0.04); color:var(--error); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">report</span>Robo</button>
-              <button class="estado-chip danada" onclick="filterGarantiaByEstado('DAÑADA')" style="padding:  8px 16px; border:1px solid rgba(245,166,35,0.3); background:rgba(245,166,35,0.04); color:#F5A623; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">build</span>Dañada</button>
-              <button class="estado-chip garantia" onclick="filterGarantiaByEstado('GARANTÍA')" style="padding:  8px 16px; border:1px solid rgba(25,118,210,0.3); background:rgba(25,118,210,0.04); color:#1976D2; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">verified</span>Garantía</button>
-              <button class="estado-chip apagada" onclick="filterGarantiaByEstado('APAGADA')" style="padding:  8px 16px; border:1px solid rgba(95,99,104,0.3); background:rgba(95,99,104,0.04); color:#5F6368; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">power_settings_new</span>Apagada</button>
-              <button class="estado-chip all" onclick="filterGarantiaByEstado('')" style="padding:  8px 16px; border:1px solid var(--primary); background:transparent; color:var(--primary); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);">👁️ Ver todos</button>
+              <button class="estado-chip robo" onclick="filterGarantiaByEstado('ROBO')" style="padding:  8px 16px; border:1px solid rgba(179,38,30,0.3); background:rgba(179,38,30,0.04); color:var(--error-ink, var(--error)); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">report</span>Robo</button>
+              <button class="estado-chip danada" onclick="filterGarantiaByEstado('DAÑADA')" style="padding:  8px 16px; border:1px solid rgba(245,166,35,0.3); background:rgba(245,166,35,0.04); color:var(--ink-ambar); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">build</span>Dañada</button>
+              <button class="estado-chip garantia" onclick="filterGarantiaByEstado('GARANTÍA')" style="padding:  8px 16px; border:1px solid rgba(25,118,210,0.3); background:rgba(25,118,210,0.04); color:var(--ink-info); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">verified</span>Garantía</button>
+              <button class="estado-chip apagada" onclick="filterGarantiaByEstado('APAGADA')" style="padding:  8px 16px; border:1px solid rgba(95,99,104,0.3); background:rgba(95,99,104,0.04); color:var(--ink-gris); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);"><span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:3px;">power_settings_new</span>Apagada</button>
+              <button class="estado-chip all" onclick="filterGarantiaByEstado('')" style="padding:  8px 16px; border:1px solid var(--primary); background:transparent; color:var(--primary-ink, var(--primary)); border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);">👁️ Ver todos</button>
             </div>
             <div id="garantia-estados-table" style="min-height:120px; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow-x:auto; width:100%; max-width:100%;">
               <div class="estado-table-empty" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:  8px; padding:  40px 20px; color:var(--text-light); text-align:center;">
@@ -10725,8 +10725,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="background:linear-gradient(135deg, #E3F2FD, #BBDEFB); border:2px solid #1976D2; border-radius:12px; padding:  16px; position:relative; overflow:hidden;">
                 <div style="position:absolute; top:-10px; right:-10px; width:60px; height:60px; background:rgba(25,118,210,0.1); border-radius:50%;"></div>
                 <div style="position:relative; z-index:2;">
-                  <p style="font-size:11px; font-weight: 600; color:#1565C0; margin:0 0 6px 0; letter-spacing:0;">Total HH</p>
-                  <div style="font-size:32px; font-weight:800; color:#0D47A1; margin-bottom:  8px;">
+                  <p style="font-size:11px; font-weight: 600; color:var(--ink-azul); margin:0 0 6px 0; letter-spacing:0;">Total HH</p>
+                  <div style="font-size:32px; font-weight:800; color:var(--ink-azul-fuerte); margin-bottom:  8px;">
                     <span id="stock-kpi-hh-total">0</span>
                   </div>
                   <div id="stock-hh-gauge" style="width:100%; height:6px; background:rgba(25,118,210,0.2); border-radius:6px; overflow:hidden;">
@@ -10739,8 +10739,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="background:linear-gradient(135deg, #F3E5F5, #E1BEE7); border:2px solid #7B1FA2; border-radius:12px; padding:  16px; position:relative; overflow:hidden;">
                 <div style="position:absolute; top:-10px; right:-10px; width:60px; height:60px; background:rgba(123,31,162,0.1); border-radius:50%;"></div>
                 <div style="position:relative; z-index:2;">
-                  <p style="font-size:11px; font-weight: 600; color:#6A1B9A; margin:0 0 6px 0; letter-spacing:0;">Total TT</p>
-                  <div style="font-size:32px; font-weight:800; color:#4A148C; margin-bottom:  8px;">
+                  <p style="font-size:11px; font-weight: 600; color:var(--ink-violeta); margin:0 0 6px 0; letter-spacing:0;">Total TT</p>
+                  <div style="font-size:32px; font-weight:800; color:var(--ink-violeta-fuerte); margin-bottom:  8px;">
                     <span id="stock-kpi-tt-total">0</span>
                   </div>
                   <div id="stock-tt-gauge" style="width:100%; height:6px; background:rgba(123,31,162,0.2); border-radius:6px; overflow:hidden;">
@@ -10753,8 +10753,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="background:linear-gradient(135deg, #FFF3E0, #FFE0B2); border:2px solid #F57C00; border-radius:12px; padding:  16px; position:relative; overflow:hidden;">
                 <div style="position:absolute; top:-10px; right:-10px; width:60px; height:60px; background:rgba(245,124,0,0.1); border-radius:50%;"></div>
                 <div style="position:relative; z-index:2;">
-                  <p style="font-size:11px; font-weight: 600; color:#E65100; margin:0 0 6px 0; letter-spacing:0;">Impresoras</p>
-                  <div style="font-size:32px; font-weight:800; color:#BF360C; margin-bottom:  8px;">
+                  <p style="font-size:11px; font-weight: 600; color:var(--ink-naranja); margin:0 0 6px 0; letter-spacing:0;">Impresoras</p>
+                  <div style="font-size:32px; font-weight:800; color:var(--ink-naranja-fuerte); margin-bottom:  8px;">
                     <span id="stock-kpi-imp-total">0</span>
                   </div>
                   <div id="stock-imp-gauge" style="width:100%; height:6px; background:rgba(245,124,0,0.2); border-radius:6px; overflow:hidden;">
@@ -10767,8 +10767,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="background:linear-gradient(135deg, #E8F5E9, #C8E6C9); border:2px solid #388E3C; border-radius:12px; padding:  16px; position:relative; overflow:hidden;">
                 <div style="position:absolute; top:-10px; right:-10px; width:60px; height:60px; background:rgba(56,142,60,0.1); border-radius:50%;"></div>
                 <div style="position:relative; z-index:2;">
-                  <p style="font-size:11px; font-weight: 600; color:#2E7D32; margin:0 0 6px 0; letter-spacing:0;">Cargadores</p>
-                  <div style="font-size:32px; font-weight:800; color:#1B5E20; margin-bottom:  8px;">
+                  <p style="font-size:11px; font-weight: 600; color:var(--ink-verde); margin:0 0 6px 0; letter-spacing:0;">Cargadores</p>
+                  <div style="font-size:32px; font-weight:800; color:var(--ink-verde-fuerte); margin-bottom:  8px;">
                     <span id="stock-kpi-carg-total">0</span>
                   </div>
                   <div id="stock-carg-gauge" style="width:100%; height:6px; background:rgba(56,142,60,0.2); border-radius:6px; overflow:hidden;">
@@ -10781,8 +10781,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <div style="background:linear-gradient(135deg, #FCE4EC, #F8BBD0); border:2px solid #C2185B; border-radius:12px; padding:  16px; position:relative; overflow:hidden;">
                 <div style="position:absolute; top:-10px; right:-10px; width:60px; height:60px; background:rgba(194,24,91,0.1); border-radius:50%;"></div>
                 <div style="position:relative; z-index:2;">
-                  <p style="font-size:11px; font-weight: 600; color:#AD1457; margin:0 0 6px 0; letter-spacing:0;">Inversión</p>
-                  <div style="font-size:24px; font-weight:800; color:#880E4F; margin-bottom:  8px;">
+                  <p style="font-size:11px; font-weight: 600; color:var(--ink-rosa); margin:0 0 6px 0; letter-spacing:0;">Inversión</p>
+                  <div style="font-size:24px; font-weight:800; color:var(--ink-rosa-fuerte); margin-bottom:  8px;">
                     $<span id="stock-kpi-inv-total">0.00</span>
                   </div>
                   <p style="font-size:11px; color:var(--text-light); margin:0;">Costo total estimado</p>
@@ -10851,7 +10851,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <!-- 2. TABLA DE EQUIPOS QUE NECESITAN ACTUALIZACIÓN -->
           <div style="background:var(--card-bg); border:1.5px solid var(--border); border-radius:16px; padding:  24px; margin-bottom:  24px;">
             <h3 style="font-size:16px; font-weight: 600; margin:0 0 16px 0; color:var(--text); display:flex; align-items:center; gap:  12px;">
-              <span class="material-symbols-outlined" style="font-size:20px; color:#F5A623;">warning</span>
+              <span class="material-symbols-outlined" style="font-size:20px; color:var(--ink-ambar);">warning</span>
               Equipos sin Android 13 (Necesitan Actualización)
             </h3>
             <div style="overflow-x:auto;">
@@ -10912,7 +10912,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       <div id="exportacion" class="section">
         <!-- HEADER -->
         <div style="display:flex; align-items:center; gap:  16px; margin-bottom:  28px; padding:  0 16px;">
-          <div style="width:44px;height:44px;background:var(--primary);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(226,0,26,0.3);">
+          <div style="width:44px;height:44px;background:var(--primary-fill, var(--primary));border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(226,0,26,0.3);">
             <span class="material-symbols-outlined" style="font-size:24px;color:white;">download</span>
           </div>
           <div>
@@ -10962,10 +10962,10 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               </p>
               <!-- Tags de lo que incluye (altura mínima) -->
               <div style="display:flex;flex-wrap:wrap;gap:  6px;min-height:28px;">
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📊 KPIs</span>
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📋 Tabla críticos</span>
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📁 Excel adjunto</span>
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(226,0,26,0.08);color:#E2001A;border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📄 PDF adjunto</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(226,0,26,0.08);color:var(--ink-marca);border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📊 KPIs</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(226,0,26,0.08);color:var(--ink-marca);border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📋 Tabla críticos</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(226,0,26,0.08);color:var(--ink-marca);border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📁 Excel adjunto</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(226,0,26,0.08);color:var(--ink-marca);border-radius:16px;border:1px solid rgba(226,0,26,0.2);">📄 PDF adjunto</span>
               </div>
               <!-- Espaciador flexible -->
               <div style="flex-grow:1;"></div>
@@ -10983,7 +10983,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <!-- Acciones secundarias -->
               <div style="display:flex;gap:  8px;">
                 <button onclick="previewEmail()"
-                  style="flex:1;padding:  8px 12px;background:rgba(226,0,26,0.06);color:#E2001A;
+                  style="flex:1;padding:  8px 12px;background:rgba(226,0,26,0.06);color:var(--ink-marca);
                          border:1px solid rgba(226,0,26,0.2);border-radius:8px;font-weight:600;
                          font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:  4px;"
                   onmouseover="this.style.background='rgba(226,0,26,0.12)';"
@@ -10991,7 +10991,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                   <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Vista previa
                 </button>
                 <button onclick="downloadReportEmail()"
-                  style="flex:1;padding:  8px 12px;background:rgba(226,0,26,0.06);color:#E2001A;
+                  style="flex:1;padding:  8px 12px;background:rgba(226,0,26,0.06);color:var(--ink-marca);
                          border:1px solid rgba(226,0,26,0.2);border-radius:8px;font-weight:600;
                          font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:  4px;"
                   onmouseover="this.style.background='rgba(226,0,26,0.12)';"
@@ -11022,9 +11022,9 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <span style="color:var(--text);font-weight:600;">Resumen, Críticos ≥4D y Detalle en un archivo.</span>
               </p>
               <div style="display:flex;flex-wrap:wrap;gap:  6px;min-height:28px;">
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(33,115,70,0.08);color:#217346;border-radius:16px;border:1px solid rgba(33,115,70,0.2);">3 hojas</span>
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(33,115,70,0.08);color:#217346;border-radius:16px;border:1px solid rgba(33,115,70,0.2);">Todos los campos</span>
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(33,115,70,0.08);color:#217346;border-radius:16px;border:1px solid rgba(33,115,70,0.2);">Filtro de plaza</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(33,115,70,0.08);color:var(--ink-excel);border-radius:16px;border:1px solid rgba(33,115,70,0.2);">3 hojas</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(33,115,70,0.08);color:var(--ink-excel);border-radius:16px;border:1px solid rgba(33,115,70,0.2);">Todos los campos</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(33,115,70,0.08);color:var(--ink-excel);border-radius:16px;border:1px solid rgba(33,115,70,0.2);">Filtro de plaza</span>
               </div>
               <!-- Espaciador flexible -->
               <div style="flex-grow:1;"></div>
@@ -11042,7 +11042,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <!-- Acciones secundarias Excel -->
               <div style="display:flex;gap:  8px;">
                 <button onclick="previewExcel()"
-                  style="flex:1;padding:  8px 12px;background:rgba(33,115,70,0.06);color:#217346;
+                  style="flex:1;padding:  8px 12px;background:rgba(33,115,70,0.06);color:var(--ink-excel);
                          border:1px solid rgba(33,115,70,0.2);border-radius:8px;font-weight:600;
                          font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:  4px;"
                   onmouseover="this.style.background='rgba(33,115,70,0.12)';"
@@ -11050,7 +11050,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                   <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Vista previa
                 </button>
                 <button onclick="exportDataByFormat('csv-todo')"
-                  style="flex:1;padding:  8px 12px;background:rgba(33,115,70,0.06);color:#217346;
+                  style="flex:1;padding:  8px 12px;background:rgba(33,115,70,0.06);color:var(--ink-excel);
                          border:1px solid rgba(33,115,70,0.2);border-radius:8px;font-weight:600;
                          font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:  4px;"
                   onmouseover="this.style.background='rgba(33,115,70,0.12)';"
@@ -11081,10 +11081,10 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <span style="color:var(--text);font-weight:600;">Ideal para presentaciones ejecutivas.</span>
               </p>
               <div style="display:flex;flex-wrap:wrap;gap:  6px;min-height:28px;">
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Portada</span>
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Resumen ejecutivo</span>
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Dashboards</span>
-                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(204,51,0,0.08);color:#CC3300;border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Top críticos</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(204,51,0,0.08);color:var(--ink-naranja-os);border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Portada</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(204,51,0,0.08);color:var(--ink-naranja-os);border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Resumen ejecutivo</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(204,51,0,0.08);color:var(--ink-naranja-os);border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Dashboards</span>
+                <span style="font-size:11px;font-weight:600;padding:  4px 8px;background:rgba(204,51,0,0.08);color:var(--ink-naranja-os);border-radius:16px;border:1px solid rgba(204,51,0,0.2);">Top críticos</span>
               </div>
               <!-- Espaciador flexible -->
               <div style="flex-grow:1;"></div>
@@ -11101,7 +11101,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
               <!-- Acción secundaria PDF -->
               <div style="display:flex;">
                 <button onclick="previewReportPDF(null, getPlazaScopedData())"
-                  style="flex:1;padding:  8px 12px;background:rgba(204,51,0,0.06);color:#CC3300;
+                  style="flex:1;padding:  8px 12px;background:rgba(204,51,0,0.06);color:var(--ink-naranja-os);
                          border:1px solid rgba(204,51,0,0.2);border-radius:8px;font-weight:600;
                          font-size:11px;cursor:pointer;transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);display:flex;align-items:center;justify-content:center;gap:  4px;"
                   onmouseover="this.style.background='rgba(204,51,0,0.12)';"
@@ -11122,13 +11122,13 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                 <span style="font-size:12px; opacity:0.6; margin-left:auto;">▼</span>
               </summary>
               <div style="margin-top:  12px; display:flex; flex-direction:column; gap:  8px; padding-top:  12px; border-top:1px solid rgba(179,38,30,0.1);">
-                <button class="btn btn-secondary" style="padding:  8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" onclick="clearPersistedComments()">
+                <button class="btn btn-secondary" style="padding:  8px 12px; background:transparent; color:var(--error-ink, var(--error)); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" onclick="clearPersistedComments()">
                   🗑️ Limpiar comentarios
                 </button>
-                <button class="btn btn-secondary" style="padding:  8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" onclick="clearAttendedAll()">
+                <button class="btn btn-secondary" style="padding:  8px 12px; background:transparent; color:var(--error-ink, var(--error)); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" onclick="clearAttendedAll()">
                   🗑️ Quitar "atendidos"
                 </button>
-                <button class="btn btn-secondary" style="padding:  8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" onclick="clearPersistedNotes()">
+                <button class="btn btn-secondary" style="padding:  8px 12px; background:transparent; color:var(--error-ink, var(--error)); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" onclick="clearPersistedNotes()">
                   🗑️ Limpiar notas
                 </button>
               </div>
@@ -11141,7 +11141,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       <!-- CONFIGURACION TAB -->
       <div id="configuracion" class="section">
         <div style="display:flex; align-items:center; gap:  12px; margin-bottom:  24px; padding:  0 16px;">
-          <span class="material-symbols-outlined" style="font-size:28px; color:var(--primary);">settings</span>
+          <span class="material-symbols-outlined" style="font-size:28px; color:var(--primary-ink, var(--primary));">settings</span>
           <h2 style="font-size:20px; font-weight: 600; margin:0; color:var(--text);">Configuración del Sistema</h2>
         </div>
         <div class="config-container" style="padding-bottom:   120px;">
@@ -11151,7 +11151,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
           <!-- GRUPO 1: CONFIGURACIÓN DE DATOS -->
           <div style="margin-bottom:   8px; padding:   12px; background: var(--config-data-bg); border-radius: 6px; border-left: 3px solid var(--config-data-border);">
-            <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--primary); display: flex; align-items: center; gap:   8px;">
+            <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--primary-ink, var(--primary)); display: flex; align-items: center; gap:   8px;">
               <span class="material-symbols-outlined" style="font-size: 18px;">bar_chart</span>
               CONFIGURACIÓN DE DATOS
             </h3>
@@ -11410,13 +11410,13 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                     <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">upload</span>
                     Cargar logo
                   </button>
-                  <button class="btn btn-secondary" onclick="clearLogo()" style="padding:  6px 16px;border-color:var(--error);color:var(--error);">
+                  <button class="btn btn-secondary" onclick="clearLogo()" style="padding:  6px 16px;border-color:var(--error);color:var(--error-ink, var(--error));">
                     <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">delete</span>
                     Quitar
                   </button>
                   <div id="logo-preview-box" style="display:none;align-items:center;gap:  8px;padding:  6px 12px;border:1px dashed var(--border);border-radius:6px;background:var(--card-bg);">
                     <img id="logo-preview-img" alt="logo" style="max-height:36px;max-width:80px;">
-                    <span style="font-size:11px;color:#5f6368;">Logo cargado</span>
+                    <span style="font-size:11px;color:var(--ink-gris);">Logo cargado</span>
                   </div>
                 </div>
               </div>
@@ -11460,17 +11460,17 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
                   <label style="display:block; font-size:11px; color:var(--text-light); margin-bottom:  4px;">Costo (USD)</label>
                   <input type="number" id="new-cost-amount" placeholder="0.00" min="0" step="0.01" style="width:100%; padding:  6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--input-bg); color:var(--text);">
                 </div>
-                <button onclick="addCostModel()" style="padding:  6px 16px; background:var(--primary); color:white; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
+                <button onclick="addCostModel()" style="padding:  6px 16px; background:var(--primary-fill, var(--primary)); color:white; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
                   Agregar
                 </button>
               </div>
 
               <!-- Botones de acción -->
               <div style="display:flex; gap:  8px; margin-top:  12px; border-top:1px solid var(--border); padding-top:  12px;">
-                <button onclick="clearAllCosts()" style="flex:1; padding:  8px 12px; background:transparent; color:var(--error); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
+                <button onclick="clearAllCosts()" style="flex:1; padding:  8px 12px; background:transparent; color:var(--error-ink, var(--error)); border:1px solid rgba(179,38,30,0.3); border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
                   🗑️ Limpiar todos
                 </button>
-                <button onclick="saveCostConfig()" style="flex:1; padding:  8px 12px; background:var(--primary); color:white; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
+                <button onclick="saveCostConfig()" style="flex:1; padding:  8px 12px; background:var(--primary-fill, var(--primary)); color:white; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">
                   <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">save</span> Guardar Costos
                 </button>
               </div>
@@ -11559,7 +11559,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             <span class="material-symbols-outlined">restart_alt</span>
             Restaurar Por Defecto
           </button>
-          <button class="btn btn-secondary" onclick="applyConfigurations()" style="flex: 1; background: var(--primary); color: white; border: none;">
+          <button class="btn btn-secondary" onclick="applyConfigurations()" style="flex: 1; background: var(--primary-fill, var(--primary)); color: white; border: none;">
             <span class="material-symbols-outlined">check</span>
             Aplicar Cambios
           </button>
@@ -11609,14 +11609,14 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <button class="btn-modal" onclick="exportSnapshotsJSON()" title="Descargar JSON con todos los snapshots">
             <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">download</span> Exportar JSON
           </button>
-          <button class="btn-modal" onclick="clearAllSnapshots()" style="color:var(--error);border-color:var(--error);">
+          <button class="btn-modal" onclick="clearAllSnapshots()" style="color:var(--error-ink, var(--error));border-color:var(--error);">
             <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">delete_forever</span> Borrar todos
           </button>
           <button class="btn-modal primary" onclick="closeSnapshotsModal()">Cerrar</button>
         </div>
       </div>
       <div class="modal-body">
-        <p style="font-size:12px;color:#5f6368;margin:0 0 10px 0;">
+        <p style="font-size:12px;color:var(--ink-gris);margin:0 0 10px 0;">
           Cada snapshot conserva fecha + KPIs + lista de equipos críticos. Útil para comparar contra el estado actual.
         </p>
         <ul id="snap-list" class="snap-list"></ul>
@@ -12665,7 +12665,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
       if (errors.length > 0) {
         validation.innerHTML = errors.join(' · ');
-        validation.style.color = 'var(--error)';
+        validation.style.color = 'var(--error-ink, var(--error))';
       } else {
         validation.innerHTML = '✓ Automático - Solo selecciona la plaza';
         validation.style.color = 'var(--success)';
@@ -13273,11 +13273,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             // Grid de stats compacto
             '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:  6px; margin-bottom:  12px;">' +
             '<div style="background:rgba(31,122,78,0.08); padding:  8px; border-radius:8px; border:1px solid rgba(31,122,78,0.15); text-align:center;">' +
-            '<div style="font-size:12px; font-weight: 600; color:#1F7A4E;">' + item.stats.online + '</div>' +
+            '<div style="font-size:12px; font-weight: 600; color:var(--ink-ok);">' + item.stats.online + '</div>' +
             '<div style="font-size:11px; color:var(--text-light); margin-top:  2px;">Online</div>' +
             '</div>' +
             '<div style="background:rgba(226,0,26,0.08); padding:  8px; border-radius:8px; border:1px solid rgba(226,0,26,0.15); text-align:center;">' +
-            '<div style="font-size:12px; font-weight: 600; color:#E2001A;">' + item.stats.offline + '</div>' +
+            '<div style="font-size:12px; font-weight: 600; color:var(--ink-marca);">' + item.stats.offline + '</div>' +
             '<div style="font-size:11px; color:var(--text-light); margin-top:  2px;">1-3d</div>' +
             '</div>' +
             '<div style="background:rgba(139,0,0,0.08); padding:  8px; border-radius:8px; border:1px solid rgba(139,0,0,0.15); text-align:center;">' +
@@ -13445,8 +13445,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           '<div style="font-weight: 600; color:var(--text); margin-bottom:  12px; display:flex; align-items:center; gap:  6px;">' +
           '<span class="material-symbols-outlined" style="font-size:18px;">phone_android</span>' +
           'HANDHELDS (HH)</div>';
-        if (hh.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; font-size:12px; margin-bottom:  6px; padding-left:  24px;">🟢 Online: ' + hh.online.join(' • ') + '</div>';
-        if (hh.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; font-size:12px; margin-bottom:  6px; padding-left:  24px;">🟠 Offline: ' + hh.offline.join(' • ') + '</div>';
+        if (hh.online.length > 0) equipmentHtml += '<div style="color:var(--ink-ok); font-size:12px; margin-bottom:  6px; padding-left:  24px;">🟢 Online: ' + hh.online.join(' • ') + '</div>';
+        if (hh.offline.length > 0) equipmentHtml += '<div style="color:var(--ink-marca); font-size:12px; margin-bottom:  6px; padding-left:  24px;">🟠 Offline: ' + hh.offline.join(' • ') + '</div>';
         if (hh.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; font-size:12px; padding-left:  24px;">🔴 Crítico: ' + hh.critical.join(' • ') + '</div>';
         equipmentHtml += '</div>';
       }
@@ -13457,8 +13457,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           '<div style="font-weight: 600; color:var(--text); margin-bottom:  12px; display:flex; align-items:center; gap:  6px;">' +
           '<span class="material-symbols-outlined" style="font-size:18px;">tablet</span>' +
           'TABLETS (TT)</div>';
-        if (tt.online.length > 0) equipmentHtml += '<div style="color:#1F7A4E; font-size:12px; margin-bottom:  6px; padding-left:  24px;">🟢 Online: ' + tt.online.join(' • ') + '</div>';
-        if (tt.offline.length > 0) equipmentHtml += '<div style="color:#E2001A; font-size:12px; margin-bottom:  6px; padding-left:  24px;">🟠 Offline: ' + tt.offline.join(' • ') + '</div>';
+        if (tt.online.length > 0) equipmentHtml += '<div style="color:var(--ink-ok); font-size:12px; margin-bottom:  6px; padding-left:  24px;">🟢 Online: ' + tt.online.join(' • ') + '</div>';
+        if (tt.offline.length > 0) equipmentHtml += '<div style="color:var(--ink-marca); font-size:12px; margin-bottom:  6px; padding-left:  24px;">🟠 Offline: ' + tt.offline.join(' • ') + '</div>';
         if (tt.critical.length > 0) equipmentHtml += '<div style="color:#8B0000; font-size:12px; padding-left:  24px;">🔴 Crítico: ' + tt.critical.join(' • ') + '</div>';
         equipmentHtml += '</div>';
       }
@@ -13923,6 +13923,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         desc: 'Centro TJ / Otay',
         center: [32.5200, -117.0000],
         color: '#1976D2',
+        labelColor: "#1565C0",  // 4.04:1 era justo por debajo del minimo
         // Zona centro: downtown TJ, Otay, zona Río
         polygon: [
           [32.5550, -117.0500], [32.5550, -116.9200],
@@ -13959,6 +13960,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         desc: 'Ensenada / San Quintín',
         center: [31.4000, -116.4000],
         color: '#F5A623',
+        labelColor: "#8A5A00",  // el ambar sobre mapa claro daba 1.78:1
         // Zona sur: Rosarito hasta San Quintín
         polygon: [
           [32.3500, -117.0600], [32.3500, -116.6500],
@@ -14073,7 +14075,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         // Label de la plaza sobre el polígono
         var labelIcon = L.divIcon({
           className: 'plaza-label-marker',
-          html: '<div style="font-size:11px; font-weight: 600; color:' + geo.color + '; text-shadow:0 0 4px white, 0 0 4px white, 0 0 4px white; white-space:nowrap; pointer-events:none;">' + geo.label + '</div>',
+          html: '<div style="font-size:11px; font-weight: 600; color:' + (geo.labelColor || geo.color) + '; text-shadow:0 0 4px white, 0 0 4px white, 0 0 4px white; white-space:nowrap; pointer-events:none;">' + geo.label + '</div>',
           iconSize: [100, 20],
           iconAnchor: [50, 10]
         });
@@ -14083,7 +14085,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       // Frontera EUA label
       var borderIcon = L.divIcon({
         className: 'border-label',
-        html: '<div style="font-size:11px; color:#888; letter-spacing:2px; font-weight:600; text-shadow:0 0 3px white;">── FRONTERA EUA ──</div>',
+        html: '<div style="font-size:11px; color:var(--ink-gris); letter-spacing:2px; font-weight:600; text-shadow:0 0 3px white;">── FRONTERA EUA ──</div>',
         iconSize: [160, 14],
         iconAnchor: [80, 7]
       });
@@ -14163,10 +14165,10 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           var popupHtml =
             '<div style="font-family:Segoe UI,Arial,sans-serif; min-width:200px;">' +
             '<div style="font-size:14px; font-weight: 600; color:' + statusColor + '; margin-bottom:  2px;">' + geo.label + '</div>' +
-            '<div style="font-size:11px; color:#888; margin-bottom:  12px;">' + geo.desc + '</div>' +
+            '<div style="font-size:11px; color:var(--ink-gris); margin-bottom:  12px;">' + geo.desc + '</div>' +
             '<div style="display:flex; gap:  12px; margin-bottom:  8px;">' +
               '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:var(--text);">' + totalPlaza + '</div><div style="font-size:11px; color:var(--text-light);">Equipos</div></div>' +
-              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:var(--error);">' + critPlaza + '</div><div style="font-size:11px; color:var(--text-light);">Offline</div></div>' +
+              '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:var(--error-ink, var(--error));">' + critPlaza + '</div><div style="font-size:11px; color:var(--text-light);">Offline</div></div>' +
               '<div style="text-align:center;"><div style="font-size:18px; font-weight:800; color:' + statusColor + ';">' + dispPct.toFixed(1) + '%</div><div style="font-size:11px; color:var(--text-light);">Disp.</div></div>' +
             '</div>' +
             '<div style="padding:  4px 8px; background:' + statusColor + '15; border-left:3px solid ' + statusColor + '; border-radius:0 4px 4px 0; font-size:11px; font-weight:600; color:' + statusColor + ';">' +
@@ -14248,22 +14250,22 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       // - >= 1 y < 4 días → RECIENTE (naranja/amarillo, ícono alerta)
       // - < 1 día → EN LÍNEA (verde, ícono checkmark, pulso)
 
-      if (!d) return { cls: 'unknown', txt: '?', icon: 'help', bg: 'rgba(0,0,0,0.06)', fg: '#666' };
+      if (!d) return { cls: 'unknown', txt: '?', icon: 'help', bg: 'var(--estado-nd-bg)', fg: 'var(--estado-nd-fg)' };
 
       var days = d.days_ago || 0;
       var cls, txt, icon, bg, fg;
       if (days >= 4) {
         cls = 'status-offline'; txt = 'Offline';
         icon = 'block';  // Icono de bloque (equipos bloqueados/desconectados)
-        bg  = '#FFEBEE'; fg = '#C62828';  // Rojo más vibrante
+        bg  = 'var(--estado-off-bg)'; fg = 'var(--estado-off-fg)';  // Rojo más vibrante
       } else if (days >= 1) {
         cls = 'status-recent'; txt = 'Reciente';
         icon = 'schedule';  // Reloj (esperando reconexión)
-        bg  = '#FFF3E0'; fg = '#E65100';  // Naranja más vibrante
+        bg  = 'var(--estado-rec-bg)'; fg = 'var(--estado-rec-fg)';  // Naranja más vibrante
       } else {
         cls = 'status-online'; txt = 'En línea';
         icon = 'check_circle';  // Checkmark en círculo (activo)
-        bg  = 'rgba(31,122,78,0.08)'; fg = '#1F7A4E';
+        bg  = 'var(--estado-on-bg)'; fg = 'var(--estado-on-fg)';
       }
 
       return { cls: cls, txt: txt, icon: icon, bg: bg, fg: fg };
@@ -14382,7 +14384,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             <td class="days-cell ${sev}"><span class="days-badge">${d.days_ago}</span></td>
             <td>${getEquipmentLabel(d.equipo_type)}</td>
             <td><strong>${d.CR || '—'}</strong></td>
-            <td>${d.PLAZA || '<span style="color:var(--error)">Sin plaza</span>'}</td>
+            <td>${d.PLAZA || '<span style="color:var(--error-ink, var(--error))">Sin plaza</span>'}</td>
             <td>${d.TIENDA || '—'}</td>
             <td>${d.ASESOR || '—'}</td>
             <td><span class="badge status-badge ${st.cls}" style="background: ${st.bg}; color: ${st.fg};"><span class="material-symbols-outlined status-icon">${st.icon}</span><span class="status-text">${st.txt}</span></span></td></tr>`);
@@ -14508,7 +14510,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         if (el) {
           if (cruceState.sortBy === realField) {
             el.textContent = cruceState.sortDir === 'asc' ? '▲' : '▼';
-            el.style.color = 'var(--primary)';
+            el.style.color = 'var(--ink-cabecera)';
           } else {
             el.textContent = '';
           }
@@ -14826,7 +14828,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
       var div = document.createElement('div');
       div.id = 'kpi-filter-banner';
-      div.style.cssText = 'display:flex;gap:  12px;align-items:center;padding:  12px 16px;margin:0 0 12px 0;border-radius:8px;font-size:12px;background:rgba(31,122,78,0.10);border:1px solid rgba(31,122,78,0.35);color:#1F7A4E;';
+      div.style.cssText = 'display:flex;gap:  12px;align-items:center;padding:  12px 16px;margin:0 0 12px 0;border-radius:8px;font-size:12px;background:rgba(31,122,78,0.10);border:1px solid rgba(31,122,78,0.35);color:var(--ink-ok);';
       div.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">filter_list</span>' +
         '<span><strong>Filtro KPI:</strong> ' + (labels[kpiId] || 'filtro activo') + '</span>' +
         '<span style="flex:1"></span>' +
@@ -14908,9 +14910,9 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             </div>
             <!-- Offline -->
             <div style="padding:   12px; background: rgba(179, 38, 30, 0.08); border-radius: 12px; box-shadow: var(--shadow-1); text-align: center; border-left: 4px solid #B3261E;">
-              <div style="font-size: 11px; font-weight: 600; color: var(--error); letter-spacing:0; margin-bottom:   4px;">Offline ≥4D</div>
-              <div style="font-size: 24px; font-weight: 800; color: var(--error);">${r.offline}</div>
-              <div style="font-size: 11px; color: var(--error); margin-top:   4px;">críticos</div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--error-ink, var(--error)); letter-spacing:0; margin-bottom:   4px;">Offline ≥4D</div>
+              <div style="font-size: 24px; font-weight: 800; color: var(--error-ink, var(--error));">${r.offline}</div>
+              <div style="font-size: 11px; color: var(--error-ink, var(--error)); margin-top:   4px;">críticos</div>
             </div>
           </div>
 
@@ -15983,7 +15985,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             <td style="padding:  6px 8px; border-bottom:1px solid var(--border); text-align:center; color:var(--text); font-weight:600; width:50px;">${data.count}</td>
             <td style="padding:  6px 8px; border-bottom:1px solid var(--border); color:var(--text); flex:1;">${typeKey}</td>
             <td style="padding:  6px 8px; border-bottom:1px solid var(--border); text-align:right; color:var(--text-light); font-size:11px; width:90px;">$${data.cost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td style="padding:  6px 8px; border-bottom:1px solid var(--border); text-align:right; color:var(--primary); font-weight:600; width:90px;">$${rowCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td style="padding:  6px 8px; border-bottom:1px solid var(--border); text-align:right; color:var(--primary-ink, var(--primary)); font-weight:600; width:90px;">$${rowCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
           `;
           tbody.appendChild(row);
         });
@@ -16064,7 +16066,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           <td style="padding:  8px 12px; text-align:left; color:var(--text);">${model}</td>
           <td style="padding:  8px 12px; text-align:right; color:var(--text); font-weight:600;">$${parseFloat(cost).toFixed(2)}</td>
           <td style="padding:  8px 12px; text-align:center;">
-            <button onclick="deleteCostModel('${model}')" style="padding:  4px 8px; background:transparent; color:var(--error); border:1px solid #B3261E; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
+            <button onclick="deleteCostModel('${model}')" style="padding:  4px 8px; background:transparent; color:var(--error-ink, var(--error)); border:1px solid #B3261E; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
               ✕
             </button>
           </td>
@@ -17603,7 +17605,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           + '<td>' + lastSeenFormatted + '</td>'
           + '<td>' + diasCell + '</td>'
           + '<td><strong>' + (d.CR || '—') + '</strong></td>'
-          + '<td>' + (d.PLAZA || '<span style="color:var(--error)">Sin plaza</span>') + '</td>'
+          + '<td>' + (d.PLAZA || '<span style="color:var(--error-ink, var(--error))">Sin plaza</span>') + '</td>'
           + '<td>' + (d.TIENDA || '—') + '</td>'
           + '<td>' + (d.ASESOR || '—') + '</td>'
           + '<td>' + getEquipmentLabel(d.equipo_type) + '</td>'
@@ -17612,7 +17614,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
           + '<td>' + buildCommentSelect(d) + '</td>'
           + '<td>' + buildNoteInput(d) + '</td>'
           + '<td style="text-align:center;" class="detalle-history-cell" data-equipo-cr="' + escHTML(d.CR || '') + '">'
-            + '<button class="detalle-history-btn" style="background:none; border:none; cursor:pointer; padding:  4px 8px; border-radius:6px; color:#E2001A; font-weight:600; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" title="Ver historial de seguimiento">'
+            + '<button class="detalle-history-btn" style="background:none; border:none; cursor:pointer; padding:  4px 8px; border-radius:6px; color:var(--ink-marca); font-weight:600; transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva);" title="Ver historial de seguimiento">'
               + '<span class="material-symbols-outlined" style="font-size:18px; vertical-align:middle;">history</span>'
             + '</button>'
           + '</td>';
@@ -18280,7 +18282,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
       panel.innerHTML =
         '<div class="kpi-detail-head">' +
-          '<span class="material-symbols-outlined" style="color:var(--primary,#E2001A);">analytics</span>' +
+          '<span class="material-symbols-outlined" style="color:var(--primary-ink, var(--primary,#E2001A));">analytics</span>' +
           '<h3>' + escHTML(title) + ' — desglose</h3>' +
           '<button class="kpi-detail-close" onclick="closeKpiDetail()" title="Cerrar" aria-label="Cerrar"><span class="material-symbols-outlined">close</span></button>' +
         '</div>' +
@@ -18805,8 +18807,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
       // === NOTA DE AUTOMATIZACIÓN ===
       html += '<div style="background:#e8f5e9; padding:  16px 40px; max-width:1000px; margin:0 auto; border-left:4px solid #1F7A4E; border-top:1px solid #f0f0f0;">';
-      html += '<div style="font-size:12px; color:#1F7A4E; font-weight:600;"><strong>✓ Información Actualizada Automáticamente</strong></div>';
-      html += '<div style="font-size:11px; color:#2e7d32; margin-top:  4px;">Este reporte se genera automáticamente del sistema de gestión de movilidad. Incluye búsqueda geográfica integrada y mapas interactivos disponibles en el aplicativo web.</div>';
+      html += '<div style="font-size:12px; color:var(--ink-ok); font-weight:600;"><strong>✓ Información Actualizada Automáticamente</strong></div>';
+      html += '<div style="font-size:11px; color:var(--ink-verde); margin-top:  4px;">Este reporte se genera automáticamente del sistema de gestión de movilidad. Incluye búsqueda geográfica integrada y mapas interactivos disponibles en el aplicativo web.</div>';
       html += '</div>';
 
       // (Sección "Resumen de costos en riesgo" eliminada a pedido del usuario.)
@@ -18991,7 +18993,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       // === MENSAJE A ASESORES ===
       html += '<div style="padding:  16px 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
       html += '<div style="background:#FFF3E0; border-left:4px solid #F57C00; padding:  16px 16px; border-radius:0 8px 8px 0; margin-bottom:  12px;">';
-      html += '<p style="font-size:13px; line-height:1.6; margin:0 0 8px 0; font-weight: 600; color:#E65100;">Estimados asesores y líderes de tienda:</p>';
+      html += '<p style="font-size:13px; line-height:1.6; margin:0 0 8px 0; font-weight: 600; color:var(--ink-naranja);">Estimados asesores y líderes de tienda:</p>';
       html += '<p style="font-size:13px; line-height:1.6; margin:0 0 6px 0; color:#424242;">';
       html += 'Les solicitamos su apoyo para asegurar la usabilidad de las herramientas y mantener los equipos encendidos para el monitoreo y las actualizaciones.';
       html += '</p>';
@@ -19550,7 +19552,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         });
 
         if (Object.keys(plazas).length > 1) {
-          plazaBreakdown = '<h3 style="font-size:13px; color:#E2001A; margin:24px 0 12px 0; border-bottom:1px solid #E2001A; padding-bottom:  6px;">Resumen por Plaza</h3>' +
+          plazaBreakdown = '<h3 style="font-size:13px; color:var(--ink-marca); margin:24px 0 12px 0; border-bottom:1px solid #E2001A; padding-bottom:  6px;">Resumen por Plaza</h3>' +
             '<table style="width:100%; border-collapse:collapse; font-size:11px;">' +
             '<thead><tr style="background:#F5F5F5;">' +
             '<th style="border:1px solid #E0E0E0; padding:  4px 6px; text-align:left;">Plaza</th>' +
@@ -19566,7 +19568,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             plazaBreakdown += '<tr style="background:' + bg + ';">' +
               '<td style="border:1px solid #E0E0E0; padding:  4px 6px;">' + escHTML(plaza) + '</td>' +
               '<td style="border:1px solid #E0E0E0; padding:  4px 6px; text-align:right;">' + p.total + '</td>' +
-              '<td style="border:1px solid #E0E0E0; padding:  4px 6px; text-align:right; color:var(--error); font-weight:600;">' + p.critical + '</td>' +
+              '<td style="border:1px solid #E0E0E0; padding:  4px 6px; text-align:right; color:var(--error-ink, var(--error)); font-weight:600;">' + p.critical + '</td>' +
               '<td style="border:1px solid #E0E0E0; padding:  4px 6px; text-align:right;">' + pctCrit + '%</td>' +
               '</tr>';
           });
@@ -19577,14 +19579,14 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       div.innerHTML =
         headerBlock +
           '<h1 style="margin:32px 0 8px 0; font-size:30px; color:#1C1B1F;">Reporte Consolidado</h1>' +
-          '<p style="font-size:14px; color:#E2001A; font-weight: 600; margin:6px 0 0 0; letter-spacing:0.5px;">' + escHTML(plazaTitulo) + '</p>' +
+          '<p style="font-size:14px; color:var(--ink-marca); font-weight: 600; margin:6px 0 0 0; letter-spacing:0.5px;">' + escHTML(plazaTitulo) + '</p>' +
           '<p style="font-size:16px; color:#49454F; margin:6px 0 0 0;">' + escHTML(fechaTxt) + '</p>' +
         '</div>' +
         '<div style="margin-top:  60px; border-top:2px solid #E2001A; padding-top:  20px;">' +
           '<table style="width:100%; border-collapse:collapse; font-size:12px;">' +
             '<tr><td style="padding:  6px 0; font-weight:600;">Total tiendas en universo:</td><td style="text-align:right;">' + stats.totalBD + '</td></tr>' +
             '<tr><td style="padding:  6px 0; font-weight:600;">Equipos en reporte (válidos):</td><td style="text-align:right;">' + stats.totalReport + '</td></tr>' +
-            '<tr><td style="padding:  6px 0; font-weight:600; color:var(--error);">Equipos apagados ≥4 días:</td><td style="text-align:right; color:var(--error); font-weight: 600;">' + stats.totalCritical + '</td></tr>' +
+            '<tr><td style="padding:  6px 0; font-weight:600; color:var(--error-ink, var(--error));">Equipos apagados ≥4 días:</td><td style="text-align:right; color:var(--error-ink, var(--error)); font-weight: 600;">' + stats.totalCritical + '</td></tr>' +
             '<tr><td style="padding:  6px 0; font-weight:600;">% Offline HH:</td><td style="text-align:right;">' + stats.hhPct + '%</td></tr>' +
             '<tr><td style="padding:  6px 0; font-weight:600;">% Offline TT:</td><td style="text-align:right;">' + stats.ttPct + '%</td></tr>' +
           '</table>' +
@@ -19598,7 +19600,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       var div = document.createElement('div');
       div.style.cssText = 'width:794px; padding:  28px 40px; font-family:Roboto,Arial,sans-serif; color:#1C1B1F; box-sizing:border-box; background:white;';
       div.innerHTML =
-        '<h2 style="font-size:14px; color:#E2001A; border-bottom:2px solid #E2001A; padding-bottom:  4px; margin:0 0 12px 0; font-weight: 600;">' + escHTML(title) + '</h2>' +
+        '<h2 style="font-size:14px; color:var(--ink-marca); border-bottom:2px solid #E2001A; padding-bottom:  4px; margin:0 0 12px 0; font-weight: 600;">' + escHTML(title) + '</h2>' +
         '<div style="font-size:11px; line-height:1.4;">' + contentHTML + '</div>';
       return div;
     }
@@ -19614,18 +19616,18 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             + '</tr></thead><tbody>';
       html += '<tr style="background:white;"><td style="border:1px solid #E0E0E0; padding:  6px 8px;">HH</td>'
             + '<td style="border:1px solid #E0E0E0; padding:  6px 8px; text-align:right;">' + stats.hhTotalBD + '</td>'
-            + '<td style="border:1px solid #E0E0E0; padding:  6px 8px; text-align:right; color:var(--error); font-weight: 600;">' + stats.hhCritical + '</td>'
+            + '<td style="border:1px solid #E0E0E0; padding:  6px 8px; text-align:right; color:var(--error-ink, var(--error)); font-weight: 600;">' + stats.hhCritical + '</td>'
             + '<td style="border:1px solid #E0E0E0; padding:  6px 8px; text-align:right;">' + stats.hhPct + '%</td></tr>';
       html += '<tr style="background:#FAFAFA;"><td style="border:1px solid #E0E0E0; padding:  6px 8px;">TABLET</td>'
             + '<td style="border:1px solid #E0E0E0; padding:  6px 8px; text-align:right;">' + stats.ttTotalBD + '</td>'
-            + '<td style="border:1px solid #E0E0E0; padding:  6px 8px; text-align:right; color:var(--error); font-weight: 600;">' + stats.ttCritical + '</td>'
+            + '<td style="border:1px solid #E0E0E0; padding:  6px 8px; text-align:right; color:var(--error-ink, var(--error)); font-weight: 600;">' + stats.ttCritical + '</td>'
             + '<td style="border:1px solid #E0E0E0; padding:  6px 8px; text-align:right;">' + stats.ttPct + '%</td></tr>';
       html += '</tbody></table>';
       return html;
     }
 
     function buildTableSectionHTML(rows, columns) {
-      if (!rows.length) return '<p style="color:#1F7A4E"><em>Sin registros que mostrar.</em></p>';
+      if (!rows.length) return '<p style="color:var(--ink-ok)"><em>Sin registros que mostrar.</em></p>';
       var html = '<table style="width:100%; border-collapse:collapse; font-size:11px;">';
       html += '<thead><tr style="background:#F8F1F5;">';
       columns.forEach(c => {
@@ -20276,12 +20278,12 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             html += '<li class="snap-item">'
               + '<div class="snap-meta">'
               +   '<b>' + escHTML(s.label) + '</b><br>'
-              +   'BD: ' + s.stats.totalBD + ' · Apagados ≥4D: <b style="color:#B3261E">' + s.stats.totalCritical + '</b>'
+              +   'BD: ' + s.stats.totalBD + ' · Apagados ≥4D: <b style="color:var(--ink-critico)">' + s.stats.totalCritical + '</b>'
               +   ' (HH ' + s.stats.hhCritical + ' / TT ' + s.stats.ttCritical + ')'
               + '</div>'
               + '<div class="snap-actions">'
               +   '<button class="btn-modal" onclick="compareWithSnapshot(\'' + s.id + '\', false)">Comparar</button>'
-              +   '<button class="btn-modal" onclick="deleteSnapshot(\'' + s.id + '\')" style="color:#B3261E">Borrar</button>'
+              +   '<button class="btn-modal" onclick="deleteSnapshot(\'' + s.id + '\')" style="color:var(--ink-critico)">Borrar</button>'
               + '</div>'
               + '</li>';
           });
@@ -20300,11 +20302,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             htmlInline += '<li class="snap-item">'
               + '<div class="snap-meta">'
               +   '<b>' + escHTML(s.label) + '</b><br>'
-              +   'BD: ' + s.stats.totalBD + ' · Apagados ≥4D: <b style="color:#B3261E">' + s.stats.totalCritical + '</b>'
+              +   'BD: ' + s.stats.totalBD + ' · Apagados ≥4D: <b style="color:var(--ink-critico)">' + s.stats.totalCritical + '</b>'
               +   ' (HH ' + s.stats.hhCritical + ' / TT ' + s.stats.ttCritical + ')'
               + '</div>'
               + '<div class="snap-actions">'
-              +   '<button class="btn-modal" onclick="deleteSnapshot(\'' + s.id + '\')" style="color:#B3261E">Borrar</button>'
+              +   '<button class="btn-modal" onclick="deleteSnapshot(\'' + s.id + '\')" style="color:var(--ink-critico)">Borrar</button>'
               + '</div>'
               + '</li>';
           });
@@ -22220,7 +22222,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .tabs { position: relative; }
     .tab-slider {
       position: absolute; bottom: 0; left: 0; width: 0; height: 3px;
-      background: var(--primary); border-radius: 6px 3px 0 0;
+      background: var(--primary-fill, var(--primary)); border-radius: 6px 3px 0 0;
       transition: left var(--mov-base) var(--mov-curva), width var(--mov-base) var(--mov-curva);
       pointer-events: none; z-index: 1;
       will-change: left, width;  /* GPU optimization para transiciones smooth */
@@ -22374,9 +22376,9 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
   }
 
   function colorForStatus(status) {
-    if (status === 'success') return '#16A34A';
-    if (status === 'warning') return '#F5A623';
-    if (status === 'error')   return '#DC2626';
+    if (status === 'success') return 'var(--ink-ok)';
+    if (status === 'warning') return 'var(--ink-ambar)';
+    if (status === 'error')   return 'var(--ink-critico-claro)';
     return null;
   }
 
@@ -22700,7 +22702,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--primary, #E2001A);
+      color: var(--primary-ink, var(--primary, #E2001A));
       z-index: 9000;
       transition: transform var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva);
     `;
@@ -23682,7 +23684,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
   /* ---------- TAB activa estilo Argon (pill rojo) ---------- */
   .tab.active {
-    color: #E2001A !important;
+    color: var(--ink-marca) !important;
     font-weight: 600 !important;
   }
   .tab .material-symbols-outlined, .tab .tab-icon-svg { transition: transform var(--mov-base) var(--mov-curva); }
@@ -23795,7 +23797,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
   /* Botones e inputs: micro-feedback */
   .btn, .bulk-btn, button { transition: transform var(--mov-rapido) var(--mov-curva), box-shadow var(--mov-rapido) var(--mov-curva), background var(--mov-rapido) var(--mov-curva); }
   .tab { transition: background-color var(--mov-base) var(--mov-curva), color var(--mov-base) var(--mov-curva), border-color var(--mov-base) var(--mov-curva), box-shadow var(--mov-base) var(--mov-curva), transform var(--mov-base) var(--mov-curva), opacity var(--mov-base) var(--mov-curva); }
-  .tab:not(.active):hover { background: rgba(226,0,26,0.06) !important; color: #E2001A !important; transform: translateY(-1px); }
+  .tab:not(.active):hover { background: rgba(226,0,26,0.06) !important; color: var(--ink-marca) !important; transform: translateY(-1px); }
 
   /* Entrada suave de la sección activa (fade-up) */
   @keyframes argonSectionIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
@@ -24958,7 +24960,7 @@ function renderUpdateRequiredTable(data) {
       html += '<tr style="border-bottom:1px solid var(--border); background:rgba(245,166,35,0.02);">' +
         '<td style="padding:  12px 16px;"><strong>' + escHTML(nameVal) + '</strong></td>' +
         '<td style="padding:  12px 16px;">' + escHTML(plazaVal) + '</td>' +
-        '<td style="padding:  12px 16px;"><span style="background:#F5A623; color:white; padding:  4px 8px; border-radius:6px; font-size:11px; font-weight: 600;">' + escHTML(osVal) + '</span></td>' +
+        '<td style="padding:  12px 16px;"><span style="background:#F5A623; color:#1A1A1A; padding:  4px 8px; border-radius:6px; font-size:11px; font-weight: 600;">' + escHTML(osVal) + '</span></td>' +
         '<td style="padding:  12px 16px;">' + escHTML(modelVal) + '</td>' +
         '</tr>';
     }
@@ -25168,7 +25170,7 @@ function debugOSModelos() {
   }
   .section div.kpi-circular-widget.status-success .kpi-barra > i { background: var(--kpi-ok); }
   .section div.kpi-circular-widget.status-warning .kpi-barra > i { background: var(--kpi-aviso); }
-  .section div.kpi-circular-widget.status-error   .kpi-barra > i { background: var(--error); }
+  .section div.kpi-circular-widget.status-error   .kpi-barra > i { background: var(--error-fill, var(--error)); }
 
   @media (max-width: 768px) {
     .section div.kpi-circular-widget { min-height: 84px; padding:   12px 16px !important; }
@@ -25678,13 +25680,23 @@ function debugOSModelos() {
   [data-theme="dark"] .tabs,
   [data-theme="dark"] .filter-toolbar,
   [data-theme="dark"] .sidebar,
-  [data-theme="dark"] .sound-toggle,
-  [data-theme="dark"] .map-info-box {
+  [data-theme="dark"] .sound-toggle {
     background: var(--glass-bg) !important;
     background-image: none !important;
     backdrop-filter: blur(var(--glass-blur)) !important;
     -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
     border: 1px solid var(--glass-borde) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  /* La caja de leyenda flota sobre el mapa, que es claro en los dos temas:
+     ponerla de cristal oscuro la dejaba con texto oscuro sobre fondo claro.
+     Se queda clara, como el mapa que tiene debajo. */
+  [data-theme="dark"] .map-info-box {
+    background: #FFFFFF !important;
+    background-image: none !important;
+    border: 1px solid #E0E0E0 !important;
+    color: #1C1B1F !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28) !important;
   }
 
@@ -25765,7 +25777,7 @@ function debugOSModelos() {
      cristal oscuro daba 2.39:1. Con la teja neutra, el rojo claro destaca. */
   [data-theme="dark"] .dashboard-card h3 .material-symbols-outlined {
     background: rgba(0, 0, 0, 0.28) !important;
-    color: var(--primary) !important;
+    color: var(--primary-ink, var(--primary)) !important;
   }
 
   /* Utilidad suelta, por si se escribe marcado nuevo con la guía */
@@ -25780,6 +25792,126 @@ function debugOSModelos() {
     }
   })();
 </script>
+
+<style id="ink-system">
+  /* ==========================================================
+     TINTAS SEMANTICAS
+     Un mismo nombre con dos valores: el del tema claro (Material
+     800/900, pensado para fondo blanco) y el del oscuro (Material
+     200/300, que es lo que se lee sobre cristal). Estos colores
+     estaban escritos a mano en 220 declaraciones y ninguno se habia
+     recalculado para el cristal: de ahi los fallos de contraste.
+     ========================================================== */
+  :root{
+    --ink-azul:#1565C0;            --ink-azul-fuerte:#0D47A1;
+    --ink-violeta:#6A1B9A;         --ink-violeta-fuerte:#4A148C;
+    --ink-naranja:#E65100;         --ink-naranja-fuerte:#BF360C;
+    --ink-verde:#2E7D32;           --ink-verde-fuerte:#1B5E20;
+    --ink-rosa:#AD1457;            --ink-rosa-fuerte:#880E4F;
+    --ink-gris:#5F6368;
+    --ink-ok:#1F7A4E;              --ink-excel:#217346;
+    --ink-naranja-os:#CC3300;
+    --ink-critico:#B3261E;         --ink-critico-medio:#C62828;
+    --ink-critico-claro:#DC2626;
+    --ink-info:#1565C0;            --ink-marca:#D1001B;
+    --ink-cabecera:#D1001B;
+    --ink-ambar:#8A5A00;
+    --warning-ink:#8A5A00;
+
+    --estado-off-bg:#FFEBEE;             --estado-off-fg:#C62828;
+    --estado-rec-bg:#FFF3E0;             --estado-rec-fg:#E65100;
+    --estado-on-bg:rgba(31,122,78,0.08); --estado-on-fg:#1F7A4E;
+    --estado-nd-bg:rgba(0,0,0,0.06);     --estado-nd-fg:#666666;
+  }
+
+  [data-theme="dark"]{
+    --ink-azul:#90CAF9;            --ink-azul-fuerte:#64B5F6;
+    --ink-violeta:#CE93D8;         --ink-violeta-fuerte:#D7A8E8;
+    --ink-naranja:#FFB74D;         --ink-naranja-fuerte:#FFAB91;
+    --ink-verde:#A5D6A7;           --ink-verde-fuerte:#81C784;
+    --ink-rosa:#F48FB1;            --ink-rosa-fuerte:#F8A3C0;
+    --ink-gris:#BDC1C6;
+    --ink-ok:#6EE7A8;              --ink-excel:#5FD68F;
+    --ink-naranja-os:#FFA98A;
+    --ink-critico:#FF8A80;         --ink-critico-medio:#FFADA5;
+    --ink-critico-claro:#FF9B94;
+    --ink-info:#90CAF9;            --ink-marca:#FF8A9E;
+    --ink-ambar:#FFC77D;
+    /* La cabecera de tabla es la superficie mas clara del cristal:
+       ahi hace falta un rojo mas palido para llegar a 4.5:1. */
+    --ink-cabecera:#FCA5A5;
+
+    /* --primary y --error servian de relleno y de texto a la vez. Sobre
+       cristal el texto pide un rojo claro y el relleno uno oscuro, que es
+       lo contrario, asi que cada uso tiene ya su propio token. */
+    --primary-ink:#FF8A9E;         --primary-fill:#E2001A;
+    --error-ink:#FCA5A5;           --error-fill:#C62828;
+
+    --estado-off-bg:rgba(255,138,128,0.18); --estado-off-fg:#FFADA5;
+    --estado-rec-bg:rgba(255,183,77,0.18);  --estado-rec-fg:#FFC77D;
+    --estado-on-bg:rgba(110,231,168,0.16);  --estado-on-fg:#6EE7A8;
+    --estado-nd-bg:rgba(255,255,255,0.08);  --estado-nd-fg:#C7CBD3;
+  }
+
+  /* --- Barra de marca ------------------------------------------------
+     El rojo #E2001A es de luminancia media: el blanco pleno da 4.94:1,
+     pero al 85-92% de opacidad se queda entre 3.77 y 4.29. */
+  .app-bar-stat, .app-bar-stat *, .logo-placeholder { color:#fff !important; }
+  /* El ambar marca aviso y no llega a 4.5:1 sobre el rojo (3.27). Con una
+     pastilla oscura detras sube a 6.09:1 y el color sigue diciendo lo mismo. */
+  .app-bar-stat.warn { background:rgba(0,0,0,0.32) !important; padding:2px 8px; }
+  .app-bar-stat.warn, .app-bar-stat.warn * { color:#FFD166 !important; }
+  /* La campana llevaba el ambar de aviso sobre el rojo (3.27:1) y el fondo
+     del boton no se puede oscurecer: tiene una transicion viva encima, y una
+     transicion gana incluso a !important. Se queda blanca, que da 4.94:1; el
+     aviso ya lo dice la insignia de al lado, asi que no se pierde nada. */
+  .app-bar-icon-btn.has-alerts .material-symbols-outlined { color:#fff !important; }
+
+  /* --- Estados vacios ------------------------------------------------- */
+  [data-theme="dark"] .dashboard-empty { color:rgba(255,255,255,0.8); }
+
+  /* --- El mapa es una isla clara ---------------------------------------
+     Leaflet dibuja sobre teselas claras siempre, en los dos temas. Dentro
+     del mapa manda el juego de valores del tema claro, aunque la app este
+     en oscuro: si no, las etiquetas de plaza y la caja de leyenda salen
+     en tinta clara sobre un mapa claro. */
+  #leaflet-map, #leaflet-map .leaflet-container {
+    --ink-azul:#1565C0;            --ink-azul-fuerte:#0D47A1;
+    --ink-violeta:#6A1B9A;         --ink-violeta-fuerte:#4A148C;
+    --ink-naranja:#E65100;         --ink-naranja-fuerte:#BF360C;
+    --ink-verde:#2E7D32;           --ink-verde-fuerte:#1B5E20;
+    --ink-rosa:#AD1457;            --ink-rosa-fuerte:#880E4F;
+    --ink-gris:#5F6368;
+    --ink-ok:#1F7A4E;              --ink-excel:#217346;
+    --ink-naranja-os:#CC3300;
+    --ink-critico:#B3261E;         --ink-critico-medio:#C62828;
+    --ink-critico-claro:#DC2626;
+    --ink-info:#1565C0;            --ink-marca:#D1001B;
+    --ink-cabecera:#D1001B;
+    --ink-ambar:#8A5A00;
+    --warning-ink:#8A5A00;
+    --primary-ink:#E2001A;         --error-ink:#B3261E;
+    --card-bg:#FFFFFF;             --surface:#F8F1F5;
+    --text:#1C1B1F;                --text-light:#49454F;
+    --border:#E0E0E0;
+  }
+
+  /* --- Superficies que seguian siendo opacas --------------------------- */
+  /* El boton de cada grafica llevaba un tinte rojo (rgba(226,0,26,0.08))
+     que sobre cristal aclara la teja y deja el icono en 4.14. El rojo es
+     de luminancia media: lo que necesita detras es oscuro, no claro. */
+  [data-theme="dark"] .chart-download-btn,
+  [data-theme="dark"] .chart-expand-btn { background:rgba(0,0,0,0.30) !important; }
+  [data-theme="dark"] .chart-download-btn:hover,
+  [data-theme="dark"] .chart-expand-btn:hover { background:rgba(0,0,0,0.42) !important; }
+  /* .btn-secondary era un gris medio opaco: rompia el cristal y dejaba la
+     variante de borrado en 2.81. */
+  [data-theme="dark"] .btn-secondary {
+    background:rgba(255,255,255,0.08);
+    border:1px solid var(--border);
+  }
+  [data-theme="dark"] .btn-secondary:hover:not(:disabled) { background:rgba(255,255,255,0.14); }
+</style>
 
 </body>
 </html>

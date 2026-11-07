@@ -552,3 +552,88 @@ no claro. Con la teja a `rgba(0,0,0,0.28)` sube a 4.59:1.
 
 Los 5 que quedan están entre 3.45 y 4.25: texto pequeño algo por debajo del
 mínimo, no ilegible.
+
+---
+
+## Barrido completo de las ocho pestañas (tintas semánticas)
+
+La cifra de «5 fallos» de arriba se midió **solo en Resumen** y con un auditor
+más flojo que el de esta pasada. Al recorrer las ocho pestañas con uno que
+compone toda la pila de cristal y mira también los iconos, la cuenta real era
+otra:
+
+| Pestaña | Fallos antes |
+|---|---|
+| Cruce | 16 |
+| Resumen | 55 |
+| Detalle | 17 |
+| Stock | 30 |
+| Inconsistencias | 10 |
+| OS & Modelos | 61 |
+| Exportación | 30 |
+| Configuración | 26 |
+| **Total** | **245** |
+
+Y la causa era una sola: **220 declaraciones de color escritas a mano con los
+tonos del tema claro** (Material 800/900, pensados para fondo blanco) que
+nadie había recalculado para el cristal. El peor caso, `#4A148C` sobre el
+lienzo oscuro, daba 1.23:1.
+
+### Qué se hizo
+
+**Tintas semánticas.** Cada color de texto pasa a un token con dos valores: el
+del tema claro y el del oscuro. `color:#4A148C` ya no existe; es
+`var(--ink-violeta-fuerte)`, que vale `#4A148C` en claro y `#D7A8E8` en
+oscuro.
+
+**Tokens que servían a dos amos.** `--primary` y `--error` eran a la vez
+relleno y texto. Sobre cristal el texto pide un rojo claro y el relleno uno
+oscuro, que es lo contrario, así que cada uso tiene ya su token:
+`--primary-ink` / `--primary-fill`, `--error-ink` / `--error-fill`. Lo mismo
+con `--warning`, que como texto sobre blanco daba 2.03:1.
+
+**El mapa es una isla clara.** Leaflet dibuja sobre teselas claras en los dos
+temas. Dentro de `#leaflet-map` mandan los valores del tema claro aunque la
+app esté en oscuro; si no, las etiquetas de plaza y la caja de leyenda salían
+en tinta clara sobre un mapa claro.
+
+**Blanco sobre ámbar.** La pastilla de versión de OS & Modelos era
+`background:#F5A623; color:white`: 2.03:1, y fallaba en los **dos** temas, no
+solo en el oscuro. Con tinta oscura sube a 8.59:1. Son 52 pastillas.
+
+**Estados de la tabla.** `statusOf()` era la única fuente de los colores de
+estado y devolvía rellenos opacos claros (`#FFEBEE`, `#FFF3E0`) que sobre
+cristal quedaban como pastillas rosa pálido flotando en lo oscuro. Ahora
+devuelve tokens.
+
+### Resultado
+
+| | Oscuro | Claro |
+|---|---|---|
+| Antes | 245 | 25 |
+| Después | **0** | **0** |
+
+Ocho pestañas, los dos temas, más la barra de marca medida aparte (la barra
+se le escapa al auditor normal porque el degradado del lienzo corta la pila).
+
+### Dos cosas que conviene saber
+
+**Me cargué la piel de cristal a mitad de camino.** Al cambiar la regla de la
+caja de leyenda del mapa, el texto que busqué coincidía con la **cola de la
+lista de superficies de cristal** —`.map-info-box` era su último selector— y
+toda la lista (tarjetas, pestañas, KPI, menú lateral) se quedó en blanco
+opaco. El barrido de contraste siguió dando 0 fallos, porque texto oscuro
+sobre blanco contrasta bien. Solo se vio mirando la pantalla.
+
+**La entrada escalonada envenena las medidas.** Varias lecturas alarmantes
+—137 fallos en el tema claro, pestañas con texto blanco sobre blanco— eran la
+animación de entrada a medio camino. Cada pestaña se mide ahora dos veces
+separadas por un segundo y solo cuenta lo que falla en las dos.
+
+### Lo que queda fuera
+
+- La atribución de Leaflet (© Leaflet / OSM) da 1.49:1. Es cromo de la
+  librería y lo pinta ella.
+- El geocodificado de tiendas contra Nominatim está roto por CORS: el
+  navegador no puede llamar a `nominatim.openstreetmap.org` desde la app. Es
+  de comportamiento, no visual, y viene de antes.
