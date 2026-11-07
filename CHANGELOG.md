@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.0 — 2026-11-07
+
+- style: tintas semanticas, un color por tema en las ocho pestañas
+- feat: piel de cristal (glassmorphism + aura) en toda la app
+
 ## v1.2.0 — 2026-11-06
 
 - style: tabla de Detalle, ocho columnas por defecto
