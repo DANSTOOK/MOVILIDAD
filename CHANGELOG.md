@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.0 — 2026-11-07
+
+- style: un nombre para el producto y un solo registro en los letreros
+- fix: las tres navegaciones dicen por fin lo mismo
+- fix: la geocodificacion de tiendas pasa por el backend, y deja de gritar
+
 ## v1.4.0 — 2026-11-07
 
 - fix: el panel de notificaciones sale a la capa superior del navegador
