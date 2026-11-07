@@ -18497,11 +18497,40 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
     function applyTheme(themeName) {
       var theme = (themeName === 'dark') ? 'dark' : 'light';
+      var raiz = document.documentElement;
+
+      /* Cambiar de tema no se anima. Al pulsar el conmutador arrancaban a la
+         vez 88 transiciones de color, y medidas en ese instante las 88
+         estaban paradas en el fotograma cero, mostrando todavia los valores
+         del tema anterior: bordes claros sobre paneles oscuros. La clase
+         apaga las transiciones mientras se cambia y se quita enseguida; el
+         temporizador esta porque si el navegador no pinta -pestaña en
+         segundo plano- requestAnimationFrame no llega nunca y la clase se
+         quedaria puesta, dejando la aplicacion sin ninguna animacion. */
+      raiz.classList.add('cambiando-tema');
+
       if (theme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
+        raiz.setAttribute('data-theme', 'dark');
       } else {
-        document.documentElement.removeAttribute('data-theme');
+        raiz.removeAttribute('data-theme');
       }
+
+      /* Leer un estilo calculado obliga al navegador a rehacer los estilos
+         AQUI MISMO, con las transiciones todavia apagadas. Sin esta linea el
+         recalculo se aplaza, la clase se quita antes de que los colores
+         cambien de verdad, y las transiciones arrancan igual: es lo que
+         pasaba, 93 transiciones de color a la vez, paradas en el fotograma
+         cero y mostrando los valores del tema anterior. */
+      void getComputedStyle(raiz).backgroundColor;
+
+      var limpiado = false;
+      var limpiar = function () {
+        if (limpiado) return;
+        limpiado = true;
+        raiz.classList.remove('cambiando-tema');
+      };
+      requestAnimationFrame(function () { requestAnimationFrame(limpiar); });
+      setTimeout(limpiar, 200);
       // Re-render charts — ECharts necesita re-init para cambio de tema
       if (typeof renderDashboards === 'function' && D && D.length) {
         try { renderDashboards(); } catch (e) {}
@@ -27091,6 +27120,102 @@ function debugOSModelos() {
     -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
     border-right: 1px solid var(--glass-borde, rgba(255, 255, 255, 0.12));
   }
+</style>
+
+<style id="superficies">
+  /* ==========================================================
+     LAS SUPERFICIES DEL TEMA OSCURO: MENOS CRISTAL, MAS PANEL
+
+     Los paneles eran blanco al 7% y al 10% sobre el degradado del fondo.
+     Eso es cristal de verdad -se ve todo lo que hay detras- y en un
+     tablero con una tabla de dos mil filas no ayuda: el degradado se
+     cuela por debajo del texto, cada tarjeta tiene un tono distinto segun
+     donde caiga, y el conjunto se ve lavado.
+
+     Ahora hay una escala de tres superficies, opacas de verdad, que no
+     cambian de color segun donde esten. Se conserva un punto de
+     translucidez y el difuminado para que siga habiendo profundidad, pero
+     el panel manda sobre el fondo y no al reves.
+     ========================================================== */
+  [data-theme="dark"] {
+    /* nivel 0: el lienzo, que no cambia
+       nivel 1: barras y fondos de apoyo
+       nivel 2: la tarjeta, la superficie normal
+       nivel 3: lo que flota sobre una tarjeta (menu, popover, cabecera de
+                tabla): mas claro, para que se despegue */
+    --sup-1: rgba(17, 23, 37, 0.82);
+    --sup-2: rgba(25, 32, 48, 0.90);
+    --sup-3: rgba(34, 43, 62, 0.95);
+
+    --glass-bg:      var(--sup-2);
+    --glass-bg-alto: var(--sup-3);
+    --glass-borde:   rgba(255, 255, 255, 0.10);
+    --glass-blur:    16px;
+
+    --surface:       var(--sup-1);
+    --card-bg:       var(--sup-2);
+    --border:        var(--glass-borde);
+    --input-bg:      rgba(0, 0, 0, 0.26);
+    --table-row-alt: rgba(255, 255, 255, 0.035);
+    --table-head-bg: var(--sup-3);
+    --hover-bg:      rgba(255, 255, 255, 0.06);
+
+    /* El lavado de la esquina de las tarjetas: en claro es un color sobre
+       blanco y se porta bien, pero en oscuro las tarjetas neutras lo pintan
+       con el color del texto -blanco- y queda un disco gris muy visible. */
+    --lavado-esquina: 7%;
+  }
+  :root { --lavado-esquina: 12%; }
+
+  /* El lavado iba del color al transparente en un 1%: eso no es un
+     degradado, es un disco con filo, y se notaba en los dos temas. Con
+     recorrido se funde con la tarjeta, que era la idea. */
+  .section div.kpi-circular-widget::after {
+    background-image: radial-gradient(ellipse 54% 64% at 100% 0%,
+      color-mix(in srgb, var(--kpi-acento) var(--lavado-esquina), transparent) 0 28%,
+      transparent 78%) !important;
+  }
+  .section .estado-card::after {
+    background-image:
+      radial-gradient(ellipse 54% 64% at 100% 0%,
+        color-mix(in srgb, var(--ec-accent) var(--lavado-esquina), transparent) 0 28%,
+        transparent 78%),
+      var(--ec-bg, linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))) !important;
+  }
+
+  /* --- Cambiar de tema no se anima -------------------------------------
+     Al pulsar el conmutador, 88 propiedades de color arrancaban a la vez
+     una transicion. Medidas en el momento del cambio, las 88 estaban
+     paradas en el fotograma cero, mostrando todavia los valores del tema
+     anterior: bordes claros sobre paneles oscuros. Y aunque no se paren,
+     medio segundo de colores a medio camino no es una transicion bonita,
+     es la interfaz sin decidirse. Un cambio de tema es instantaneo. */
+  html.cambiando-tema,
+  html.cambiando-tema *,
+  html.cambiando-tema *::before,
+  html.cambiando-tema *::after {
+    transition: none !important;
+  }
+
+  /* --- Los tintes de color, mas discretos sobre oscuro ------------------
+     Un tinte pensado para blanco se vuelve una mancha sobre un panel
+     oscuro: el mismo 5-6% que en claro apenas se nota, en oscuro compite
+     con el texto. */
+  [data-theme="dark"] .filter-bar-pretty {
+    background: var(--sup-1) !important;
+    background-image: none !important;
+    border-bottom: 1px solid var(--glass-borde) !important;
+  }
+  [data-theme="dark"] tbody#cruce-table tr.sev-critical { background: rgba(229, 57, 53, 0.10) !important; }
+  [data-theme="dark"] tbody#cruce-table tr.sev-warning  { background: rgba(245, 166, 35, 0.08) !important; }
+  [data-theme="dark"] tbody#cruce-table tr.sev-critical:hover { background: rgba(229, 57, 53, 0.17) !important; }
+  [data-theme="dark"] tbody#cruce-table tr.sev-warning:hover  { background: rgba(245, 166, 35, 0.15) !important; }
+
+  /* La cabecera de tabla llevaba su linea inferior en un gris claro escrito
+     a mano (#E9ECEF). En claro es correcto; en oscuro es una raya blanca
+     cruzando el panel. Que use el borde del tema, como todo lo demas. */
+  .table-wrapper table th { border-bottom-color: var(--border) !important; }
+
 </style>
 
 </body>
