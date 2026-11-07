@@ -7329,7 +7329,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             <span class="badge" id="hdr-notif-count" aria-hidden="true" style="display:none;">0</span>
           </button>
           <!-- Panel de notificaciones dropdown -->
-          <div id="notif-panel" style="display:none; position:absolute; top:48px; right:0; width:380px; max-height:480px; border-radius:16px; z-index:9999; overflow:hidden;">
+          <div id="notif-panel" popover="manual">
             <div style="padding:  16px 16px; border-bottom:1px solid var(--border, #e0e0e0); display:flex; align-items:center; justify-content:space-between;">
               <div style="display:flex; align-items:center; gap:  8px;">
                 <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary-ink, var(--primary, #E2001A));">notifications_active</span>
@@ -13597,11 +13597,58 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     var _notifsRead = false;       // si el usuario marcó como leídas
     var _notifSignature = '';      // firma del conjunto actual (para detectar cambios)
 
-    function toggleNotifPanel() {
+    /* El panel vive en la capa superior del navegador.
+
+       Estaba dentro de .app-bar, y la barra lleva isolation:isolate con
+       z-index:1000. Eso crea un contexto de apilado del que el z-index:9999
+       del panel no podia salir: el panel arrancaba a 62px mientras la barra
+       mide 92 de alto, asi que sus primeros 30px quedaban por debajo y los
+       datos de la barra -el chip de "14 offline", la hora- se le pintaban
+       ENCIMA. Subir mas el z-index no arreglaba nada, porque el problema no
+       era el numero sino el contexto.
+
+       popover lo saca a la capa superior, por encima de cualquier contexto
+       de apilado y de cualquier overflow. Es "manual" y no "auto" a
+       proposito: el cierre al pulsar fuera y con Escape ya estaba escrito
+       aqui, y con auto el clic en la campana cerraria el panel justo
+       despues de que este codigo lo abra. */
+    function setNotifPanel(abierto) {
       var panel = document.getElementById('notif-panel');
       if (!panel) return;
-      _notifPanelOpen = !_notifPanelOpen;
-      panel.style.display = _notifPanelOpen ? 'block' : 'none';
+      _notifPanelOpen = abierto;
+      var capaSuperior = typeof panel.showPopover === 'function' && panel.hasAttribute('popover');
+      if (capaSuperior) {
+        try {
+          if (abierto) { colocarNotifPanel(); panel.showPopover(); }
+          else panel.hidePopover();
+          return;
+        } catch (e) { /* si falla, se cae al modo de siempre */ }
+      }
+      panel.style.display = abierto ? 'block' : 'none';
+      if (abierto) colocarNotifPanel();
+    }
+
+    /* En la capa superior el panel se coloca respecto a la ventana, no
+       respecto a la barra, asi que hay que decirle donde va. Se cuelga de la
+       campana y se mantiene dentro de la ventana. */
+    function colocarNotifPanel() {
+      var panel = document.getElementById('notif-panel');
+      var btn = document.getElementById('notif-bell-btn');
+      if (!panel || !btn) return;
+      var b = btn.getBoundingClientRect();
+      var margen = 12;
+      var ancho = Math.min(380, window.innerWidth - margen * 2);
+      var derecha = Math.max(margen, window.innerWidth - b.right);
+      panel.style.width = ancho + 'px';
+      panel.style.top = Math.round(b.bottom + 10) + 'px';
+      panel.style.right = Math.round(derecha) + 'px';
+      /* la flecha apunta al centro de la campana */
+      panel.style.setProperty('--flecha', Math.round(window.innerWidth - b.left - b.width / 2 - derecha) + 'px');
+    }
+    window.addEventListener('resize', function(){ if (_notifPanelOpen) colocarNotifPanel(); });
+
+    function toggleNotifPanel() {
+      setNotifPanel(!_notifPanelOpen);
     }
 
     // Cerrar panel al hacer clic fuera
@@ -13610,17 +13657,14 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       var btn = document.getElementById('notif-bell-btn');
       if (!panel || !btn) return;
       if (_notifPanelOpen && !panel.contains(e.target) && !btn.contains(e.target)) {
-        _notifPanelOpen = false;
-        panel.style.display = 'none';
+        setNotifPanel(false);
       }
     });
 
     // Cerrar panel con Escape; activar notificaciones con Enter/Espacio
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && _notifPanelOpen) {
-        _notifPanelOpen = false;
-        var panel = document.getElementById('notif-panel');
-        if (panel) panel.style.display = 'none';
+        setNotifPanel(false);
         return;
       }
       if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('notif-clickable')) {
@@ -13764,9 +13808,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     /* Acción de notificación: ejecuta y cierra el panel */
     function runNotifAction(idx) {
       try { if (window.notifActions && window.notifActions[idx]) window.notifActions[idx](); } catch(e) {}
-      _notifPanelOpen = false;
-      var panel = document.getElementById('notif-panel');
-      if (panel) panel.style.display = 'none';
+      setNotifPanel(false);
     }
 
     /* Marca todas como leídas: oculta el badge hasta que cambien las notificaciones */
@@ -26565,6 +26607,67 @@ function debugOSModelos() {
   .section div.kpi-circular-widget,
   .section .summary-card {
     padding: var(--space-md) !important;
+  }
+</style>
+
+<style id="panel-capa-superior">
+  /* ==========================================================
+     EL PANEL DE NOTIFICACIONES, FUERA DE LA BARRA
+
+     Lo que llevaba en el atributo style -posicion, ancho, z-index- se
+     trae aqui, porque en la capa superior la posicion la pone el codigo
+     y el z-index ya no pinta nada.
+     ========================================================== */
+  #notif-panel {
+    position: fixed;
+    margin: 0;
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    width: 380px;
+    max-height: min(480px, calc(100vh - 96px));
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    inset: auto;
+  }
+  #notif-panel:not(:popover-open):not([style*="display: block"]) { display: none; }
+
+  /* La flecha que lo engancha a la campana: antes flotaba suelto, lejos y
+     a la izquierda del boton que lo abre, y no se sabia de donde salia. */
+  #notif-panel::before {
+    content: "";
+    position: absolute;
+    top: -7px;
+    right: var(--flecha, 24px);
+    width: 12px;
+    height: 12px;
+    transform: rotate(45deg);
+    background: inherit;
+    border-left: 1px solid rgba(0, 0, 0, 0.10);
+    border-top: 1px solid rgba(0, 0, 0, 0.10);
+    border-top-left-radius: 3px;
+    z-index: 1;
+  }
+  [data-theme="dark"] #notif-panel::before {
+    border-color: var(--glass-borde, rgba(255, 255, 255, 0.12));
+  }
+
+  /* En oscuro era la unica superficie opaca de toda la aplicacion: un
+     #1f1d23 macizo en medio del cristal. */
+  [data-theme="dark"] #notif-panel {
+    background: var(--glass-bg-alto, rgba(32, 30, 38, 0.86)) !important;
+    backdrop-filter: blur(var(--glass-blur, 20px));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
+    border-color: var(--glass-borde, rgba(255, 255, 255, 0.12));
+  }
+
+  /* Entra desde arriba, como si saliera de la campana. */
+  @keyframes notifEntra {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+  #notif-panel:popover-open { animation: notifEntra var(--mov-base) var(--mov-curva); }
+  @media (prefers-reduced-motion: reduce) {
+    #notif-panel:popover-open { animation: none; }
   }
 </style>
 
