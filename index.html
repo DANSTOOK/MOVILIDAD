@@ -13018,15 +13018,25 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       });
       if (pending.length === 0) return;
 
-      // Sin token Mapbox: Nominatim en cola SERIALIZADA (su política exige
-      // máx. 1 req/segundo; dispararlas en paralelo provoca baneo de IP).
+      // Sin token Mapbox se pregunta a Nominatim a través del backend.
+      //
+      // La cola encadena por RESPUESTA, no por reloj. Antes lanzaba una cada
+      // 1,1 s con un temporizador, sin mirar si la anterior había vuelto, y
+      // eso tiene dos problemas: el servidor espaciá las suyas un segundo,
+      // así que la cola se acumulaba y salían cientos de peticiones en vuelo
+      // antes de que volviera la primera; y el corte por fallos no llegaba a
+      // tiempo de evitar nada. Con una sola en vuelo, el corte funciona y el
+      // ritmo lo marca quien contesta.
       if (!token) {
+        if (_geoBatchCorriendo) return;
+        _geoBatchCorriendo = true;
         var qi = 0;
-        (function nextNominatim() {
-          if (qi >= pending.length) return;
+        (function siguiente() {
+          if (qi >= pending.length || _geoCortado) { _geoBatchCorriendo = false; return; }
           var t = pending[qi++];
-          geocodeTiendaAndAdd(t, tiendas[t]);
-          setTimeout(nextNominatim, 1100);
+          geocodeTiendaAndAdd(t, tiendas[t]).then(function() {
+            setTimeout(siguiente, 60);
+          });
         })();
         return;
       }
@@ -13106,33 +13116,75 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
             return null;
           });
       }
-      var nominatimUrl = 'https://nominatim.openstreetmap.org/search?q=' +
-        encodeURIComponent(query) + '&format=json&limit=1';
-      return fetch(nominatimUrl)
-        .then(function(r) { return r.json(); })
-        .then(function(results) {
-          if (results && results.length > 0) {
-            return { lat: parseFloat(results[0].lat), lon: parseFloat(results[0].lon) };
+      // Sin token de Mapbox se pregunta a Nominatim, pero NO desde aquí:
+      // Nominatim no manda cabecera de CORS y el navegador descartaba todas
+      // las respuestas. La consola se llenaba de cientos de errores y no se
+      // dibujaba ni una tienda. La llamada la hace el backend, que además
+      // guarda lo ya preguntado y respeta el límite de una por segundo para
+      // todos los navegadores a la vez, no solo para cada uno por su cuenta.
+      return fetch('/api/geocode/tienda?nombre=' + encodeURIComponent(tienda))
+        .then(function(r) {
+          if (!r.ok) throw new Error('geocodificador: ' + r.status);
+          return r.json();
+        })
+        .then(function(d) {
+          if (d && typeof d.lat === 'number' && typeof d.lon === 'number') {
+            return { lat: d.lat, lon: d.lon };
           }
           return null;
         });
     }
 
+    /* Cuando el geocodificador no está disponible falla para las 174 tiendas
+       seguidas, y escribir una línea roja por cada una deja la consola
+       inservible para cualquier otra cosa: eran cientos de errores y el único
+       dato útil -que el servicio no contesta- se perdía entre ellos. Se
+       cuentan y se dice una sola vez. */
+    var _geoFallos = 0, _geoAvisoPuesto = false;
+    /* Si el geocodificador no contesta, no contesta para las 174: seguir
+       preguntando es gastar cinco minutos para llegar al mismo sitio, y deja
+       174 peticiones fallidas en el registro del navegador, que eso no se
+       puede silenciar desde el código. A los tres fallos seguidos se corta.
+       Un acierto reinicia la cuenta: un fallo suelto no corta nada. */
+    var _geoSeguidos = 0, _geoCortado = false, _geoBatchCorriendo = false;
+    var GEO_MAX_SEGUIDOS = 3;
+
     function geocodeTiendaAndAdd(tienda, stats) {
-      geocodeOxxoStore(tienda)
+      if (_geoCortado) return Promise.resolve();
+      return geocodeOxxoStore(tienda)
         .then(function(coords) {
           if (coords) {
+            _geoSeguidos = 0;
             _tiendaCoordinates[tienda] = coords;  // Cache it
             saveTiendaCoordsCache();
             addTiendaMarkerToMap(tienda, coords, stats);
-            console.log('✅ Geocoded Oxxo:', tienda, coords);
           } else {
-            console.warn('❌ Could not geocode:', tienda);
+            anotarFalloGeo();
           }
         })
-        .catch(function(err) {
-          console.error('Geocoding error for', tienda, ':', err);
+        .catch(function() {
+          anotarFalloGeo();
         });
+    }
+
+    function anotarFalloGeo() {
+      _geoFallos++;
+      if (++_geoSeguidos >= GEO_MAX_SEGUIDOS) _geoCortado = true;
+      avisarGeocodificador();
+    }
+
+    function avisarGeocodificador() {
+      if (_geoAvisoPuesto) return;
+      _geoAvisoPuesto = true;
+      /* Se espera un poco para contar las que fallen en la misma tanda. */
+      setTimeout(function() {
+        console.warn('No se pudieron situar ' + _geoFallos + ' tienda(s) en el mapa: '
+          + 'el geocodificador no respondió'
+          + (_geoCortado ? ', y se dejó de preguntar por las demás' : '')
+          + '. Las plazas sí se dibujan; lo que falta son los puntos de tienda.');
+        _geoAvisoPuesto = false;
+        _geoFallos = 0;
+      }, 3000);
     }
 
     function addTiendaMarkerToMap(tienda, coords, stats) {
@@ -24536,8 +24588,17 @@ function renderNotesTimeline(equipoKey) {
     var dateStr = date.toLocaleDateString('es-MX');
     var timeStr = date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 
-    var statusColor = note.status === 'CRÍTICO' ? '#B3261E' : note.status === 'RECIENTE' ? '#F5A623' : '#1F7A4E';
-    var statusBg = note.status === 'CRÍTICO' ? '#FFEBEE' : note.status === 'RECIENTE' ? '#FFF3E0' : '#F1F8F4';
+    /* Esto iba con seis colores a pelo (#FFEBEE, #FFF3E0, #F1F8F4 de fondo).
+       En tema claro se ve bien, pero son tres losas blanquecinas: en oscuro
+       quedaban como manchas claras en medio del cristal, con el texto de la
+       nota -que hereda el color del tema- casi invisible encima. Los tokens
+       de estado ya tienen un valor para cada tema. */
+    var statusColor = note.status === 'CRÍTICO' ? 'var(--estado-off-fg)'
+                    : note.status === 'RECIENTE' ? 'var(--estado-rec-fg)'
+                    : 'var(--estado-on-fg)';
+    var statusBg = note.status === 'CRÍTICO' ? 'var(--estado-off-bg)'
+                 : note.status === 'RECIENTE' ? 'var(--estado-rec-bg)'
+                 : 'var(--estado-on-bg)';
 
     html += '<div style="position:relative; padding:  16px; border-left:3px solid ' + statusColor + '; background:' + statusBg + '; margin-bottom:  12px; border-radius:6px; animation:slideInLeft 0.15s ease;">' +
       '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:  8px;">' +

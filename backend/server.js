@@ -245,6 +245,86 @@ app.get('/api/analytics', verifyToken, async (req, res) => {
 });
 
 // ════════════════════════════════════════════════════════════════
+// GEOCODIFICACIÓN DE TIENDAS
+//
+// El mapa sitúa cada tienda llamando a Nominatim (OpenStreetMap). Desde el
+// navegador eso no funciona: Nominatim no manda cabecera de CORS, así que el
+// navegador descarta todas las respuestas. La consola se llenaba de cientos
+// de "blocked by CORS policy" y ninguna tienda llegaba a dibujarse.
+//
+// La llamada se hace desde aquí, donde no hay CORS que valga. Tres cuidados
+// que Nominatim pide por escrito en su política de uso:
+//
+//   · como máximo una petición por segundo — y aquí se cumple para TODOS los
+//     navegadores a la vez, no solo para cada uno por su cuenta, que es lo
+//     que hacía el cliente con su cola de 1,1 s;
+//   · identificarse con un User-Agent de verdad;
+//   · no repetir lo ya preguntado. Una tienda no se mueve de sitio, así que
+//     la respuesta se guarda y no se vuelve a preguntar.
+//
+// El cliente manda SOLO el nombre de la tienda, no una consulta libre: la
+// consulta la arma este servidor. Si no, esto sería un proxy abierto a
+// Nominatim con el que cualquiera podría hacer que nos baneen la IP.
+// ════════════════════════════════════════════════════════════════
+const _geoCache = new Map();
+let _geoUltima = 0;          // cuándo salió la última petición de aquí
+let _geoCola = Promise.resolve();
+
+const GEO_ESPERA_MS = 1100;  // la política dice 1/s; 1,1 da margen
+const GEO_TIMEOUT_MS = 8000;
+const GEO_CACHE_MAX = 5000;
+const GEO_AGENTE = 'OXXO-Movilidad/1.0 (tablero interno de operaciones)';
+
+function geocodificar(nombre) {
+  // Las peticiones salen de una en una y espaciadas, encadenándolas.
+  _geoCola = _geoCola.then(async () => {
+    const espera = GEO_ESPERA_MS - (Date.now() - _geoUltima);
+    if (espera > 0) await new Promise((r) => setTimeout(r, espera));
+    _geoUltima = Date.now();
+
+    const url = 'https://nominatim.openstreetmap.org/search'
+      + '?q=' + encodeURIComponent('Oxxo ' + nombre + ' Mexico')
+      + '&format=json&limit=1&countrycodes=mx';
+
+    const r = await fetch(url, {
+      headers: { 'User-Agent': GEO_AGENTE, 'Accept-Language': 'es' },
+      signal: AbortSignal.timeout(GEO_TIMEOUT_MS),
+    });
+    if (!r.ok) throw new Error('Nominatim respondió ' + r.status);
+    const datos = await r.json();
+    if (!Array.isArray(datos) || datos.length === 0) return null;
+    return { lat: parseFloat(datos[0].lat), lon: parseFloat(datos[0].lon) };
+  });
+  return _geoCola;
+}
+
+app.get('/api/geocode/tienda', async (req, res) => {
+  const nombre = String(req.query.nombre || '').trim();
+  if (!nombre || nombre.length > 120) {
+    return res.status(400).json({ error: 'Falta el nombre de la tienda, o es demasiado largo.' });
+  }
+
+  const clave = nombre.toLowerCase();
+  if (_geoCache.has(clave)) {
+    const guardado = _geoCache.get(clave);
+    return res.json(guardado ? { ...guardado, cache: true } : { encontrada: false, cache: true });
+  }
+
+  try {
+    const coords = await geocodificar(nombre);
+    if (_geoCache.size >= GEO_CACHE_MAX) _geoCache.clear();
+    _geoCache.set(clave, coords);
+    // Un "no la encuentro" también se guarda: preguntarlo otra vez daría lo
+    // mismo y gastaría el cupo de peticiones.
+    return res.json(coords ? { ...coords, cache: false } : { encontrada: false, cache: false });
+  } catch (err) {
+    // No se guarda en caché: un fallo de red sí puede ir distinto la próxima.
+    console.warn('Geocodificación de "' + nombre + '" falló:', err.message);
+    return res.status(502).json({ error: 'No se pudo consultar el geocodificador.' });
+  }
+});
+
+// ════════════════════════════════════════════════════════════════
 // HEALTH CHECK
 // ════════════════════════════════════════════════════════════════
 app.get('/api/health', (req, res) => {
