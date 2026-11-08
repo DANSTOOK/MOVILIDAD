@@ -6210,22 +6210,19 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       box-shadow: 0 4px 12px rgba(226, 0, 26, 0.2);
     }
 
-    /* === DARK MODE CHARTS === */
-    @media (prefers-color-scheme: dark) {
-      .chart-container {
-        background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
-        border-color: var(--text);
-      }
-
-      .chart-container text {
-        fill: #e0e0e0;
-      }
-
-      .chart-grid {
-        stroke: #333;
-        opacity: 0.3;
-      }
+    /* === Las graficas en tema oscuro ===
+       Esto estaba colgado de @media (prefers-color-scheme: dark), es decir,
+       de la preferencia del SISTEMA OPERATIVO. La aplicacion tiene su propio
+       conmutador de tema, asi que las dos cosas se contradecian: con Windows
+       en oscuro y la aplicacion en claro, los contenedores de grafica salian
+       negros en medio de una pagina blanca.
+       Manda el tema de la aplicacion, que es el que el usuario eligio aqui. */
+    [data-theme="dark"] .chart-container {
+      background: var(--sup-2, linear-gradient(135deg, #1a1a1a 0%, #222 100%));
+      border-color: var(--border);
     }
+    [data-theme="dark"] .chart-container text { fill: var(--text); }
+    [data-theme="dark"] .chart-grid { stroke: var(--border); opacity: 0.4; }
 
     .chart-container {
       background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
@@ -20524,13 +20521,27 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') { closeEmailView(); closeSnapshotsModal(); }
     }) // INIT
-    // Aplicar tema temprano para evitar flash de blanco si el modo guardado es oscuro
+    /* EL TEMA POR DEFECTO ES EL CLARO.
+
+       El oscuro es una eleccion que se recuerda, no algo que se herede del
+       sistema operativo: quien tenga Windows en oscuro no por eso quiere el
+       tablero en oscuro, y mezclarlo producia una pagina clara con las
+       graficas negras.
+
+       Se aplica aqui, antes de pintar, para que quien SI lo eligio no vea
+       un fogonazo blanco antes de que cargue la configuracion. Y se quita
+       explicitamente en el caso contrario, para que el arranque sea siempre
+       el mismo independientemente de lo que quedara puesto. */
     try {
       var earlyCfg = JSON.parse(localStorage.getItem('oxxoConfig') || '{}');
       if (earlyCfg && earlyCfg.theme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
       }
-    } catch (e) {}
+    } catch (e) {
+      document.documentElement.removeAttribute('data-theme');
+    }
 
     loadPlazaOverrides();
     loadAppMode();
