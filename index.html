@@ -740,7 +740,7 @@
     .app-bar-icon-btn .badge {
       position: absolute; top: -3px; right: -3px;
       background: #FFD166;
-      color: #1C1B1F;
+      color: var(--text);
       font-size: 11px; font-weight: 600;
       min-width: 16px; height: 16px;
       border-radius: 999px;
@@ -9065,7 +9065,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       gap:   4px;
       animation: deltaIn 0.15s ease;
     }
-    .kpi-delta.up   { color: #16A34A; background: rgba(22,163,74,0.1); }
+    .kpi-delta.up   { color: var(--ink-ok); background: rgba(22,163,74,0.1); }
     .kpi-delta.down { color: var(--ink-critico-claro); background: rgba(220,38,38,0.1); }
     .kpi-delta.flat { color: #6B7280; background: rgba(107,114,128,0.1); }
     @keyframes deltaIn { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform: translateY(0); } }
@@ -9178,7 +9178,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       border-radius: 999px;
       font-size: 11px;
       font-weight: 600;
-      color: #16A34A;
+      color: var(--ink-ok);
       display: flex;
       align-items: center;
       gap:   6px;
@@ -9268,7 +9268,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       font-size: 16px;
     }
     .insight-banner .insight-text { flex: 1; font-size: 13px; line-height: 1.45; }
-    .insight-banner .insight-title { font-weight: 600; margin: 0 0 2px; color: #3B82F6; }
+    .insight-banner .insight-title { font-weight: 600; margin: 0 0 2px; color: var(--ink-info); }
 
     /* --- Keyboard shortcuts toast --- */
     .shortcuts-hint {
@@ -9339,7 +9339,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     .health-gauge-num {
       font-size: 28px;
       font-weight: 800;
-      color: #16A34A;
+      color: var(--ink-ok);
       line-height: 1.2;
       margin: 6px 0;
       letter-spacing: -1px;
@@ -9613,7 +9613,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
     tbody#cruce-table tr.sev-critical:hover { background: rgba(229,57,53,0.11); }
     /* Celda de días offline destacada por severidad */
     .days-cell { font-weight: 600; }
-    .days-cell.sev-warning { color: #C77700; }
+    .days-cell.sev-warning { color: var(--ink-ambar); }
     .days-cell.sev-critical { color: var(--ink-critico-medio); }
     .days-cell .days-badge {
       display: inline-block; min-width: 26px; padding:   2px 8px; border-radius: 12px;
@@ -25928,7 +25928,7 @@ function debugOSModelos() {
     background: #FFFFFF !important;
     background-image: none !important;
     border: 1px solid #E0E0E0 !important;
-    color: #1C1B1F !important;
+    color: var(--text) !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28) !important;
   }
 

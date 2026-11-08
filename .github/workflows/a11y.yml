@@ -32,6 +32,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Esto tarda un segundo y no necesita navegador, asi que va primero y
+  # aparte: si alguien mete un color suelto, se sabe enseguida y no hay que
+  # esperar a que termine la auditoria entera para verlo.
+  paleta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+      - name: Que no vuelvan los colores sueltos
+        run: node tests/color/guardian.mjs
+
   auditar:
     runs-on: ubuntu-latest
     timeout-minutes: 20
