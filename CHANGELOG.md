@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.6.1 — 2026-11-08
+
+- fix: el arranque en claro, explicito, y sin herencia del sistema
+- ci: un guardian para que no vuelvan los colores sueltos
+- fix: el correo llegaba sin color y el PDF tenia un ambar ilegible
+
 ## v1.6.0 — 2026-11-08
 
 - style: la colorimetria pasa a ser una escala medida en OKLCH
