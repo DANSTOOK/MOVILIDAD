@@ -18780,6 +18780,14 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         .slice(0, 5);
     }
 
+    /* OJO AL TOCAR ESTO: lo que se construye aqui acaba dentro de un correo,
+       y un cuerpo de correo NO es una pagina. Outlook, Gmail y Apple Mail no
+       entienden las variables CSS, asi que aqui los colores van en
+       hexadecimal literal a proposito, no por descuido. Si cambia la escala
+       de color, estos valores se actualizan A MANO.
+       Ya paso una vez: un pase que convirtio literales en tokens por todo el
+       documento entro tambien aqui, y tres colores del correo llevaban meses
+       llegando sin color a la bandeja de quien lo recibe. */
     function buildEmailHTML() {
       var s = getResumenStats();
       var fecha = typeof dayjs !== 'undefined' ? dayjs().format('DD MMMM YYYY').toLowerCase() : new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
@@ -18878,8 +18886,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
       // === NOTA DE AUTOMATIZACIÓN ===
       html += '<div style="background:#e8f5e9; padding:  16px 40px; max-width:1000px; margin:0 auto; border-left:4px solid #1F7A4E; border-top:1px solid #f0f0f0;">';
-      html += '<div style="font-size:12px; color:var(--ink-ok); font-weight:600;"><strong>✓ Información Actualizada Automáticamente</strong></div>';
-      html += '<div style="font-size:11px; color:var(--ink-verde); margin-top:  4px;">Este reporte se genera automáticamente del sistema de gestión de movilidad. Incluye búsqueda geográfica integrada y mapas interactivos disponibles en el aplicativo web.</div>';
+      html += '<div style="font-size:12px; color:#0E7B5E; font-weight:600;"><strong>✓ Información Actualizada Automáticamente</strong></div>';
+      html += '<div style="font-size:11px; color:#0E7B5E; margin-top:  4px;">Este reporte se genera automáticamente del sistema de gestión de movilidad. Incluye búsqueda geográfica integrada y mapas interactivos disponibles en el aplicativo web.</div>';
       html += '</div>';
 
       // (Sección "Resumen de costos en riesgo" eliminada a pedido del usuario.)
@@ -19064,7 +19072,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       // === MENSAJE A ASESORES ===
       html += '<div style="padding:  16px 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
       html += '<div style="background:#FFF3E0; border-left:4px solid #F57C00; padding:  16px 16px; border-radius:0 8px 8px 0; margin-bottom:  12px;">';
-      html += '<p style="font-size:13px; line-height:1.6; margin:0 0 8px 0; font-weight: 600; color:var(--ink-naranja);">Estimados asesores y líderes de tienda:</p>';
+      html += '<p style="font-size:13px; line-height:1.6; margin:0 0 8px 0; font-weight: 600; color:#8E5D07;">Estimados asesores y líderes de tienda:</p>';
       html += '<p style="font-size:13px; line-height:1.6; margin:0 0 6px 0; color:#424242;">';
       html += 'Les solicitamos su apoyo para asegurar la usabilidad de las herramientas y mantener los equipos encendidos para el monitoreo y las actualizaciones.';
       html += '</p>';
@@ -24231,7 +24239,7 @@ function generateReportPDF(title, equiposList) {
 
   // Date
   doc.setFontSize(10);
-  doc.setTextColor(120, 120, 120);
+  doc.setTextColor(101, 105, 110);   // 5.50:1 sobre papel; antes 4.01:1
   var now = new Date();
   doc.text('Generado: ' + now.toLocaleString('es-MX'), 15, 30);
 
@@ -24251,7 +24259,10 @@ function generateReportPDF(title, equiposList) {
       // Mostrar equipos en esta página
       for (var i = 0; i < maxEquiposPerPage && equipoIndex < equiposList.length; i++) {
         var equipo = equiposList[equipoIndex];
-        var color = equipo.days_ago >= 15 ? [179, 38, 30] : equipo.days_ago >= 4 ? [249, 166, 37] : [31, 122, 78];
+        /* Los mismos colores que la escala de la aplicacion, en la forma que
+           pide jsPDF. El ambar de antes, [249,166,37], daba 2.00:1 sobre
+           papel blanco: el estado RECIENTE no se leia. */
+        var color = equipo.days_ago >= 15 ? [185, 46, 35] : equipo.days_ago >= 4 ? [142, 93, 7] : [14, 123, 94];
         doc.setTextColor(color[0], color[1], color[2]);
         var estado = equipo.days_ago >= 15 ? 'CRÍTICO' : equipo.days_ago >= 4 ? 'RECIENTE' : 'OPERATIVO';
         var texto = equipo.CR + ' | ' + (equipo.TIENDA || '—') + ' | ' + estado + ' (' + equipo.days_ago + 'd)';
@@ -24270,7 +24281,7 @@ function generateReportPDF(title, equiposList) {
 
   // Footer
   doc.setFontSize(8);
-  doc.setTextColor(150, 150, 150);
+  doc.setTextColor(101, 105, 110);   // 5.50:1 sobre papel; antes 2.85:1
   var pageCount = doc.internal.getPages().length;
   for (var p = 1; p <= pageCount; p++) {
     doc.setPage(p);
