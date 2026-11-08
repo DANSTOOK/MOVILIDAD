@@ -27218,6 +27218,133 @@ function debugOSModelos() {
 
 </style>
 
+<style id="colorimetria">
+  /* ==========================================================
+     COLORIMETRIA: UNA ESCALA MEDIDA, NO UNA ACUMULACION
+
+     Punto de partida: 235 colores hexadecimales distintos en 898 usos,
+     mas 389 valores rgba. Eso no es una paleta.
+
+     Lo primero que hay que decir, porque cambia el diagnostico: TODAS las
+     tintas semanticas que habia ya pasaban WCAG, de 4.6:1 a 10.6:1. El
+     problema no era el contraste. Era otro, y se ve midiendo la claridad
+     perceptual (la L de OKLCH) de cada una:
+
+       tema claro   L de 0.498 a 0.574   (rango 0.076)
+       tema oscuro  L de 0.759 a 0.864   (rango 0.105)
+
+     En oscuro el ambar estaba a 0.864 y el rojo a 0.759. Es decir: el
+     aviso y el visto bueno BRILLABAN MAS que el error. Ninguna norma lo
+     prohibe -los tres pasan de sobra- pero la jerarquia que ve el ojo
+     estaba del reves, y por un motivo que nadie eligio: cada color se fue
+     ajustando por su cuenta hasta pasar el minimo.
+
+     COMO SE CONSTRUYE AHORA
+
+     Cada papel (fondo blanco, panel oscuro) tiene UNA claridad para sus
+     tintas. Se fija el tono y el croma de cada color, se resuelve la
+     claridad en OKLCH -que es perceptualmente uniforme, a diferencia de
+     HSL- y luego se MIDE el contraste WCAG del par real, porque la
+     uniformidad perceptual no garantiza el contraste: son dos cosas
+     distintas y conviene no confundirlas.
+
+     UN CAMBIO DE TONO, Y POR QUE
+
+     El verde pasa de H 157 a H 168, hacia el verde azulado. La deficiencia
+     rojo-verde es la mas frecuente, y un verde amarillento y un rojo se
+     acercan mucho al verlos asi; el verde azulado se separa bastante
+     mejor. No se cambia el esquema rojo-ambar-verde por azul-naranja, que
+     seria lo mas seguro, porque en operaciones ese codigo esta aprendido;
+     lo que se hace es alejar el verde del rojo todo lo que se puede sin
+     dejar de ser verde, y mantener que el estado SIEMPRE lleve ademas un
+     icono o una palabra.
+
+     El rojo de marca y el rojo de error comparten tono a proposito: en
+     esta aplicacion el error ES del color de la casa. No hace falta
+     distinguirlos entre si porque nunca significan dos cosas a la vez en
+     el mismo sitio.
+     ========================================================== */
+
+  :root {
+    /* --- Tintas sobre blanco. Las seis a L 0.520 --------------------- */
+    --ink-marca:        #C60215;   /* 6.15:1 */
+    --ink-critico:      #B92E23;   /* 6.03:1 */
+    --ink-ambar:        #8E5D07;   /* 5.63:1 */
+    --ink-ok:           #0E7B5E;   /* 5.22:1 */
+    --ink-info:         #0C6BB7;   /* 5.51:1 */
+    --ink-gris:         #65696E;   /* 5.50:1 */
+
+    /* Los alias que ya usaba la aplicacion cuelgan de los de arriba, asi
+       que no hay dos sitios donde tocar el mismo color. */
+    --ink-critico-medio: var(--ink-critico);
+    --ink-critico-claro: var(--ink-critico);
+    --ink-excel:         var(--ink-ok);
+    --ink-verde:         var(--ink-ok);
+    --ink-verde-fuerte:  var(--ink-ok);
+    --ink-azul:          var(--ink-info);
+    --ink-azul-fuerte:   var(--ink-info);
+    --ink-naranja:       var(--ink-ambar);
+    --ink-naranja-fuerte: var(--ink-ambar);
+    --ink-naranja-os:    var(--ink-ambar);
+    --ink-cabecera:      var(--ink-marca);
+    --primary-ink:       var(--ink-marca);
+    --error-ink:         var(--ink-critico);
+    --warning-ink:       var(--ink-ambar);
+
+    /* --- Rellenos: fondo de color con texto BLANCO encima ------------
+       Todos a L 0.550, la claridad mas alta a la que los cinco aguantan
+       texto blanco por encima de 4.5:1. Mas claros, el verde se caia. */
+    --fill-marca:  #D50518;   /* blanco encima 5.44:1 */
+    --fill-error:  #C4392D;   /* 5.30:1 */
+    --fill-ambar:  #99650A;   /* 4.96:1 */
+    --fill-ok:     #128565;   /* 4.59:1 */
+    --fill-info:   #0F74C5;   /* 4.85:1 */
+    --primary-fill: var(--fill-marca);
+    --error-fill:   var(--fill-error);
+
+    /* --- Pastillas de estado: tinte de fondo y su tinta -------------- */
+    --estado-off-bg: #FFEBE7;  --estado-off-fg: var(--ink-critico);  /* 5.26:1 */
+    --estado-rec-bg: #FFEDD7;  --estado-rec-fg: var(--ink-ambar);    /* 4.94:1 */
+    --estado-on-bg:  #D4FAEA;  --estado-on-fg:  var(--ink-ok);       /* 4.67:1 */
+    --estado-nd-bg:  #EFF0F1;  --estado-nd-fg:  var(--ink-gris);     /* 5.13:1 */
+  }
+
+  [data-theme="dark"] {
+    /* --- Tintas sobre el panel oscuro. Las seis a L 0.800 ------------ */
+    --ink-marca:        #FFA196;   /* 8.32:1 */
+    --ink-critico:      #FEA294;   /* 8.34:1 */
+    --ink-ambar:        #EDB160;   /* 8.55:1 */
+    --ink-ok:           #5ED7AE;   /* 9.17:1 */
+    --ink-info:         #89C3FF;   /* 8.75:1 */
+    --ink-gris:         #BABEC3;   /* 8.70:1 */
+
+    /* Los rellenos no cambian con el tema: son fondo de color con texto
+       blanco, y eso se lee igual en los dos. */
+
+    /* Las pastillas, en cambio, si: un tinte claro sobre un panel oscuro
+       es una mancha. Se hacen con el propio color a baja opacidad, que se
+       funde con el panel. */
+    --estado-off-bg: rgba(254, 162, 148, 0.16);
+    --estado-rec-bg: rgba(237, 177, 96, 0.16);
+    --estado-on-bg:  rgba(94, 215, 174, 0.16);
+    --estado-nd-bg:  rgba(255, 255, 255, 0.08);
+  }
+  /* --- El ultimo tramo: las tarjetas y los chips de estado ------------
+     Tenian su propio juego de hexadecimales (#B3261E, #E07F0E, #1976D2,
+     #5F6368) escritos aparte, asi que se quedaban fuera de la escala y en
+     oscuro ni siquiera cambiaban. Ahora cuelgan de las mismas tintas que
+     todo lo demas, y el tinte de fondo se hace con el color propio a baja
+     opacidad, que funciona igual sobre blanco y sobre panel oscuro. */
+  .estado-card.robo,     .estado-chip.robo     { --ec-accent: var(--ink-critico); --ec-dot-ring: color-mix(in srgb, var(--ink-critico) 22%, transparent); }
+  .estado-card.danada,   .estado-chip.danada   { --ec-accent: var(--ink-ambar);   --ec-dot-ring: color-mix(in srgb, var(--ink-ambar) 22%, transparent); }
+  .estado-card.garantia, .estado-chip.garantia { --ec-accent: var(--ink-info);    --ec-dot-ring: color-mix(in srgb, var(--ink-info) 22%, transparent); }
+  .estado-card.apagada,  .estado-chip.apagada  { --ec-accent: var(--ink-gris);    --ec-dot-ring: color-mix(in srgb, var(--ink-gris) 22%, transparent); }
+  .estado-card.robo,     .estado-chip.robo     { --ec-bg: linear-gradient(135deg, color-mix(in srgb, var(--ink-critico) 10%, transparent), color-mix(in srgb, var(--ink-critico) 3%, transparent)); }
+  .estado-card.danada,   .estado-chip.danada   { --ec-bg: linear-gradient(135deg, color-mix(in srgb, var(--ink-ambar) 10%, transparent),   color-mix(in srgb, var(--ink-ambar) 3%, transparent)); }
+  .estado-card.garantia, .estado-chip.garantia { --ec-bg: linear-gradient(135deg, color-mix(in srgb, var(--ink-info) 10%, transparent),    color-mix(in srgb, var(--ink-info) 3%, transparent)); }
+  .estado-card.apagada,  .estado-chip.apagada  { --ec-bg: linear-gradient(135deg, color-mix(in srgb, var(--ink-gris) 10%, transparent),    color-mix(in srgb, var(--ink-gris) 3%, transparent)); }
+</style>
+
 </body>
 </html>
 <!-- end -->
