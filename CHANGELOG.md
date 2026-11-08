@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.6.0 — 2026-11-08
+
+- style: la colorimetria pasa a ser una escala medida en OKLCH
+- style: el tema oscuro deja de ser cristal y pasa a ser panel
+- style: la pantalla de arranque y la barra lateral, con la marca y el resplandor
+- feat: el header, de dos bandas a una, con el logo oficial
+- ci: la auditoría corre en cada push y en cada pull request
+
 ## v1.5.0 — 2026-11-07
 
 - style: un nombre para el producto y un solo registro en los letreros
