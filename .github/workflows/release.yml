@@ -71,12 +71,26 @@ jobs:
           fi
           cat notes.md
 
+      # El release no adjuntaba nada: solo notas. Para bajarse una version
+      # concreta del tablero habia que clonar el repositorio y moverse al
+      # tag, que para quien solo quiere el fichero es dar un rodeo.
+      #
+      # Ojo con index.html a secas: desde que la barra lleva el logo oficial
+      # YA NO es autosuficiente, porque referencia header/Oxxo_Logo.svg. Si
+      # alguien se baja solo el HTML, el logo sale roto. Por eso van los dos:
+      # el HTML para mirarlo o diferenciarlo, y el zip para usarlo de verdad.
+      - name: Preparar los ficheros del release
+        run: |
+          zip -r "movilidad-${GITHUB_REF_NAME}.zip" index.html header/ > /dev/null
+          ls -la index.html "movilidad-${GITHUB_REF_NAME}.zip"
+
       - name: Publicar el GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          ADJUNTOS="index.html movilidad-${GITHUB_REF_NAME}.zip"
           if [ "${{ steps.notes.outputs.auto }}" = "true" ]; then
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes $ADJUNTOS
           else
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md $ADJUNTOS
           fi
