@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.4 — 2026-11-08
+
+- feat: el logo va dentro del HTML, que vuelve a bastarse solo
+
 ## v1.6.3 — 2026-11-08
 
 - ci: el release se publica con el tablero adjunto
