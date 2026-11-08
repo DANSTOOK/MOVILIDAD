@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.2 — 2026-11-08
+
+- test: el auditor abre tambien el menu lateral y el panel de avisos
+
 ## v1.6.1 — 2026-11-08
 
 - fix: el arranque en claro, explicito, y sin herencia del sistema
