@@ -287,7 +287,11 @@
 
     .sidebar-header-text p {
       font-size: 11px;
-      opacity: 0.9;
+      /* Llevaba opacity:0.9, que sobre el rojo de marca deja el blanco en
+         #FCE6E8 y el contraste en 4.14:1. En blanco entero son 4.94. Para
+         rebajar un subtitulo sobre un fondo de color fuerte no sirve la
+         opacidad: lo unico que hay para separarlo del titulo es el tamano
+         y el peso, que ya los tiene. */
       margin: 2px 0 0 0;
     }
 

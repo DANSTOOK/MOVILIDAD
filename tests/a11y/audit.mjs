@@ -61,6 +61,48 @@ const TABS = [
 
 const THEMES = ['light', 'dark'];
 
+/* Superficies que se abren ENCIMA del tablero y que no son una pestaña.
+   Estaban fuera de la auditoria sin que nadie lo hubiera decidido: el
+   recorrido se escribio por pestañas y estas dos no lo son. Justo son las
+   dos que mas se han rediseñado -el resplandor de la fila activa, el
+   cristal del menu en oscuro, el panel en la capa superior-, asi que
+   quedaban cubiertas solo por "lo mire a mano", que en este proyecto ya
+   ha fallado cuatro veces. */
+const CAPAS = [
+  {
+    id: 'menu-lateral',
+    label: 'Menú lateral',
+    abrir: (page) => page.evaluate(() => {
+      if (typeof window.toggleSidebar !== 'function') return false;
+      const sb = document.querySelector('.sidebar');
+      if (!sb) return false;
+      if (!sb.classList.contains('open')) window.toggleSidebar();
+      return document.querySelector('.sidebar').classList.contains('open');
+    }),
+    cerrar: (page) => page.evaluate(() => {
+      const sb = document.querySelector('.sidebar');
+      if (sb && sb.classList.contains('open') && typeof window.toggleSidebar === 'function') window.toggleSidebar();
+    }),
+  },
+  {
+    id: 'panel-avisos',
+    label: 'Panel de avisos',
+    abrir: (page) => page.evaluate(() => {
+      const p = document.getElementById('notif-panel');
+      if (!p || typeof window.toggleNotifPanel !== 'function') return false;
+      const abierto = p.matches(':popover-open') || getComputedStyle(p).display !== 'none';
+      if (!abierto) window.toggleNotifPanel();
+      const p2 = document.getElementById('notif-panel');
+      return p2.matches(':popover-open') || getComputedStyle(p2).display !== 'none';
+    }),
+    cerrar: (page) => page.evaluate(() => {
+      const p = document.getElementById('notif-panel');
+      const abierto = p && (p.matches(':popover-open') || getComputedStyle(p).display !== 'none');
+      if (abierto && typeof window.toggleNotifPanel === 'function') window.toggleNotifPanel();
+    }),
+  },
+];
+
 /* ---------------------------------------------------------------------------
  * Exclusiones. Cada una esta aqui porque medirla contra el DOM da un fallo que
  * no existe en pantalla, no porque el fallo moleste.
@@ -283,6 +325,29 @@ async function main() {
           `  ${theme.padEnd(5)} ${tab.label.padEnd(16)} `
           + `${results.violations.length} reglas, ${bad} nodos serious/critical`,
         );
+      }
+
+      /* Las dos superficies que se abren encima de todo y que hasta ahora
+         nadie media. No viven dentro de una pestaña, asi que se recorren
+         una vez por tema en vez de en las nueve: lo que hay dentro no
+         cambia de una pestaña a otra. */
+      for (const capa of CAPAS) {
+        await openTab(page, TABS[0]);          // siempre desde el mismo sitio
+        const abierta = await capa.abrir(page);
+        if (!abierta) {
+          console.log(`  ${theme.padEnd(5)} ${capa.label.padEnd(16)} no se pudo abrir, no se mide`);
+          continue;
+        }
+        await esperarQuietud(page);
+        const results = await runAxe(page);
+        const counts = summarize(results);
+        views.push({ theme, tab: capa.label, tabId: capa.id, counts, results });
+        const bad = counts.serious + counts.critical;
+        console.log(
+          `  ${theme.padEnd(5)} ${capa.label.padEnd(16)} `
+          + `${results.violations.length} reglas, ${bad} nodos serious/critical`,
+        );
+        await capa.cerrar(page);
       }
     }
   } finally {
