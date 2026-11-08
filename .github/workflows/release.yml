@@ -75,20 +75,25 @@ jobs:
       # concreta del tablero habia que clonar el repositorio y moverse al
       # tag, que para quien solo quiere el fichero es dar un rodeo.
       #
-      # Ojo con index.html a secas: desde que la barra lleva el logo oficial
-      # YA NO es autosuficiente, porque referencia header/Oxxo_Logo.svg. Si
-      # alguien se baja solo el HTML, el logo sale roto. Por eso van los dos:
-      # el HTML para mirarlo o diferenciarlo, y el zip para usarlo de verdad.
-      - name: Preparar los ficheros del release
+      # Durante un par de versiones hubo tambien un zip, porque el HTML
+      # referenciaba header/Oxxo_Logo.svg y suelto salia con el logo roto.
+      # Ya no: el logo va dentro del documento, asi que index.html vuelve a
+      # ser lo que siempre debio ser, el entregable completo y unico. Se
+      # comprueba antes de publicar, para que no vuelva a colarse.
+      - name: Comprobar que index.html se basta solo
         run: |
-          zip -r "movilidad-${GITHUB_REF_NAME}.zip" index.html header/ > /dev/null
-          ls -la index.html "movilidad-${GITHUB_REF_NAME}.zip"
+          if grep -n 'src="header/' index.html; then
+            echo "✗ index.html referencia ficheros de header/; ya no es autosuficiente"
+            exit 1
+          fi
+          grep -q 'id="logo-oxxo"' index.html || { echo "✗ falta el simbolo del logo"; exit 1; }
+          echo "✓ index.html lleva el logo dentro ($(du -h index.html | cut -f1))"
 
       - name: Publicar el GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ADJUNTOS="index.html movilidad-${GITHUB_REF_NAME}.zip"
+          ADJUNTOS="index.html"
           if [ "${{ steps.notes.outputs.auto }}" = "true" ]; then
             gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes $ADJUNTOS
           else

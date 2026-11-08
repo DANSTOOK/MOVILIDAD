@@ -7085,6 +7085,34 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 </style>
 </head>
 <body>
+<!-- ════════════════════════════════════════════════════════════════
+     EL LOGOTIPO, DENTRO DEL DOCUMENTO
+
+     Estaba en header/Oxxo_Logo.svg, un fichero aparte, y eso rompia lo
+     que esta aplicacion es: UN solo fichero que se abre y funciona. Quien
+     se bajaba el index.html suelto veia el logo roto en cuatro sitios.
+
+     Va una sola vez, como simbolo, y los cuatro sitios que lo pintan -la
+     barra, la pantalla de arranque, la cabecera del menu y el modo
+     presentacion- lo referencian con <use>. Una copia del dibujo, cuatro
+     usos: cambiarlo es tocar aqui y ya.
+
+     Los cuatro hexadecimales de los trazos de abajo (el blanco, los dos
+     amarillos y el rojo) son literales A PROPOSITO y no deben pasar a
+     tokens: no son colores de interfaz que se adapten al tema, son el
+     dibujo de la marca. El logo es el mismo en claro y en oscuro.
+     ════════════════════════════════════════════════════════════════ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
+  <symbol id="logo-oxxo" viewBox="35.43 35.45 885.83 448.9">
+    <defs id="defs4"/>
+      <g transform="translate(827.88999,968.22013)" id="layer1">
+        <path d="M -792.45694,-878.04836 C -792.45694,-907.6486 -768.68375,-931.6666 -739.32839,-931.6666 L 40.118862,-931.6666 C 69.449742,-931.6666 93.247422,-907.6486 93.247422,-878.04836 L 93.247422,-538.88255 C 93.247422,-509.28235 69.449742,-485.28882 40.118862,-485.28882 L -739.32839,-485.28882 C -768.68375,-485.28882 -792.45694,-509.28235 -792.45694,-538.88255 L -792.45694,-878.04836" id="path8304" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"/>
+        <path d="M -791.84486,-883.45915 C -791.84486,-910.6845 -769.95688,-932.7683 -742.97638,-932.7683 L 44.525842,-932.7683 C 71.506332,-932.7683 93.369832,-910.6845 93.369832,-883.45915 L 93.369832,-881.89222 L -791.84486,-881.89222 L -791.84486,-883.45915" id="path8308" style="fill:#fbb110;fill-opacity:1;fill-rule:nonzero;stroke:none"/>
+        <path d="M 93.369832,-534.40212 L 93.369832,-533.17796 C 93.369832,-505.95264 71.506332,-483.86879 44.525842,-483.86879 L -742.97638,-483.86879 C -769.95688,-483.86879 -791.84486,-505.95264 -791.84486,-533.17796 L -791.84486,-534.40212 L 93.369832,-534.40212" id="path8312" style="fill:#fbb110;fill-opacity:1;fill-rule:nonzero;stroke:none"/>
+        <path d="M -179.20167,-708.84494 C -179.20167,-639.92473 -123.84515,-584.05406 -55.537008,-584.05406 C 12.746642,-584.05406 68.127652,-639.92473 68.127652,-708.84494 C 68.127652,-777.78964 12.746642,-833.66031 -55.537008,-833.66031 C -123.84515,-833.66031 -179.20167,-777.78964 -179.20167,-708.84494 z M -768.80617,-708.84494 C -768.80617,-639.92473 -713.42516,-584.05406 -645.11702,-584.05406 C -576.83337,-584.05406 -521.45236,-639.92473 -521.45236,-708.84494 C -521.45236,-777.78964 -576.83337,-833.66031 -645.11702,-833.66031 C -713.42516,-833.66031 -768.80617,-777.78964 -768.80617,-708.84494 z M 93.369832,-558.02841 L -516.38434,-558.02841 C -505.39138,-565.81407 -495.1574,-576.46426 -483.99306,-590.8359 L -421.87918,-670.82253 L -394.75179,-636.22776 L -364.564,-676.74746 L -390.95689,-710.6567 L -327.74126,-792.08783 C -307.66504,-817.91761 -346.0547,-848.27679 -366.13092,-822.44701 L -422.00159,-750.46639 L -478.80262,-823.40185 C -498.90333,-849.15818 -537.21955,-818.72556 -517.11884,-792.94475 L -452.92388,-710.63222 L -522.38273,-621.19508 C -547.0618,-589.41588 -571.6919,-560.28087 -620.58485,-558.02841 L -791.84486,-558.02841 L -791.84486,-858.26593 L -185.29799,-858.26593 C -195.72783,-850.57821 -205.57008,-840.27078 -216.24475,-826.51122 L -278.33416,-746.54908 L -305.48603,-781.11936 L -335.64934,-740.59966 L -309.25644,-706.7149 L -372.49656,-625.28377 C -392.5483,-599.45399 -354.15864,-569.09482 -334.10689,-594.9246 L -278.21174,-666.88073 L -221.41071,-593.96975 C -201.31,-568.18894 -162.99379,-598.62156 -183.0945,-624.40238 L -247.28946,-706.73939 L -177.83061,-796.15205 C -155.15916,-825.38499 -132.5122,-852.36548 -91.037651,-858.26593 L 93.369832,-858.26593 L 93.369832,-558.02841 z M -129.57422,-708.84494 C -129.57422,-750.12362 -96.423961,-783.56768 -55.537008,-783.56768 C -14.650058,-783.56768 18.475712,-750.12362 18.475712,-708.84494 C 18.475712,-667.59075 -14.650058,-634.14669 -55.537008,-634.14669 C -96.423961,-634.14669 -129.57422,-667.59075 -129.57422,-708.84494 z M -719.15423,-708.84494 C -719.15423,-750.12362 -686.00397,-783.56768 -645.11702,-783.56768 C -604.25456,-783.56768 -571.1043,-750.12362 -571.1043,-708.84494 C -571.1043,-667.59075 -604.25456,-634.14669 -645.11702,-634.14669 C -686.00397,-634.14669 -719.15423,-667.59075 -719.15423,-708.84494" id="path8316" style="fill:#e70020;fill-opacity:1;fill-rule:nonzero;stroke:none"/>
+      </g>
+  </symbol>
+</svg>
   <!-- Fondo ambiental reactivo: el tono refleja la salud global (verde/ámbar/rojo) -->
   <div id="ambient-aurora" aria-hidden="true"></div>
   <style>
@@ -7170,7 +7198,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
            leia a duras penas- y un script que buscaba en localStorage
            un logo subido a mano, mecanismo que ya no existe. -->
       <div class="splash-logo-card">
-        <img src="header/Oxxo_Logo.svg" alt="OXXO" width="200" height="101" decoding="async">
+        <svg class="logo-oxxo" width="200" height="101" role="img" aria-label="OXXO"><use href="#logo-oxxo"/></svg>
       </div>
       <div class="splash-tagline">Movilidad</div>
       <div class="splash-loader">
@@ -7190,7 +7218,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       <!-- El logo, igual que en la barra y en el arranque. Antes habia un
            icono generico de "dashboard" que no decia de quien es esto. -->
       <div class="sidebar-header-icon">
-        <img src="header/Oxxo_Logo.svg" alt="OXXO" width="78" height="40" decoding="async">
+        <svg class="logo-oxxo" width="78" height="40" role="img" aria-label="OXXO"><use href="#logo-oxxo"/></svg>
       </div>
       <div class="sidebar-header-text">
         <h3>OXXO Movilidad</h3>
@@ -7313,7 +7341,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
            localStorage. Cada navegador podia acabar con un logo distinto,
            y quien no subia ninguno veia un hueco punteado en la barra. -->
       <div class="app-bar-logo" id="app-logo">
-        <img src="header/Oxxo_Logo.svg" alt="OXXO" width="96" height="49" decoding="async">
+        <svg class="logo-oxxo" width="96" height="49" role="img" aria-label="OXXO"><use href="#logo-oxxo"/></svg>
       </div>
 
       <div class="app-bar-title">
@@ -9210,7 +9238,8 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       left: 28px;
       z-index: 60;
     }
-    #presentation-logo img {
+    #presentation-logo img,
+    #presentation-logo .logo-oxxo {
       max-height: 60px;
       max-width: 200px;
       width: auto;
@@ -13860,10 +13889,11 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       if (window.toast) window.toast({ type:'success', title:'Notificaciones', msg:'Marcadas como leídas.' });
     }
 
-    /* El logo ya no se sube ni se guarda: es un fichero del repositorio
-       (header/Oxxo_Logo.svg) y sale igual en todos los navegadores. Aqui
-       vivian onLogoSelected, applyLogo, removeLogo y restoreLogo, con su
-       clave de localStorage; nada de eso hace falta. */
+    /* El logo ya no se sube ni se guarda: vive dentro de este documento,
+       como simbolo <use href="#logo-oxxo">, y sale igual en todos los
+       navegadores sin depender de ningun fichero de al lado. Aqui vivian
+       onLogoSelected, applyLogo, removeLogo y restoreLogo, con su clave de
+       localStorage; nada de eso hace falta. */
 
     /* Salta a CRUCE mostrando solo los equipos offline */
     function goToOfflineEquipos() {
@@ -22330,7 +22360,7 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
 
   <!-- Logo flotante visible en Modo Presentación (la barra superior se oculta) -->
   <div id="presentation-logo" aria-hidden="true">
-    <img src="header/Oxxo_Logo.svg" alt="OXXO" width="140" height="71" decoding="async">
+    <svg class="logo-oxxo" width="140" height="71" role="img" aria-label="OXXO"><use href="#logo-oxxo"/></svg>
   </div>
 
   <!-- ============ ANIMACIONES REACTIVAS (personalidad por pestaña) ============ -->
@@ -26802,7 +26832,8 @@ function debugOSModelos() {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22) !important;
     cursor: default;
   }
-  .app-bar-logo img {
+  .app-bar-logo img,
+  .app-bar-logo .logo-oxxo {
     display: block;
     height: 26px;
     width: auto;
@@ -26855,7 +26886,8 @@ function debugOSModelos() {
   }
 
   /* El modo presentacion oculta la barra y saca el logo flotando. */
-  body.presentation-mode #presentation-logo img {
+  body.presentation-mode #presentation-logo img,
+  body.presentation-mode #presentation-logo .logo-oxxo {
     height: 40px;
     width: auto;
     display: block;
@@ -27009,7 +27041,8 @@ function debugOSModelos() {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
-  .splash-logo-card img { display: block; width: 180px; height: auto; }
+  .splash-logo-card img,
+  .splash-logo-card .logo-oxxo { display: block; width: 180px; height: auto; }
   .splash-tagline { margin-top: 18px; }
 
   /* El fundido de salida se dispara con la clase, no con un retardo fijo
@@ -27109,7 +27142,8 @@ function debugOSModelos() {
     align-items: center;
     flex: 0 0 auto;
   }
-  .sidebar-header-icon img { display: block; height: 24px; width: auto; }
+  .sidebar-header-icon img,
+  .sidebar-header-icon .logo-oxxo { display: block; height: 24px; width: auto; }
 
   /* Los rotulos de seccion: la rayita que les seguia se quedaba corta y
      desigual segun el largo del texto. Que llegue hasta el final. */
