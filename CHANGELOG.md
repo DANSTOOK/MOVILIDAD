@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.3 — 2026-11-08
+
+- ci: el release se publica con el tablero adjunto
+
 ## v1.6.2 — 2026-11-08
 
 - test: el auditor abre tambien el menu lateral y el panel de avisos
