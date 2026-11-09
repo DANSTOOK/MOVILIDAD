@@ -18767,19 +18767,51 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
      * Si el canvas no existe (porque la pestaña Resumen no se ha visitado),
      * fuerza un render rápido para que estén disponibles.
      */
-    function getChartDataURL(chartId) {
+    /* Devuelve la grafica ya pintada como PNG en base64, lista para
+       incrustar en el correo.
+
+       El pixelRatio es un argumento y no un 3 fijo porque el peso manda:
+       una sola grafica a 3 son ~90 KB de base64 y Gmail recorta el correo
+       entero a partir de ~102 KB. Quien llama decide la resolucion segun
+       lo que le queda de presupuesto. */
+    function getChartDataURL(chartId, pixelRatio, ancho, alto) {
       var dom = document.getElementById(chartId);
       if (!dom) {
         try { renderDashboards(); } catch(e) {}
         dom = document.getElementById(chartId);
       }
       if (!dom) return null;
+      var chart = null;
+      try { chart = echarts.getInstanceByDom(dom); } catch (e) { return null; }
+      if (!chart) return null;
+
+      /* Casi todas estas graficas se inicializan con su pestana oculta, y
+         un contenedor oculto mide 0x0. ECharts no acepta eso y cae a su
+         tamano de reserva: 100x100. Pedirle entonces el PNG devuelve una
+         miniatura de 100 px que el correo estiraba a 900 y salia un
+         borron gigante; se veia en la captura y era exactamente eso.
+
+         Asi que antes de capturar se le da el tamano al que se va a
+         mostrar, y despues se le devuelve el que tenia. Las dos llamadas
+         van seguidas, sin nada en medio que ceda el hilo, asi que el
+         navegador no llega a pintar el estado intermedio: no parpadea ni
+         para la grafica que esta a la vista. */
+      var w0 = chart.getWidth(), h0 = chart.getHeight();
+      var redimensionar = ancho && alto && (w0 < ancho * 0.9);
       try {
-        var chart = echarts.getInstanceByDom(dom);
-        if (!chart) return null;
-        return chart.getDataURL({ type: 'png', pixelRatio: 3, backgroundColor: '#ffffff' });
+        if (redimensionar) chart.resize({ width: ancho, height: alto });
+        /* JPEG y no PNG. Medido sobre estas graficas a 880x400: PNG son
+           56.6 KB de base64 y JPEG 27.7, la mitad justa, y puestas una al
+           lado de la otra no se distingue cual es cual. PNG gana cuando
+           hay texto fino sobre color plano; estas son barras y anillos con
+           degradado, que es justo donde JPEG no pierde nada. Con el tope
+           del correo tan ajustado, la mitad de peso son el doble de
+           vistas, y eso si se nota. */
+        return chart.getDataURL({ type: 'jpeg', pixelRatio: pixelRatio || 1.5, backgroundColor: '#ffffff' });
       } catch (e) {
         return null;
+      } finally {
+        if (redimensionar) { try { chart.resize({ width: w0, height: h0 }); } catch (e) {} }
       }
     }
 
@@ -18819,7 +18851,10 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
        Ya paso una vez: un pase que convirtio literales en tokens por todo el
        documento entro tambien aqui, y tres colores del correo llevaban meses
        llegando sin color a la bandeja de quien lo recibe. */
-    function buildEmailHTML() {
+    /* opciones.soloTexto: arma el cuerpo sin capturar ni una grafica. Se
+       usa para medir cuanto ocupa el texto y repartir lo que queda del
+       presupuesto del mensaje. Ver TOPE_CORREO mas abajo. */
+    function buildEmailHTML(opciones) {
       var s = getResumenStats();
       var fecha = typeof dayjs !== 'undefined' ? dayjs().format('DD MMMM YYYY').toLowerCase() : new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
       var fechaTitulo = typeof dayjs !== 'undefined' ? dayjs().format('DD MMMM YYYY').toUpperCase() : new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
@@ -18844,14 +18879,28 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         ? ((totalEquipos - equiposCriticos) / totalEquipos * 100).toFixed(1)
         : '0';
 
-      // Colores reutilizables (paleta corporativa restringida: rojo OXXO + slate neutral)
-      var oxxoRed = '#E2001A';
-      var oxxoRedDark = '#B80018';
-      var successGreen = '#1F7A4E';
-      var criticalRed = '#B3261E';
-      var warmYellow = '#F5A623';
-      var slate = '#37474F';        // encabezados de secciones de datos (corporativo)
-      var slateDark = '#263238';
+      /* La paleta del correo, literal y a proposito: los clientes de correo
+         ignoran las variables CSS, asi que aqui no se puede usar var(--...).
+         Pero los VALORES son exactamente los de la escala medida de la
+         aplicacion (el bloque #colorimetria), para que el correo y el
+         tablero sean el mismo producto y no dos que se parecen.
+
+         Las tintas van sobre blanco con >=5:1; los rellenos estan todos a
+         la misma claridad OKLCH (L 0.550) y aguantan texto blanco encima
+         con >=4.5:1. Si cambias una, cambiala tambien alli. */
+      var oxxoRed = '#D50518';      // --fill-marca
+      var oxxoRedDark = '#C60215';  // --ink-marca
+      var successGreen = '#128565'; // --fill-ok
+      var successInk = '#0E7B5E';   // --ink-ok
+      var criticalRed = '#C4392D';  // --fill-error
+      var criticalInk = '#B92E23';  // --ink-critico
+      var warmYellow = '#99650A';   // --fill-ambar
+      var warmInk = '#8E5D07';      // --ink-ambar
+      var infoBlue = '#0F74C5';     // --fill-info
+      var infoInk = '#0C6BB7';      // --ink-info
+      var slate = '#3B4252';        // encabezados de secciones de datos
+      var slateDark = '#262C38';
+      var grayInk = '#65696E';      // --ink-gris, texto secundario legible
 
       // Color dinámico según disponibilidad
       function dispColor(pct) {
@@ -18868,6 +18917,165 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       function dot(color) {
         return '<span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:' + color + '; margin-right:8px; vertical-align:middle;"></span>';
       }
+
+      /* ── LAS PANTALLAS DE LA APLICACION, DENTRO DEL CORREO ──────────
+         Las graficas se incrustan como PNG en base64, que es lo unico
+         que un cliente de correo pinta sin pedir permiso ni depender de
+         un servidor. El precio es el peso, y el peso tiene un tope duro:
+         Gmail RECORTA el mensaje a partir de unos 102 KB y enseña
+         "[Mensaje recortado]", escondiendo todo lo que venga despues.
+
+         Por eso hay presupuesto. Cada grafica se pide con la resolucion
+         mas alta que quepa en lo que queda; si no cabe ni la mas baja, se
+         deja fuera y se dice por que en la consola, en vez de reventar el
+         correo por abajo en silencio. Las secciones de texto importantes
+         van ANTES que las graficas en el documento, asi que si algo se
+         pierde por un recorte inesperado, se pierde lo decorativo. */
+      /* El tope. Gmail recorta a partir de unos 102 KB: no borra nada,
+         esconde el final tras un "ver mensaje completo". Como ahora las
+         vistas van al final del documento, lo unico que puede quedar
+         detras de ese enlace son ellas, nunca una tabla. Eso permite
+         pasar algo del limite a cambio de mas contenido, que es
+         justamente lo que se pedia.
+
+         Aun asi se apunta por DEBAJO del corte, a 100 KB. Con 130 cabia
+         una vista mas, pero empezaba en el KB 109: es decir, se pagaba
+         su peso para dejarla detras del enlace, donde casi nadie mira.
+         Mejor tres vistas que se ven que cuatro de las que se ve una
+         menos. El margen que queda absorbe un concentrado algo mayor sin
+         que nada se vaya detras del corte.
+
+         La descarga y la vista previa no pasan por ningun servidor de
+         correo y no tienen este problema, asi que piden el cuerpo con
+         opciones.sinTope y se llevan todas las vistas. */
+      var TOPE_CORREO = (opciones && opciones.sinTope) ? Infinity : 100 * 1024;
+      var graficasFuera = [];
+
+      /* Para repartir el presupuesto hay que saber primero cuanto ocupa
+         el texto, y eso no se sabe hasta haberlo escrito entero. Asi que
+         se arma dos veces: una en seco, sin graficas, solo para medir, y
+         otra de verdad con lo que sobra repartido entre las vistas. La
+         pasada en seco no captura ni una imagen, que es lo unico caro
+         aqui, asi que no se nota.
+
+         El intento anterior fue a ojo y salio mal: miraba html.length,
+         pero las graficas se iban acumulando en una variable aparte, de
+         modo que html.length no crecia y las cinco creian tener libre el
+         presupuesto entero. El correo acabo en 133 KB, treinta por
+         encima del recorte. De ahi que ahora se mida de verdad. */
+      var soloTexto = !!(opciones && opciones.soloTexto);
+      var presupuesto = 0;
+      if (!soloTexto) {
+        presupuesto = Math.max(0, TOPE_CORREO - buildEmailHTML({ soloTexto: true }).length);
+      }
+      var gastado = 0;
+      var capturadas = {};
+      /* El tamano al que se captura y se muestra cada vista. Uno solo
+         para todas: lo que hace que un correo parezca de una sola pieza
+         es que las imagenes compartan ancho y proporcion. 880 es el ancho
+         util dentro de la tarjeta; la proporcion ancha va bien a barras y
+         lineas, y a los anillos no les estorba. */
+      var ANCHO_VISTA = 700, ALTO_VISTA = 320;
+
+      /* Las graficas se capturan TODAS aqui, por orden de importancia, y
+         despues cada seccion recoge la suya. Hacerlo sobre la marcha
+         repartia el presupuesto por orden de aparicion en el documento,
+         que no es lo mismo: el panorama va arriba y se lo gastaba todo
+         antes de llegar a las dos graficas que acompanan a su tabla, que
+         son justo las que mas se entienden. Primero se decide que entra,
+         luego se escribe. */
+      /* Se elige UNA escala para todas y se baja hasta que el conjunto
+         quepa. Dar a cada una la mejor que le toque por orden gasta el
+         presupuesto en las tres primeras y deja fuera las demas: salen
+         tres vistas nitidas en vez de seis utiles, y ademas con nitidez
+         distinta entre ellas, que se nota al hojear.
+
+         Que 1 sea suficiente no es resignarse: estas graficas miden unos
+         1200 px de ancho en pantalla y en el correo se muestran a 900
+         como mucho, asi que a escala 1 ya llegan sobremuestreadas. */
+      function reservarGraficas(ids) {
+        if (soloTexto) return;
+        var escalas = [1.5, 1.25, 1];
+        for (var e = 0; e < escalas.length; e++) {
+          /* Cada vista no son solo sus bytes de imagen: lleva titulo,
+             marco y la etiqueta <img>. Sin contarlo, el cuerpo se pasaba
+             del tope por ese margen. */
+          var MARCO = 520;
+          var lote = {}, suma = 0, sinNodo = [];
+          ids.forEach(function(id){
+            var u = getChartDataURL(id, escalas[e], ANCHO_VISTA, ALTO_VISTA);
+            if (!u) { sinNodo.push(id); return; }
+            lote[id] = u; suma += u.length + MARCO;
+          });
+          var ultima = (e === escalas.length - 1);
+          if (suma <= presupuesto || ultima) {
+            // En la ultima escala, si aun no cabe, se cae por la cola.
+            var orden = ids.filter(function(id){ return lote[id]; });
+            for (var k = orden.length - 1; k >= 0 && suma > presupuesto; k--) {
+              suma -= lote[orden[k]].length + MARCO;
+              delete lote[orden[k]];
+              graficasFuera.push(orden[k] + ' (sin presupuesto)');
+            }
+            capturadas = lote;
+            gastado = suma;
+            sinNodo.forEach(function(id){ graficasFuera.push(id + ' (sin instancia)'); });
+            return;
+          }
+        }
+      }
+
+      function graficaHTML(id, titulo, nota, anchoMax) {
+        var src = capturadas[id];
+        if (!src) return '';
+
+        var o = '';
+        o += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%; border-collapse:collapse; margin:0 0 4px 0;"><tr>';
+        o += '<td style="padding:  14px 16px 10px 16px;">';
+        o += '<div style="font-size:12px; font-weight:700; color:' + slateDark + '; letter-spacing:.2px;">' + escHTML(titulo) + '</div>';
+        if (nota) o += '<div style="font-size:11px; color:' + grayInk + '; margin-top:  3px;">' + escHTML(nota) + '</div>';
+        o += '</td></tr><tr><td style="padding:  0 16px 14px 16px;">';
+        /* width y height como atributos ademas de en el style: Outlook
+           los necesita para reservar el hueco, y sin ellos el correo da
+           un salto cuando terminan de pintarse las imagenes. El max-width
+           es el tamano REAL de captura, nunca mas: estirar una imagen por
+           encima de sus pixeles es lo que la vuelve un borron. */
+        o += '<img src="' + src + '" alt="' + escHTML(titulo) + '" width="' + ANCHO_VISTA + '" height="' + ALTO_VISTA + '"'
+           + ' style="width:100%; max-width:' + ANCHO_VISTA + 'px; height:auto; display:block; margin:0 auto; border:1px solid #e5e7eb; border-radius:8px;">';
+        o += '</td></tr></table>';
+        return o;
+      }
+
+      /* Cabecera de tarjeta, igual para todas las secciones. Antes cada
+         una repetia su propio HTML con pequenas diferencias y por eso no
+         se parecian entre si. */
+      function cabeceraTarjeta(texto, fondo, insignia) {
+        var o = '<div style="background:' + fondo + '; padding:  12px 16px;">';
+        o += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr>';
+        o += '<td style="color:#ffffff; font-size:13px; font-weight: 600; letter-spacing:.3px;">' + escHTML(texto) + '</td>';
+        /* Relleno oscuro y no blanco translucido: el translucido aclara
+           el fondo y deja el texto blanco por debajo de 4.5:1. */
+        if (insignia) o += '<td style="text-align:right;"><span style="color:#ffffff; font-size:12px; background:' + slateDark + '; padding:  3px 12px; border-radius:12px; white-space:nowrap;">' + escHTML(insignia) + '</span></td>';
+        o += '</tr></table></div>';
+        return o;
+      }
+
+      /* El orden ES la prioridad: lo primero que se pide es lo primero
+         que se queda con presupuesto, y las tres primeras son las que
+         van pegadas a una tabla, porque una grafica junto a sus numeros
+         se lee y en una parrilla aparte solo se hojea. */
+      reservarGraficas([
+        'chart-responsabilidad',     // disponibilidad global: el titular
+        'chart-top5-tiendas',        // junto al listado de equipos apagados
+        'chart-modelos-equipos',     // junto a la tabla de modelos
+        'chart-hh-tt-offline',       // junto a la disponibilidad por tipo
+        'chart-dias-tienda',
+        'chart-criticidad-cr',
+        'chart-asesores-llamadas',
+      ]);
+
+      var abrirSeccion = '<div style="padding:  0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">'
+                       + '<div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:  16px;">';
+      var cerrarSeccion = '</div></div>';
 
       var html = '';
 
@@ -18888,8 +19096,13 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       html += '<td style="vertical-align:middle; width:70%; color:white;">';
       html += '<div style="font-size:12px; font-weight:800; letter-spacing:2px; margin-bottom:  8px; opacity:0.9;">★ REPORTE DE MOVILIDAD</div>';
       html += '<div style="font-size:32px; font-weight:800; margin-bottom:  12px; line-height:1.2; letter-spacing:-1px;">Equipos de Movilidad</div>';
-      html += '<div style="font-size:14px; font-weight: 600; opacity:0.95; margin-bottom:  4px;">' + escHTML(fechaTitulo) + '</div>';
-      html += '<div style="font-size:13px; opacity:0.85;">' + escHTML(plazaTitulo) + '</div>';
+      /* El opacity:0.85 de esta linea daba 4.16:1 sobre el rojo: por
+         debajo del minimo. Es el mismo error de siempre -bajar la
+         opacidad para "atenuar" un texto-, y la solucion es la de
+         siempre: blanco entero y la jerarquia por tamano, no por
+         transparencia. */
+      html += '<div style="font-size:14px; font-weight: 600; margin-bottom:  4px;">' + escHTML(fechaTitulo) + '</div>';
+      html += '<div style="font-size:13px; color:#ffffff;">' + escHTML(plazaTitulo) + '</div>';
       html += '</td>';
       html += '<td style="vertical-align:top; text-align:right; width:30%; padding-left:  20px;">';
       html += '<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; margin-left:auto;">';
@@ -18995,49 +19208,118 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       html += '<span style="display:inline-block; background:' + dispColor(s.dispTT) + '; color:white; padding:  4px 12px; border-radius:12px; font-weight: 600; font-size:13px;">' + s.dispTT + '%</span>';
       html += '</td></tr>';
       html += '</tbody></table>';
+      html += graficaHTML('chart-hh-tt-offline', 'Distribución de equipos offline por tipo', null, 900);
       html += '</div>'; // card
       html += '</div>'; // padding
 
+      /* Estilos de celda compartidos. Los de arriba (tdBase/tdBorder) se
+         quedan donde estan para no tocar las tablas que ya funcionaban;
+         estos son los que usan las secciones nuevas, y son mas cortos a
+         proposito: cada byte repetido por fila cuenta cuando el tope del
+         mensaje son 92 KB. */
+      var thBase = 'padding:  11px 14px; font-weight:700; color:#424242; border-bottom:2px solid #e0e0e0; font-size:11px; letter-spacing:.4px;';
+      var td = 'padding:  10px 14px; border-bottom:1px solid #f0f0f0;';
 
-      // === DASHBOARDS EMBEBIDOS (4 charts: 2x2 grid) ===
-      var dashList = [
-        { id: 'chart-global-availability-gauge',  label: 'Disponibilidad Global' },
-        { id: 'chart-top5-critical-stores',        label: 'Top 5 Tiendas Críticas' },
-        { id: 'chart-equipment-models-pie',         label: 'Distribución por Modelo' },
-        { id: 'chart-offline-heatmap',              label: 'Heatmap Días Offline' }
-      ];
-      var dashImgs = dashList.map(function(d){
-        return { label: d.label, src: getChartDataURL(d.id) };
-      }).filter(function(d){ return d.src; });
+      /* === VERSIONES DE ANDROID Y MODELOS ===
+         El aplicativo tiene una pestana entera para esto (OS & Modelos) y
+         el correo no decia ni una palabra, aunque el dato viene en el
+         mismo concentrado: la columna OS. Es ademas de los pocos numeros
+         sobre los que se puede accionar de verdad, porque un equipo por
+         debajo de Android 13 es trabajo planificable, no una incidencia.
 
-      if (dashImgs.length) {
-        html += '<div style="padding:  0 24px; background:#fafafa; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">';
-        html += '<div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:  16px;">';
-        html += '<div style="background:' + slate + '; padding:  12px 16px;">';
-        html += '<span style="color:white; font-size:13px; font-weight: 600;">DASHBOARDS PRINCIPALES</span>';
-        html += '</div>';
-        html += '<div style="padding:  12px;">';
-        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse;">';
-        // Show charts in rows of 2
-        for (var j = 0; j < dashImgs.length; j += 2) {
-          html += '<tr>';
-          for (var k = 0; k < 2; k++) {
-            var idx = j + k;
-            if (idx < dashImgs.length) {
-              html += '<td style="width:50%; vertical-align:top; padding:  8px;">';
-              html += '<div style="font-size:11px; font-weight: 600; margin-bottom:  6px; color:' + oxxoRed + '; letter-spacing:0;">' + escHTML(dashImgs[idx].label) + '</div>';
-              html += '<img src="' + dashImgs[idx].src + '" style="width:100%; max-width:340px; height:auto; border:1px solid #f0f0f0; border-radius:6px;" onerror="this.style.display=\'none\'">';
-              html += '</td>';
-            } else {
-              html += '<td style="width:50%;"></td>';
-            }
-          }
-          html += '</tr>';
+         El criterio de "al dia" es el mismo que usa la pestana: que la
+         version contenga 13. Si manana sube a 14, se cambia aqui y alli;
+         estan a proposito con la misma forma para que se vea el par. */
+      var osCuenta = {}, modeloCuenta = {}, sinOS = 0;
+      Dscope.forEach(function(d){
+        var o = String(d.OS == null ? '' : d.OS).trim();
+        if (!o) { sinOS++; o = 'Sin dato'; }
+        osCuenta[o] = (osCuenta[o] || 0) + 1;
+        var m = String(d.Model == null ? '' : d.Model).trim() || 'Sin dato';
+        modeloCuenta[m] = (modeloCuenta[m] || 0) + 1;
+      });
+      var osLista = Object.keys(osCuenta).map(function(k){ return { v: k, n: osCuenta[k] }; })
+                      .sort(function(a,b){ return b.n - a.n; });
+      var alDia = 0;
+      osLista.forEach(function(x){ if (x.v.indexOf('13') >= 0) alDia += x.n; });
+      var porActualizar = totalEquipos - alDia;
+      var pctAlDia = totalEquipos > 0 ? (alDia / totalEquipos * 100).toFixed(1) : '0';
+
+      if (osLista.length) {
+        html += abrirSeccion;
+        html += cabeceraTarjeta('VERSIONES DE ANDROID — ' + plazaTitulo, slate,
+                                alDia + ' de ' + totalEquipos + ' al día');
+
+        // Lo accionable primero, en una banda, antes que la tabla.
+        var bandaBg = porActualizar === 0 ? '#D4FAEA' : (parseFloat(pctAlDia) >= 60 ? '#FFEDD7' : '#FFEBE7');
+        var bandaInk = porActualizar === 0 ? successInk : (parseFloat(pctAlDia) >= 60 ? warmInk : criticalInk);
+        html += '<div style="background:' + bandaBg + '; padding:  14px 16px; border-bottom:1px solid #e5e7eb;">';
+        html += '<span style="font-size:14px; font-weight:700; color:' + bandaInk + ';">';
+        if (porActualizar === 0) {
+          html += dot(successGreen) + 'Todo el parque está en Android 13';
+        } else {
+          html += dot(bandaInk) + fmt(porActualizar) + ' equipo' + (porActualizar === 1 ? '' : 's') + ' por debajo de Android 13';
         }
-        html += '</table>';
-        html += '</div>'; // padding
-        html += '</div>'; // card
-        html += '</div>'; // section
+        html += '</span>';
+        html += '<span style="font-size:12px; color:' + grayInk + '; margin-left:  10px;">' + pctAlDia + '% al día</span>';
+        if (sinOS) html += '<span style="font-size:12px; color:' + grayInk + '; margin-left:  10px;">· ' + fmt(sinOS) + ' sin dato de versión</span>';
+        html += '</div>';
+
+        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:13px;">';
+        html += '<thead><tr style="background:#f8f9fa;">';
+        html += '<th style="' + thBase + 'text-align:left;">VERSIÓN</th>';
+        html += '<th style="' + thBase + 'text-align:center;">EQUIPOS</th>';
+        html += '<th style="' + thBase + 'text-align:center;">%</th>';
+        html += '<th style="' + thBase + 'text-align:left; width:42%;">PROPORCIÓN</th>';
+        html += '</tr></thead><tbody>';
+        osLista.forEach(function(x, i){
+          var al = x.v.indexOf('13') >= 0;
+          var pct = totalEquipos > 0 ? (x.n / totalEquipos * 100) : 0;
+          var color = al ? successGreen : (x.v === 'Sin dato' ? grayInk : warmYellow);
+          html += '<tr style="' + (i % 2 ? 'background:#fafafa;' : '') + '">';
+          html += '<td style="' + td + 'font-weight:700; color:' + (al ? successInk : slateDark) + ';">'
+                + (al ? dot(successGreen) : '') + 'Android ' + escHTML(x.v) + (al ? ' · al día' : '') + '</td>';
+          html += '<td style="' + td + 'text-align:center; font-weight:600;">' + fmt(x.n) + '</td>';
+          html += '<td style="' + td + 'text-align:center; color:' + grayInk + ';">' + pct.toFixed(1) + '%</td>';
+          /* La barra va como tabla y no como div con ancho en porcentaje:
+             Outlook no respeta el % de un div anidado, pero si el de una
+             celda. Es la forma fea que si se ve en todas partes. */
+          html += '<td style="' + td + '">';
+          html += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%; border-collapse:collapse; background:#eceef1; border-radius:4px;"><tr>';
+          html += '<td style="width:' + Math.max(1, Math.round(pct)) + '%; background:' + color + '; height:10px; line-height:10px; font-size:0; border-radius:4px;">&nbsp;</td>';
+          html += '<td style="font-size:0; line-height:10px;">&nbsp;</td>';
+          html += '</tr></table>';
+          html += '</td></tr>';
+        });
+        html += '</tbody></table>';
+        html += cerrarSeccion;
+      }
+
+      // Modelos del parque: el reverso del dato anterior.
+      var modTodos = Object.keys(modeloCuenta).length;
+      var modLista = Object.keys(modeloCuenta).map(function(k){ return { v: k, n: modeloCuenta[k] }; })
+                       .sort(function(a,b){ return b.n - a.n; }).slice(0, 10);
+      if (modLista.length) {
+        html += abrirSeccion;
+        html += cabeceraTarjeta('MODELOS EN EL PARQUE — ' + plazaTitulo, slate,
+                                modTodos > 10 ? ('10 de ' + modTodos + ' modelos') : (modTodos + ' modelos'));
+        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:13px;">';
+        html += '<thead><tr style="background:#f8f9fa;">';
+        html += '<th style="' + thBase + 'text-align:left;">MODELO</th>';
+        html += '<th style="' + thBase + 'text-align:center;">EQUIPOS</th>';
+        html += '<th style="' + thBase + 'text-align:center;">%</th>';
+        html += '</tr></thead><tbody>';
+        modLista.forEach(function(x, i){
+          var pctm = totalEquipos > 0 ? (x.n / totalEquipos * 100) : 0;
+          html += '<tr style="' + (i % 2 ? 'background:#fafafa;' : '') + '">';
+          html += '<td style="' + td + 'font-weight:600;">' + escHTML(x.v) + '</td>';
+          html += '<td style="' + td + 'text-align:center; font-weight:600;">' + fmt(x.n) + '</td>';
+          html += '<td style="' + td + 'text-align:center; color:' + grayInk + ';">' + pctm.toFixed(1) + '%</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        html += graficaHTML('chart-modelos-equipos', 'Distribución de Top 10 modelos en base de datos', null, 900);
+        html += cerrarSeccion;
       }
 
       // === ESTATUS POR TIPO (Robo / Garantía / Dañada / Apagada) ===
@@ -19120,35 +19402,49 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
         html += '<div style="background:' + criticalRed + '; padding:  12px 16px;">';
         html += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%;"><tr>';
         html += '<td style="color:white; font-size:13px; font-weight: 600;">EQUIPOS APAGADOS SIN NOTIFICACIÓN</td>';
-        html += '<td style="text-align:right;"><span style="color:white; font-size:12px; background:rgba(255,255,255,0.2); padding:  2px 12px; border-radius:12px;">' + criticos.length + ' equipos</span></td>';
+        /* La insignia translucida aclaraba el rojo de debajo y el blanco
+           encima se quedaba en 3.79:1. Se rellena en oscuro en vez de en
+           claro: el mismo efecto de pastilla, y el blanco vuelve a tener
+           contraste de sobra. */
+        html += '<td style="text-align:right;"><span style="color:#ffffff; font-size:12px; background:' + slateDark + '; padding:  3px 12px; border-radius:12px; white-space:nowrap;">' + criticos.length + ' equipos</span></td>';
         html += '</tr></table>';
         html += '</div>';
-        html += '<table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
-        html += '<thead><tr style="background:#f8f9fa;">';
-        html += '<th style="' + tdBase + 'text-align:left; font-weight: 600; border-bottom:2px solid #e0e0e0;">Última Conexión</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight: 600; border-bottom:2px solid #e0e0e0;">Días</th>';
-        html += '<th style="' + tdBase + 'text-align:left; font-weight: 600; border-bottom:2px solid #e0e0e0;">CR</th>';
-        html += '<th style="' + tdBase + 'text-align:left; font-weight: 600; border-bottom:2px solid #e0e0e0;">Tienda</th>';
-        html += '<th style="' + tdBase + 'text-align:left; font-weight: 600; border-bottom:2px solid #e0e0e0;">Asesor</th>';
-        html += '<th style="' + tdBase + 'text-align:center; font-weight: 600; border-bottom:2px solid #e0e0e0;">Equipo</th>';
-        html += '<th style="' + tdBase + 'text-align:left; font-weight: 600; border-bottom:2px solid #e0e0e0;">Comentario</th>';
+        /* Esta tabla es, de largo, la mas pesada del correo: una fila por
+           equipo critico y siete celdas por fila. Antes cada celda
+           repetia su relleno y su borde en un atributo style, unos 420
+           bytes de puro adorno por fila que con 106 equipos son ~45 KB,
+           casi la mitad del tope del mensaje y la razon de que no
+           cupiera una sola grafica.
+
+           El relleno pasa a cellpadding, que es del siglo pasado pero lo
+           respetan todos los clientes, Outlook incluido, y se escribe UNA
+           vez para toda la tabla. El borde por celda se va: el rayado de
+           filas alternas ya separa de sobra. No se pierde ni una fila ni
+           un dato; se pierde la repeticion. */
+        html += '<table cellpadding="9" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:12px;">';
+        html += '<thead><tr style="background:#f8f9fa; text-align:left;">';
+        var encCrit = ['Última Conexión','Días','CR','Tienda','Asesor','Equipo','Comentario'];
+        var centrar = { 1:1, 5:1 };
+        encCrit.forEach(function(h, hi){
+          html += '<th style="font-weight:700; font-size:11px; letter-spacing:.3px; color:#424242; border-bottom:2px solid #e0e0e0;'
+                + (centrar[hi] ? 'text-align:center;' : 'text-align:left;') + '">' + h + '</th>';
+        });
         html += '</tr></thead><tbody>';
         criticos.forEach(function(d, ci) {
-          var rowBg = (ci % 2 === 1) ? 'background:#fafafa;' : '';
           // Severidad visual según días offline
-          var diasColor = d.days_ago >= 15 ? '#B71C1C' : d.days_ago >= 7 ? criticalRed : '#E65100';
-          var diasWeight = d.days_ago >= 15 ? '800' : '600';
-          html += '<tr style="' + rowBg + '">';
-          html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d['Last Seen'] || '—') + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center; color:' + diasColor + '; font-weight:' + diasWeight + ';">' + d.days_ago + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'font-weight:600;">' + escHTML(d.CR || '—') + '</td>';
-          html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.TIENDA || '—') + '</td>';
-          html += '<td style="' + tdBase + tdBorder + '">' + escHTML(d.ASESOR || '—') + '</td>';
-          html += '<td style="' + tdBase + tdBorder + 'text-align:center;">' + escHTML(getEquipmentLabel(d.equipo_type)) + '</td>';
-          html += '<td style="' + tdBase + tdBorder + '">' + escHTML(getComment(d) || '—') + '</td>';
+          var diasColor = d.days_ago >= 15 ? '#A32017' : d.days_ago >= 7 ? criticalInk : warmInk;
+          html += ci % 2 ? '<tr style="background:#fafafa;">' : '<tr>';
+          html += '<td>' + escHTML(d['Last Seen'] || '—') + '</td>';
+          html += '<td align="center" style="color:' + diasColor + '; font-weight:' + (d.days_ago >= 15 ? '800' : '700') + ';">' + d.days_ago + '</td>';
+          html += '<td style="font-weight:600;">' + escHTML(d.CR || '—') + '</td>';
+          html += '<td>' + escHTML(d.TIENDA || '—') + '</td>';
+          html += '<td>' + escHTML(d.ASESOR || '—') + '</td>';
+          html += '<td align="center">' + escHTML(getEquipmentLabel(d.equipo_type)) + '</td>';
+          html += '<td>' + escHTML(getComment(d) || '—') + '</td>';
           html += '</tr>';
         });
         html += '</tbody></table>';
+        html += graficaHTML('chart-top5-tiendas', 'Tiendas con mayor número de equipos críticos', null, 900);
         html += '</div>'; // card
       } else {
         html += '<div style="background:#E8F5E9; border:1px solid #C8E6C9; padding:  16px; border-radius:8px; text-align:center;">';
@@ -19157,16 +19453,59 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       }
       html += '</div>'; // section
 
+      /* Esta seccion va LA ULTIMA, justo antes del pie, y no en medio
+         como estaba. Es por el recorte: si el correo se pasa del tope
+         del cliente, lo que queda escondido tras el "ver mensaje
+         completo" es lo que este mas abajo. Que sean las vistas de
+         apoyo y nunca el listado de equipos apagados, que es el motivo
+         por el que se manda el reporte. */
+      /* === LAS PANTALLAS DEL APLICATIVO ===
+         Esta seccion pedia cuatro graficas que NO EXISTEN en el documento
+         -chart-global-availability-gauge, chart-top5-critical-stores,
+         chart-equipment-models-pie y chart-offline-heatmap-, asi que
+         getChartDataURL devolvia null las cuatro veces, dashImgs quedaba
+         vacio y el bloque entero no se escribia nunca. El correo llevaba
+         meses saliendo sin una sola grafica, y de ahi que se viera corto.
+
+         Estos son los identificadores de verdad, con el mismo titulo que
+         llevan en pantalla, para que quien abra el correo reconozca lo
+         que ya vio en el tablero. */
+      var paneles = [
+        { id: 'chart-responsabilidad',    t: 'Disponibilidad global del parque de equipos' },
+        { id: 'chart-dias-tienda',        t: 'Análisis de rango de días offline por tienda' },
+        { id: 'chart-criticidad-cr',      t: 'CRs con mayor concentración de equipos offline' },
+        { id: 'chart-asesores-llamadas',  t: 'Top 10 asesores por cantidad de equipos' },
+      ];
+      /* chart-top5-tiendas y chart-modelos-equipos NO estan aqui: van
+         pegadas a la tabla que explican, mas abajo. Una grafica al lado
+         de sus numeros se lee; en una parrilla aparte, se hojea. */
+      var panelHTML = '';
+      paneles.forEach(function(p){ panelHTML += graficaHTML(p.id, p.t, null, 900); });
+
+      if (panelHTML) {
+        html += abrirSeccion;
+        html += cabeceraTarjeta('PANORAMA — LAS MISMAS VISTAS DEL APLICATIVO', slate, null);
+        html += '<div style="padding:  4px 0 8px 0;">' + panelHTML + '</div>';
+        html += cerrarSeccion;
+      }
+
       // === FOOTER ===
       html += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%; border-collapse:collapse;">';
       html += '<tr><td style="background:#f0f0f0; padding:  16px 24px; border-radius:0 0 8px 8px; border:1px solid #e5e7eb; border-top:none;">';
       html += '<table cellpadding="0" cellspacing="0" border="0" style="width:100%;">';
       html += '<tr>';
-      html += '<td style="font-size:11px; color:#757575; line-height:1.5;">';
+      html += '<td style="font-size:11px; color:' + grayInk + '; line-height:1.5;">';
       html += 'Generado automáticamente desde el <strong>Dashboard OXXO Movilidad</strong><br>';
-      html += escHTML(fecha) + ' — ' + escHTML(plazaTitulo);
+      html += escHTML(fecha) + ' — ' + escHTML(plazaTitulo) + ' · ' + fmt(totalEquipos) + ' equipos';
+      /* Si alguna vista se quedo fuera por presupuesto, se dice. Un hueco
+         silencioso es peor que una linea de letra pequena. */
+      if (graficasFuera.length) {
+        html += '<br><span style="color:' + grayInk + ';">Algunas vistas no se incluyeron para no exceder el límite del correo; están completas en el aplicativo.</span>';
+      }
       html += '</td>';
-      html += '<td style="text-align:right; font-size:16px; font-weight:800; color:#ccc; letter-spacing:1px;">OXXO</td>';
+      /* El #ccc de antes sobre el #f0f0f0 del pie daba 1.4:1: la palabra
+         estaba, pero practicamente no se veia. */
+      html += '<td style="text-align:right; font-size:16px; font-weight:800; color:' + oxxoRedDark + '; letter-spacing:1px;">OXXO</td>';
       html += '</tr></table>';
       html += '</td></tr></table>';
 
@@ -19207,6 +19546,33 @@ table { width: 100%; border-collapse: collapse; margin-top:   6px; }
       t += '  ─────────────────────────────────────────\n';
       t += '  HH  │ Total: ' + s.hhTotalBD + '  │ Offline: ' + s.hhCritical + '  │ Disp: ' + s.dispHH + '%\n';
       t += '  TT  │ Total: ' + s.ttTotalBD + '  │ Offline: ' + s.ttCritical + '  │ Disp: ' + s.dispTT + '%\n\n';
+
+      /* La version en texto es la que sale por mailto:, que no admite
+         HTML. Llevaba los mismos datos que el cuerpo rico menos este,
+         y no tiene sentido que quien abra el correo en el movil se
+         entere de una cosa distinta. Aqui no hay graficas, pero el
+         numero -que es lo accionable- si cabe. */
+      var osTxt = {}, sinOSTxt = 0;
+      Dscope.forEach(function(d){
+        var o = String(d.OS == null ? '' : d.OS).trim();
+        if (!o) { sinOSTxt++; o = 'Sin dato'; }
+        osTxt[o] = (osTxt[o] || 0) + 1;
+      });
+      var versiones = Object.keys(osTxt).sort(function(a,b){ return osTxt[b] - osTxt[a]; });
+      if (versiones.length) {
+        var alDiaTxt = 0;
+        versiones.forEach(function(v){ if (v.indexOf('13') >= 0) alDiaTxt += osTxt[v]; });
+        t += '  VERSIONES DE ANDROID\n';
+        t += '  ─────────────────────────────────────────\n';
+        versiones.forEach(function(v){
+          var pct = totalEquipos > 0 ? (osTxt[v] / totalEquipos * 100).toFixed(1) : '0';
+          t += '  Android ' + (v + '      ').slice(0, 8) + '│ ' + (('    ' + osTxt[v]).slice(-4)) + ' equipos │ ' + (('     ' + pct).slice(-5)) + '%'
+             + (v.indexOf('13') >= 0 ? '  ✓ al día' : '') + '\n';
+        });
+        t += '  Por actualizar a Android 13: ' + (totalEquipos - alDiaTxt) + ' de ' + totalEquipos + '\n';
+        if (sinOSTxt) t += '  Sin dato de versión: ' + sinOSTxt + '\n';
+        t += '\n';
+      }
 
       if (criticos.length) {
         t += '  EQUIPOS APAGADOS (' + criticos.length + ')\n';
@@ -24442,7 +24808,9 @@ function closeEmailPreview() {
 }
 
 function downloadReportEmail() {
-  var emailHTML = buildEmailHTML();
+  // El fichero no pasa por un servidor de correo: aqui caben todas las
+  // vistas y a la mejor resolucion.
+  var emailHTML = buildEmailHTML({ sinTope: true });
   var blob = new Blob([emailHTML], { type: 'text/html;charset=utf-8' });
   var link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
