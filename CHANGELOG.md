@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.5 — 2026-11-10
+
+- feat(correo): las vistas del aplicativo, Android y el parque de modelos
+
 ## v1.6.4 — 2026-11-08
 
 - feat: el logo va dentro del HTML, que vuelve a bastarse solo

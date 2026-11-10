@@ -1,6 +1,6 @@
 {
   "name": "oxxo-movilidad-api",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "description": "API Backend para Dashboard OXXO Movilidad",
   "main": "server.js",
   "scripts": {
