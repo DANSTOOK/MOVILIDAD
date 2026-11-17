@@ -36,14 +36,31 @@ const actualizar = process.argv.includes('--actualizar');
 const html = readFileSync(INDEX, 'utf8');
 const HEX = /#[0-9A-Fa-f]{6}\b/g;
 
-/* Un bloque <style> es "de tokens" si define la escala. */
-const esDeTokens = (bloque) => /--ink-marca:\s*#/.test(bloque);
+/* Que cuenta como "definicion de token" y que como color suelto.
+ *
+ * Esto se hacia por bloque <style>: si el bloque contenia --ink-marca era
+ * el de la escala y todo lo suyo eran definiciones; si no, todo lo suyo
+ * eran literales. Medir asi estaba mal por los dos lados. Hay tokens
+ * definidos en :root repartidos por otros bloques -70 declaraciones- y
+ * esas se contaban como suciedad, cuando son exactamente donde un
+ * hexadecimal DEBE estar. El numero asustaba de mas y, peor, apuntaba al
+ * sitio equivocado: quien fuera a limpiar empezaria por tocar tokens.
+ *
+ * Ahora se mira declaracion por declaracion. Un hexadecimal es:
+ *   - definicion, si esta en el valor de una propiedad --algo
+ *   - literal, en cualquier otro sitio
+ * No importa en que bloque viva. */
+const esDefinicionDeToken = (linea, hex) =>
+  new RegExp('--[\\w-]+\\s*:\\s*[^;{}]*' + hex.replace('#', '#'), 'i').test(linea);
 
 let enTokens = 0;
 let enCss = 0;
 const sinEstilos = html.replace(/<style[^>]*>[\s\S]*?<\/style>/g, (bloque) => {
-  const n = (bloque.match(HEX) || []).length;
-  if (esDeTokens(bloque)) enTokens += n; else enCss += n;
+  for (const linea of bloque.split('\n')) {
+    for (const hex of linea.match(HEX) || []) {
+      if (esDefinicionDeToken(linea, hex)) enTokens++; else enCss++;
+    }
+  }
   return ''; // se saca para contar el resto aparte
 });
 const enScript = (sinEstilos.match(HEX) || []).length;
